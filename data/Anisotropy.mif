@@ -1,0 +1,288 @@
+# MIF 2.2
+
+set pi [expr 4*atan(1.0)]
+set mu0 [expr 4*$pi*1e-7]
+
+set Msall 1200e3
+set xlimit 70e-9
+set ylimit 70e-9
+set z1 0.7e-9
+set z2 2.1e-9
+set z3 3.5e-9
+set Ktop 900e3
+set Kbot 1500e3
+
+Parameter seed 23446
+eval RandomSeed $seed
+Parameter time_steps 1e-14
+Parameter czas 0.55e-9
+  
+SetOptions {
+basename voltage-spin-diode
+vector_field_output_format {text %.17g}
+}  
+  
+proc Ellipse { x y z } {
+    set xrad [expr 2.*$x - 1. ]
+    set yrad [expr 2.*$y - 1. ]
+    set test [expr $xrad*$xrad+$yrad*$yrad]
+    if {$test>1.0} {return 0}
+    return 1
+}
+
+Specify Oxs_MultiAtlas:atlas {
+   atlas { Oxs_ScriptAtlas:top {
+  xrange {0 70e-9}
+  yrange {0 70e-9}
+  zrange {2.1e-9 3.5e-9}
+    regions { top }
+  script Ellipse
+   }   }
+   atlas { Oxs_ScriptAtlas:spacer {
+  xrange {0 70e-9}
+  yrange {0 70e-9}
+  zrange {0.7e-9 2.1e-9}
+    regions { spacer }
+  script Ellipse
+   }   }
+   atlas { Oxs_ScriptAtlas:bottom {
+  xrange {0 70e-9}
+  yrange {0 70e-9}
+  zrange {0e-9 0.7e-9}
+    regions { bot }
+  script Ellipse
+   }   }
+}
+
+
+
+Specify Oxs_RectangularMesh:mesh {
+  cellsize {2e-9 2e-9 0.7e-9}
+  atlas :atlas
+}
+
+
+# Exchange
+Specify Oxs_Exchange6Ngbr {
+  atlas :atlas
+  default_A 0
+  A {
+    bot bot 13e-12      
+    top top 13e-12
+  }
+}
+
+# Stepped applied field
+
+Specify Oxs_Demag {}
+
+Specify Oxs_LinearScalarField:zheight {
+ vector {0 0 1}
+ norm   1.0
+}
+
+Specify Oxs_MR [subst {
+
+  RA_p 1.47e-10
+  RA_ap 3.9e-10
+ 
+ surface1 {
+         atlas  :atlas
+        region  bot
+   scalarfield  :zheight
+   scalarvalue  $z1
+    scalarside  -
+ }
+ surface2 {
+         atlas  :atlas
+        region  top
+   scalarfield  :zheight
+   scalarvalue  $z2
+    scalarside  +
+ }  
+} ]
+
+
+# Evolver
+# Evolver
+Specify Oxs_RungeKuttaEvolve:evolve {
+ alpha 0.017
+ min_timestep 5e-14
+}
+
+proc Sineroughnesstop { x y z } {
+    set Pi 3.14
+    set maxangle 3.0
+    set lambdax 0.3  
+    set lambday 0.3
+    set angamp [expr $Pi/180*$maxangle]
+    set kx [expr $Pi*2/$lambdax]
+    set ky [expr $Pi*2/$lambday]
+    set Kdevx [expr {sin($angamp*sin($x*$kx))} ]
+    set Kdevy [expr {sin($angamp*sin($y*$ky))} ]
+    set Kdevz 1.0
+    return [list $Kdevx $Kdevy $Kdevz]
+}
+
+Specify Oxs_ScriptVectorField:roughnessztop {
+  script_args rawpt  
+  script {Sineroughnesstop}
+  norm 1
+  atlas :atlas
+}
+
+
+Specify Oxs_TwoSurfaceExchange:FF [subst {
+ sigma 0.0
+ comment {sigma2 -1e-4}
+ surface1 {
+         atlas  :atlas
+        region  bot
+   scalarfield  :zheight
+   scalarvalue  $z1
+    scalarside  -
+ }
+ surface2 {
+         atlas  :atlas
+        region  top
+   scalarfield  :zheight
+   scalarvalue  $z2
+    scalarside  +
+ }
+}]
+
+
+Specify Oxs_UniaxialAnisotropy:stat [subst {
+ K1  { Oxs_AtlasScalarField {
+     atlas :atlas
+     default_value 0
+    values {
+        top 0
+		bot $Kbot
+     }
+ }}
+  axis { Oxs_AtlasVectorField {
+   atlas :atlas
+   default_value { 0 0 1 }
+   values {
+     bot { roughnessztop }
+	 top { roughnessztop }
+    }
+  }
+ }
+}]
+
+Specify Oxs_UniaxialAnisotropy:ip [subst {
+ K1  { Oxs_AtlasScalarField {
+     atlas :atlas
+     default_value 0
+    values {
+        top 7.5e3
+     }
+ }}
+  axis { Oxs_AtlasVectorField {
+   atlas :atlas
+   default_value { 0 0 1 }
+   values {
+	 top { 1 0 0 }
+    }
+  }
+ }
+}]
+
+proc StepDecayField { total_time } {
+
+global czas
+
+ set t $total_time
+ set offset 900e3
+ set start 1e-9
+ set end [expr {$start+$czas}]
+ set pw 10e-12
+ set A [expr {-100e3}]
+ 
+ set t1 [expr {$start-$pw/2}]
+ set t2 [expr {$start+$pw/2}]
+ set t3 [expr {$end-$pw/2}]
+ set t4 [expr {$end+$pw/2}]
+ 
+ set H 0
+ set dH 0
+ 
+ if {$t > $t1} {
+  set H [expr {$A*exp(-($t-$t2)*($t-$t2)/(2*($t2-$t1)*($t2-$t1)/9))} ]
+  set dH [expr {$H*(-2*($t-$t2))/(2*($t2-$t1)*($t2-$t1)/9)} ]
+  }
+ if {$t > $t2} {
+  set H [expr {$A} ]
+  set dH 0
+  }
+ if {$t > $t3} {
+  set H [expr {$A*exp(-($t-$t3)*($t-$t3)/(2*($t3-$t4)*($t3-$t4)/9))} ]
+  set dH [expr {$H*(-2*($t-$t3))/(2*($t3-$t4)*($t3-$t4)/9)} ]
+  }
+ if {$t > $t4} {
+  set H 0
+  set dH 0
+  }
+ set H [expr {$H+$offset}] 
+ return [list $H $dH ] 
+ 
+}  
+
+Specify Oxs_UniaxialAnisotropy:dyn [subst {
+ K1  { Oxs_AtlasScalarField {
+     atlas :atlas
+     default_value 0
+    values {
+        top 1
+		bot 0
+     }
+ }}
+  axis { Oxs_AtlasVectorField {
+   atlas :atlas
+   default_value { 0 0 1 }
+   values {
+     bot { roughnessztop }
+	 top { roughnessztop }
+    }
+  }
+ }
+ 
+ multscript StepDecayField
+multscript_args total_time
+ 
+}]
+
+
+Specify Oxs_UZeeman {
+multiplier 795.77472
+Hrange {
+{ 28.28 0 28.28 28.28 0 28.28 0 }
+}
+}
+
+Specify Oxs_FileVectorField:mag30 {
+file /mnt/gpfs/work/plgrid/groups/plggspinsym/MF/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0200000.omf
+atlas :atlas
+}
+
+Specify Oxs_TimeDriver [subst {
+evolver :evolve 
+mesh :mesh
+ stopping_time 8e-9
+ Ms  { Oxs_AtlasScalarField {
+     atlas :atlas
+     default_value 0
+    values {
+        bot 1000e3
+        top $Msall
+     }
+ }}
+m0 mag30
+}]
+
+
+Destination archive mmArchive
+Schedule DataTable archive step 100
+Schedule Oxs_TimeDriver::Magnetization archive step 100
