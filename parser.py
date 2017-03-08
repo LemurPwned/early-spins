@@ -27,6 +27,13 @@ def extract_base_data(filename):
 
 base_data, count = extract_base_data(filename)
 to_skip=[x for x in range(count)]
-data = pd.read_csv(filename, skiprows=to_skip, index_col=['x','y','z'])
+a=['Whitespace', 'x','y','z']
+data = pd.read_csv(filename, delimiter=' ', skiprows=to_skip)
+data.columns = a
+data.drop('Whitespace', axis=1, inplace=True)
+data.drop([data.shape[0]-2,data.shape[0]-1],axis=0, inplace=True)
+print(list(data))
 print(data.head())
+print(data.tail())
 print(data.shape)
+print(data.describe())
