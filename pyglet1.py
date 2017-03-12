@@ -2,7 +2,7 @@ import pyglet
 from pyglet.gl import *
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
-from parser import *
+from input_parser import *
 import pandas as pd
 
 WINDOW   = 800
@@ -39,8 +39,7 @@ class Window(pyglet.window.Window):
         #arr in format [[x1,x2,x3, y1,y2,y3], [], [], [], []...]
         #TODO create coloring algorithm
         #maybe multithreading?
-        for vec in arr:
-            #print(vec)
+        for vec in arr:             #print(vec)
             #glPointSize(1)
             glBegin(GL_LINES)
             glVertex3f(vec[0],vec[1],vec[2])
