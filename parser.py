@@ -46,9 +46,17 @@ def read_that_badass_file(filename):
             except:
                 pass
         new_cont.append(temp_line)
-    print(new_cont[0])
-    print(len(new_cont))
+    col = ['Total energy', 'Energy calc count', 'Max dm/dt', 'dE/dt',
+        'Delta E', '_MRmagnetoresistance', 'Energy ', 'Max Spin Ang',
+        'Stage Max Spin Ang', 'Run Max Spin Ang', '_DemagEnergy',
+        '_MREnergy', '_TwoSurfaceExchangeFFEnergy',
+        '_UniaxialAnisotropystatEnergy', '_UniaxialAnisotropyipEnergy ',
+        '_UniaxialAnisotropydynEnergy', '_UZeemanEnergy', '_UZeemanB',
+        '_UZeemanBx', '_UZeemanBy', '_UZeemanBz', 'Iteration', 'Stage iteration',
+        'Stage ', 'mx', 'my', 'mz', 'Last time step', 'Simulation time']
 
+    df = pd.DataFrame.from_records(new_cont, columns=col)
+    return df
 
 def form_dataframe(filename, to_skip, cols=['Whitespace', 'x','y','z']):
     data = pd.read_csv(filename, delimiter=' ', skiprows=to_skip)
@@ -72,14 +80,7 @@ data = form_dataframe(filename, to_skip)
 
 relate = vc.Vector(1,0,0)
 color = calculate_color(data, relate)
-#print(color)
 
-read_that_badass_file(filename2)
 
-# test
-#print(list(data))
-#print(data.head())
-#print(data.tail())
-#print(data.shape)
-#print(data.describe())
-#print(data)
+df = read_that_badass_file(filename2)
+print(df.head())
