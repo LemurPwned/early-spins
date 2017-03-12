@@ -2,14 +2,21 @@ import pyglet
 from pyglet.gl import *
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
+from parser import *
+import pandas as pd
 
 WINDOW   = 800
 INCREMENT = 5
 
+filename='./data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
+base_data, count = extract_base_data(filename)
+to_skip=[x for x in range(count)]
+data = form_dataframe(filename, to_skip)
+
 class Window(pyglet.window.Window):
 
     # Cube 3D start rotation
-    xRotation = yRotation = 30  
+    xRotation = yRotation = 30
 
     def __init__(self, width, height, title=''):
         super(Window, self).__init__(width, height, title)
@@ -43,14 +50,30 @@ class Window(pyglet.window.Window):
             glBegin(GL_POINTS)
             glVertex3f(vec[3],vec[4],vec[5])
             glEnd()
-            
 
-    def create_vector(self):
+
+    def create_vector(self, df):
         self.vec = []
+        '''
         for i in range(-30, 30):
             for j in range(-30, 30):
-                self.vec.append([i, j, 0, i, j, 1])        
-    
+                self.vec.append([i, j, 0, i, j, 1])
+                '''
+        iterator = df.shape[0]
+        while iterator>1:
+            row = next(df.iterrows())[1]
+            if iterator%10 == 0:
+                self.vec.append([row[0],row[1],row[2],1,0,iterator])
+            iterator -= 1
+
+    def form_vector_field(self, df):
+        #should worry about the size
+        iterator = df.shape[0]
+        self.field = []
+        while iterator>1:
+            field.append([next(df.iterrows())[1][0],next(df.iterrows())[1][1],next(df.iterrows())[1][2],iterator,0,0])
+
+
     def on_draw(self):
         # Clear the current GL Window
         self.clear()
@@ -62,8 +85,8 @@ class Window(pyglet.window.Window):
         glRotatef(self.yRotation, 0, 1, 0)
 
         # Draw the six sides of the cube
-        
-        
+
+
         #self.draw_vector([[0,0,0,4,0,0],[0,0,0,0,4,0], [0,0,0,0,0,4]])
         self.draw_vector(self.vec)
         '''for i in range(-40,40):
@@ -71,7 +94,7 @@ class Window(pyglet.window.Window):
             for j in range(-40, 40):
                 glVertex3f(i*5,j*5,0)
                 glVertex3f(i*5,j*5,5)'''
-        
+
 
         # Pop Matrix off stack
         glPopMatrix()
@@ -90,7 +113,7 @@ class Window(pyglet.window.Window):
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         glTranslatef(0, 0, -50)
-        self.create_vector()
+        self.create_vector(data)
 
 
     def on_text_motion(self, motion):
@@ -116,7 +139,7 @@ class Window(pyglet.window.Window):
             self.position[1] += dy * 0.005
 
 
-            
+
 if __name__ == '__main__':
     Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
     pyglet.app.run()
