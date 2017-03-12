@@ -1,8 +1,11 @@
 import pandas as pd
 import sys
+import numpy as np
+import vector as vc
+
 
 filename='./data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
-
+filename2='./data/voltage-spin-diode.odt'
 def extract_base_data(filename):
     base_data = {}
     count = 0
@@ -25,15 +28,58 @@ def extract_base_data(filename):
     f.close()
     return base_data, count
 
+def read_that_badass_file(filename):
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+    f.close()
+    lines = [x.strip() for x in lines]
+    print(len(lines))
+    lines = [x.split(' ') for x in lines]
+    new_cont = []
+    lines = lines[5:-1]
+    for line in lines:
+        temp_line = []
+        for el in line:
+            try:
+                new_el = float(el)
+                temp_line.append(new_el)
+            except:
+                pass
+        new_cont.append(temp_line)
+    print(new_cont[0])
+    print(len(new_cont))
+
+
+def form_dataframe(filename, to_skip, cols=['Whitespace', 'x','y','z']):
+    data = pd.read_csv(filename, delimiter=' ', skiprows=to_skip)
+    if cols != None:
+        data.columns = cols
+        data.drop('Whitespace', axis=1, inplace=True)
+        data.drop([data.shape[0]-2,data.shape[0]-1],axis=0, inplace=True)
+        data[['x','y','z']] = data[['x','y','z']].astype(float)
+    return data
+
+def calculate_color(data, relate):
+    norms = pd.Series(data['x']**2+data['y']**2+data['z']**2, dtype=np.float).apply(np.sqrt)
+    dot = pd.Series(data['x']*relate.x+data['y']*relate.y+data['z']*relate.z, dtype=np.float)
+    angle = pd.Series(dot/(relate.norm*norms), dtype=np.float).apply(np.arccos).fillna(np.float(-1))
+    color = pd.Series(angle, dtype=tuple).apply(vc.color_map)
+    return color
+
 base_data, count = extract_base_data(filename)
 to_skip=[x for x in range(count)]
-a=['Whitespace', 'x','y','z']
-data = pd.read_csv(filename, delimiter=' ', skiprows=to_skip)
-data.columns = a
-data.drop('Whitespace', axis=1, inplace=True)
-data.drop([data.shape[0]-2,data.shape[0]-1],axis=0, inplace=True)
-print(list(data))
-print(data.head())
-print(data.tail())
-print(data.shape)
-print(data.describe())
+data = form_dataframe(filename, to_skip)
+
+relate = vc.Vector(1,0,0)
+color = calculate_color(data, relate)
+#print(color)
+
+read_that_badass_file(filename2)
+
+# test
+#print(list(data))
+#print(data.head())
+#print(data.tail())
+#print(data.shape)
+#print(data.describe())
+#print(data)
