@@ -81,6 +81,9 @@ data = form_dataframe(filename, to_skip)
 relate = vc.Vector(1,0,0)
 color = calculate_color(data, relate)
 
+row = next(data.iterrows())[1]
+print(row[2])
+print(data.shape[0])
 
 df = read_that_badass_file(filename2)
-print(df.head())
+#print(df.head())
