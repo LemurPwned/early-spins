@@ -116,7 +116,7 @@ class Window(pyglet.window.Window):
         self.create_vector(data)
 
 
-    def on_text_motion(self, motion):
+    '''def on_text_motion(self, motion):
         if motion == key.UP:
             self.xRotation -= INCREMENT
         if motion == key.DOWN:
@@ -125,10 +125,11 @@ class Window(pyglet.window.Window):
             self.yRotation -= INCREMENT
         if motion == key.RIGHT:
             self.yRotation += INCREMENT
+            '''
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         self.position[2] -= 0.3*scroll_y
-        self.upload_uniforms()
+        #self.upload_uniforms()
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if buttons & mouse.LEFT != 0:
