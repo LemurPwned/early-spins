@@ -8,64 +8,66 @@ INCREMENT = 5
 
 class Window(pyglet.window.Window):
 
-   # Cube 3D start rotation
-   xRotation = yRotation = 30  
+    # Cube 3D start rotation
+    xRotation = yRotation = 30  
 
-   def __init__(self, width, height, title=''):
-       super(Window, self).__init__(width, height, title)
-       glClearColor(0, 0, 0, 1)
-       glEnable(GL_DEPTH_TEST)  
+    def __init__(self, width, height, title=''):
+        super(Window, self).__init__(width, height, title)
+        glClearColor(0, 0, 0, 1)
+        glEnable(GL_DEPTH_TEST)  
 
-   def on_draw(self):
-       # Clear the current GL Window
-       self.clear()
+    def draw_vector(self, x1,y1,z1, x2,y2,z2): pass
 
-       # Push Matrix onto stack
-       glPushMatrix()
+    def on_draw(self):
+        # Clear the current GL Window
+        self.clear()
 
-       glRotatef(self.xRotation, 1, 0, 0)
-       glRotatef(self.yRotation, 0, 1, 0)
+        # Push Matrix onto stack
+        glPushMatrix()
 
-       # Draw the six sides of the cube
-       glBegin(GL_LINES)
-       
-       for i in range(-30,30):
-           glColor3ub(i*2, 150, 100)
-           for j in range(-30, 30):
-               glVertex3f(i*5,j*5,0)
-               glVertex3f(i*5,j*5,5)
-       glEnd()
+        glRotatef(self.xRotation, 1, 0, 0)
+        glRotatef(self.yRotation, 0, 1, 0)
 
-       # Pop Matrix off stack
-       glPopMatrix()
+        # Draw the six sides of the cube
+        glBegin(GL_LINES)
 
-   def on_resize(self, width, height):
-       # set the Viewport
-       glViewport(0, 0, width, height)
+        for i in range(-40,40):
+        glColor3ub(i*2, 150, 100)
+        for j in range(-40, 40):
+        glVertex3f(i*5,j*5,0)
+        glVertex3f(i*5,j*5,5)
+        glEnd()
 
-       # using Projection mode
-       glMatrixMode(GL_PROJECTION)
-       glLoadIdentity()
+        # Pop Matrix off stack
+        glPopMatrix()
 
-       aspectRatio = width / height
-       gluPerspective(85, aspectRatio, 1, 1000)
+    def on_resize(self, width, height):
+        # set the Viewport
+        glViewport(0, 0, width, height)
 
-       glMatrixMode(GL_MODELVIEW)
-       glLoadIdentity()
-       glTranslatef(0, 0, -400)
+        # using Projection mode
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+
+        aspectRatio = width / height
+        gluPerspective(85, aspectRatio, 1, 1000)
+
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+        glTranslatef(0, 0, -400)
 
 
-   def on_text_motion(self, motion):
-       if motion == key.UP:
+    def on_text_motion(self, motion):
+        if motion == key.UP:
             self.xRotation -= INCREMENT
-       elif motion == key.DOWN:
-           self.xRotation += INCREMENT
-       elif motion == key.LEFT:
-           self.yRotation -= INCREMENT
-       elif motion == key.RIGHT:
-           self.yRotation += INCREMENT
+        elif motion == key.DOWN:
+            self.xRotation += INCREMENT
+        elif motion == key.LEFT:
+            self.yRotation -= INCREMENT
+        elif motion == key.RIGHT:
+            self.yRotation += INCREMENT
 
             
 if __name__ == '__main__':
-   Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
-   pyglet.app.run()
+    Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
+    pyglet.app.run()
