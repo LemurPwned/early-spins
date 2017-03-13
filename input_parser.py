@@ -1,7 +1,7 @@
 import pandas as pd
 import sys
 import numpy as np
-import vector as vc
+import tiny_vectors as vc
 
 
 def extract_base_data(filename):
@@ -66,11 +66,30 @@ def form_dataframe(filename, to_skip, cols=['Whitespace', 'x','y','z']):
     return data
 
 def calculate_color(data, relate):
+    '''
+    calculates the color of each vector
+    '''
     norms = pd.Series(data['x']**2+data['y']**2+data['z']**2, dtype=np.float).apply(np.sqrt)
     dot = pd.Series(data['x']*relate.x+data['y']*relate.y+data['z']*relate.z, dtype=np.float)
     angle = pd.Series(dot/(relate.norm*norms), dtype=np.float).apply(np.arccos).fillna(np.float(-1))
     color = pd.Series(angle, dtype=tuple).apply(vc.color_map)
     return color
+
+def node_iterator(base_data, func):
+    for z in range(int(base_data['znodes'])):
+        for y in range(int(base_data['ynodes'])):
+            for x in range(int(base_data['xnodes'])):
+                (x1, y1, z1) = (x, y, z)
+                func(x1,y1,z1)
+
+def layer_splitter(data, base_data):
+    '''
+    splits data into n separate layers with proper indices
+    '''
+    (x,y,z) = (int(base_data['xnodes']),int(base_data['ynodes']),int(base_data['znodes']))
+    thickness = x*y
+    layers = [data.iloc[thickness*i:thickness*i + thickness , :] for i in range(z)]
+    return layers
 
 if __name__=="__main__":
     filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
@@ -78,13 +97,18 @@ if __name__=="__main__":
     base_data, count = extract_base_data(filename)
     to_skip=[x for x in range(count)]
     data = form_dataframe(filename, to_skip)
+    print(base_data)
 
     relate = vc.Vector(1,0,0)
     color = calculate_color(data, relate)
+
+
+    layer_splitter(data, base_data)
 
     row = next(data.iterrows())[1]
     print(row[2])
     print(data.shape[0])
 
     df = read_that_badass_file(filename2)
+    #node_iterator(base_data, print)
     #print(df.head())
