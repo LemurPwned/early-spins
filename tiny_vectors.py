@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 class Vector:
     def __init__(self, x, y, z):
@@ -12,6 +13,15 @@ class Vector:
 
 def dot(v1,v2):
         return v1.x*v2.x+v1.y*v2.y+v1.z*v2.z
+
+def df_color(data, v1, v2, v3):
+    # v1, v2, v3 = base_vectors
+    angle1 = pd.Series(data['x']*v1.x + data['y']*v1.y + data['z']*v1.z, dtype=np.float).apply(np.arccos).fillna(0).apply(color_map)
+    angle2 = pd.Series(data['x']*v2.x + data['y']*v2.y + data['z']*v2.z, dtype=np.float).apply(np.arccos).fillna(0).apply(color_map)
+    angle3 = pd.Series(data['x']*v3.x + data['y']*v3.y + data['z']*v3.z, dtype=np.float).apply(np.arccos).fillna(0).apply(color_map)
+    color = (angle1, angle2, angle3)
+    return color
+
 
 def relative_direction(v1, v2=Vector(1,0,0)):
         return np.arccos(dot(v1,v2)/(v1.norm*v2.norm))
@@ -33,11 +43,6 @@ def color_mapping(angle1, angle2, angle3, scale=1):
         return (r,g,b)
 
 def color_map(angle):
-        # red is (255,0,0); yellow is (255,255,0) will turn yellow->red
-        if angle<0:
-            return 0
-        else:
-            new_map = np.ceil(np.array(angle*255)/np.pi)
-            return new_map
+    return np.ceil(np.array(angle*255)/np.pi)
 
 #test

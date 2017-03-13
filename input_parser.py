@@ -110,5 +110,9 @@ if __name__=="__main__":
     print(data.shape[0])
 
     df = read_that_badass_file(filename2)
+    v1 = vc.Vector(1,0,0)
+    v2 = vc.Vector(0,1,0)
+    v3 = vc.Vector(0,0,1)
+    vc.df_color(data, v1, v2, v3)
     #node_iterator(base_data, print)
     #print(df.head())
