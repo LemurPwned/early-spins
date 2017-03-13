@@ -8,11 +8,6 @@ import pandas as pd
 WINDOW   = 800
 INCREMENT = 5
 
-filename='./data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
-base_data, count = extract_base_data(filename)
-to_skip=[x for x in range(count)]
-data = form_dataframe(filename, to_skip)
-
 class Window(pyglet.window.Window):
 
     # Cube 3D start rotation
@@ -22,6 +17,7 @@ class Window(pyglet.window.Window):
         super(Window, self).__init__(width, height, title)
         glClearColor(0, 0, 0, 1)
         glEnable(GL_DEPTH_TEST)
+        self.initial_transformation()
 
     def upload_uniforms(self):
         uni = self.shader.uniforms
@@ -50,14 +46,8 @@ class Window(pyglet.window.Window):
             glVertex3f(vec[3],vec[4],vec[5])
             glEnd()
 
-
     def create_vector(self, df):
         self.vec = []
-        '''
-        for i in range(-30, 30):
-            for j in range(-30, 30):
-                self.vec.append([i, j, 0, i, j, 1])
-                '''
         iterator = df.shape[0]
         while iterator>1:
             row = next(df.iterrows())[1]
@@ -72,6 +62,15 @@ class Window(pyglet.window.Window):
         while iterator>1:
             field.append([next(df.iterrows())[1][0],next(df.iterrows())[1][1],next(df.iterrows())[1][2],iterator,0,0])
 
+    def initial_transformation(self):
+        self.rotation = [0,0,0] #xyz degrees in xyz axis
+        self.position = [0,0,-50] #xyz
+
+    def transformate(self): #applies rotation and transformation
+        glRotatef(self.rotation[0], 0, 1, 0)#weird
+        glRotatef(self.rotation[1], 1, 0, 0)#weird
+        glRotatef(self.rotation[2], 0, 0, 1)
+        glTranslatef(self.position[0], self.position[1], self.position[2])
 
     def on_draw(self):
         # Clear the current GL Window
@@ -80,20 +79,9 @@ class Window(pyglet.window.Window):
         # Push Matrix onto stack
         glPushMatrix()
 
-        glRotatef(self.xRotation, 1, 0, 0)
-        glRotatef(self.yRotation, 0, 1, 0)
+        self.transformate()
 
-        # Draw the six sides of the cube
-
-
-        #self.draw_vector([[0,0,0,4,0,0],[0,0,0,0,4,0], [0,0,0,0,0,4]])
         self.draw_vector(self.vec)
-        '''for i in range(-40,40):
-            glColor3ub(i*2, 150, 100)
-            for j in range(-40, 40):
-                glVertex3f(i*5,j*5,0)
-                glVertex3f(i*5,j*5,5)'''
-
 
         # Pop Matrix off stack
         glPopMatrix()
@@ -114,32 +102,25 @@ class Window(pyglet.window.Window):
         glTranslatef(0, 0, -50)
         self.create_vector(data)
 
-
-    '''def on_text_motion(self, motion):
-        if motion == key.UP:
-            self.xRotation -= INCREMENT
-        if motion == key.DOWN:
-            self.xRotation += INCREMENT
-        if motion == key.LEFT:
-            self.yRotation -= INCREMENT
-        if motion == key.RIGHT:
-            self.yRotation += INCREMENT
-            '''
-
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        self.position[2] -= 0.3*scroll_y
-        #self.upload_uniforms()
+        self.position[2] += 0.8*scroll_y
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if buttons & mouse.LEFT != 0:
-            self.xRotation -= dy * 0.3
-            self.yRotation += dx * 0.3
+            self.rotation[0] += dx * 0.06
+            self.rotation[1] -= dy * 0.06
         elif buttons & mouse.RIGHT != 0:
-            self.position[0] += dx * 0.005
-            self.position[1] += dy * 0.005
+            self.position[0] += dx * 0.1
+            self.position[1] += dy * 0.1
+
 
 
 
 if __name__ == '__main__':
+    filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
+    base_data, count = extract_base_data(filename)
+    to_skip = [x for x in range(count)]
+    data = form_dataframe(filename, to_skip)
+
     Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
     pyglet.app.run()
