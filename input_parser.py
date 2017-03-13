@@ -77,7 +77,7 @@ def calculate_color(data, relate):
 base_data, count = extract_base_data(filename)
 to_skip=[x for x in range(count)]
 data = form_dataframe(filename, to_skip)
-
+print(base_data)
 relate = vc.Vector(1,0,0)
 color = calculate_color(data, relate)
 
