@@ -2,7 +2,8 @@ import pandas as pd
 import sys
 import numpy as np
 import tiny_vectors as vc
-
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def extract_base_data(filename):
     base_data = {}
@@ -91,13 +92,19 @@ def layer_splitter(data, base_data):
     layers = [data.iloc[thickness*i:thickness*i + thickness , :] for i in range(z)]
     return layers
 
+def plotters(data):
+    cmap = sns.cubehelix_palette(as_cmap=True, dark=0, light=1, reverse=True)
+    #sns.kdeplot(data['Total energy'], cut=0, bw=0.2);
+    sns.jointplot(data['mx'],data['Total energy'],kind="kde")
+    plt.show()
+
 if __name__=="__main__":
     filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
     filename2 = './data/voltage-spin-diode.odt'
     base_data, count = extract_base_data(filename)
     to_skip=[x for x in range(count)]
     data = form_dataframe(filename, to_skip)
-    print(base_data)
+    #print(base_data)
 
     relate = vc.Vector(1,0,0)
     color = calculate_color(data, relate)
@@ -106,10 +113,13 @@ if __name__=="__main__":
     layer_splitter(data, base_data)
 
     row = next(data.iterrows())[1]
-    print(row[2])
-    print(data.shape[0])
+    #print(row[2])
+    #print(data.shape[0])
 
     df = read_that_badass_file(filename2)
+    #print(df.columns.values.tolist(), df.shape)
+    print(df['Iteration'].head())
+    plotters(df)
     v1 = vc.Vector(1,0,0)
     v2 = vc.Vector(0,1,0)
     v3 = vc.Vector(0,0,1)
