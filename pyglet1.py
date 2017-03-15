@@ -34,19 +34,7 @@ class Window(pyglet.window.Window):
     def draw_vector(self, vec, color=[1,1,1]):
         #arr in format [[x1,x2,x3, y1,y2,y3], [], [], [], []...]
         #TODO create coloring algorithm
-        #maybe multithreading?
-        '''
-        x_max_nodes = base_data['xnodes']
-        y_max_nodes = base_data['ynodes']
-        z_max_nodes = base_data['znodes']
-
-        xbase = base_data['xbase']
-        ybase = base_data['ybase']
-        zbase = base_data['zbase']
-
-               '''
-
-        #for vec in arr:             
+        #maybe multithreading?          
             
         glColor3f(color[0], color[1], color[2])
         glBegin(GL_LINES)
@@ -57,12 +45,6 @@ class Window(pyglet.window.Window):
         glBegin(GL_POINTS)
         glVertex3f(vec[3],vec[4],vec[5])
         glEnd()
-
-        '''
-        x = 0
-        colorTab = [[1,0,0], [0,1,0], [0,0,1]]
-        for vec in arr[-3:]:
-                   '''
 
     def draw_cordinate_system(self, size = 5):
         self.draw_vector([0,0,0,size,0,0], [1,0,0])
@@ -89,12 +71,13 @@ class Window(pyglet.window.Window):
                 xpos=0
 
             xpos+=1
-
-            self.vec.append([xpos*float(base_data['xbase']*1e9)
-, ypos*float(base_data['ybase']*1e9)
-, zpos*float(base_data['zbase']*1e9)
-, row[0], row[1], row[2]])
-            iterator -= 1	
+            xtemp = xpos*float(base_data['xbase'])*1e9
+            ytemp = ypos*float(base_data['ybase'])*1e9
+            ztemp = zpos*float(base_data['zbase'])*1e9
+            self.vec.append([xtemp, ytemp, ztemp, xtemp+row[0], ytemp+row[1], ztemp+row[2]])
+            print(row)    
+            iterator -= 1
+        
        
     def form_vector_field(self, df):
         #should worry about the size
@@ -125,9 +108,9 @@ class Window(pyglet.window.Window):
         x=0
 
         for vector in self.vec:
-            if x%10==0:
-                self.draw_vector(vector)
-            x+=1
+            #if x%10==0:
+            self.draw_vector(vector)
+            #x+=1
         #print(self.vec[0:5])
         #exit()
         #self.draw_vector(self.vec)
