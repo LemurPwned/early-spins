@@ -31,30 +31,71 @@ class Window(pyglet.window.Window):
         width, height = self.get_size()
         uni.proj = perspective(60.0, width/height, 0.1, 256.0)
 
-    def draw_vector(self, arr):
+    def draw_vector(self, vec, color=[1,1,1]):
         #arr in format [[x1,x2,x3, y1,y2,y3], [], [], [], []...]
         #TODO create coloring algorithm
         #maybe multithreading?
-        for vec in arr:             #print(vec)
-            #glPointSize(1)
-            glBegin(GL_LINES)
-            glVertex3f(vec[0],vec[1],vec[2])
-            glVertex3f(vec[3],vec[4],vec[5])
-            glEnd()
-            glPointSize(3)
-            glBegin(GL_POINTS)
-            glVertex3f(vec[3],vec[4],vec[5])
-            glEnd()
+        '''
+        x_max_nodes = base_data['xnodes']
+        y_max_nodes = base_data['ynodes']
+        z_max_nodes = base_data['znodes']
+
+        xbase = base_data['xbase']
+        ybase = base_data['ybase']
+        zbase = base_data['zbase']
+
+               '''
+
+        #for vec in arr:             
+            
+        glColor3f(color[0], color[1], color[2])
+        glBegin(GL_LINES)
+        glVertex3f(vec[0],vec[1],vec[2])
+        glVertex3f(vec[3],vec[4],vec[5])
+        glEnd()
+        glPointSize(3)
+        glBegin(GL_POINTS)
+        glVertex3f(vec[3],vec[4],vec[5])
+        glEnd()
+
+        '''
+        x = 0
+        colorTab = [[1,0,0], [0,1,0], [0,0,1]]
+        for vec in arr[-3:]:
+                   '''
+
+    def draw_cordinate_system(self, size = 5):
+        self.draw_vector([0,0,0,size,0,0], [1,0,0])
+        self.draw_vector([0,0,0,0,size,0], [0,1,0])
+        self.draw_vector([0,0,0,0,0,size], [0,0,1])
 
     def create_vector(self, df):
         self.vec = []
         iterator = df.shape[0]
+
+        xpos = 0
+        ypos = 0
+        zpos = 0
+
         while iterator>1:
             row = next(df.iterrows())[1]
-            if iterator%10 == 0:
-                self.vec.append([row[0],row[1],row[2],1,0,iterator])
-            iterator -= 1
+            #if iterator%10 == 0:
+            if xpos>=int(base_data['xnodes']):
+                ypos+=1
+                xpos=0
+            if ypos>=int(base_data['ynodes']):
+                zpos+=1
+                ypos=0
+                xpos=0
 
+            xpos+=1
+
+            self.vec.append([xpos*float(base_data['xbase']*1e9)
+, ypos*float(base_data['ybase']*1e9)
+, zpos*float(base_data['zbase']*1e9)
+, row[0], row[1], row[2]])
+            iterator -= 1	
+       
     def form_vector_field(self, df):
         #should worry about the size
         iterator = df.shape[0]
@@ -80,8 +121,16 @@ class Window(pyglet.window.Window):
         glPushMatrix()
 
         self.transformate()
+        self.draw_cordinate_system()
+        x=0
 
-        self.draw_vector(self.vec)
+        for vector in self.vec:
+            if x%10==0:
+                self.draw_vector(vector)
+            x+=1
+        #print(self.vec[0:5])
+        #exit()
+        #self.draw_vector(self.vec)
 
         # Pop Matrix off stack
         glPopMatrix()
@@ -99,7 +148,7 @@ class Window(pyglet.window.Window):
 
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-        glTranslatef(0, 0, -50)
+        glTranslatef(0, 0, 0)
         self.create_vector(data)
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
