@@ -108,18 +108,21 @@ if __name__=="__main__":
 
     relate = vc.Vector(1,0,0)
     color = calculate_color(data, relate)
+    #print(base_data)
+
+    #layer_splitter(data, base_data)
+    #print(data.head())
+    for index, row in data.iterrows():
+        print(row)
 
 
-    layer_splitter(data, base_data)
-
-    row = next(data.iterrows())[1]
-    #print(row[2])
+    #print(data.columns.values.tolist())
     #print(data.shape[0])
 
     df = read_that_badass_file(filename2)
     #print(df.columns.values.tolist(), df.shape)
-    print(df['Iteration'].head())
-    plotters(df)
+    #print(df['Iteration'].head())
+    #plotters(df)
     v1 = vc.Vector(1,0,0)
     v2 = vc.Vector(0,1,0)
     v3 = vc.Vector(0,0,1)
