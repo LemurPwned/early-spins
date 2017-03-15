@@ -34,8 +34,8 @@ class Window(pyglet.window.Window):
     def draw_vector(self, vec, color=[1,1,1]):
         #arr in format [[x1,x2,x3, y1,y2,y3], [], [], [], []...]
         #TODO create coloring algorithm
-        #maybe multithreading?          
-            
+        #maybe multithreading?
+
         glColor3f(color[0], color[1], color[2])
         glBegin(GL_LINES)
         glVertex3f(vec[0],vec[1],vec[2])
@@ -53,14 +53,11 @@ class Window(pyglet.window.Window):
 
     def create_vector(self, df):
         self.vec = []
-        iterator = df.shape[0]
-
         xpos = 0
         ypos = 0
         zpos = 0
 
-        while iterator>1:
-            row = next(df.iterrows())[1]
+        for index, row in df.iterrows():
             #if iterator%10 == 0:
             if xpos>=int(base_data['xnodes']):
                 ypos+=1
@@ -75,10 +72,10 @@ class Window(pyglet.window.Window):
             ytemp = ypos*float(base_data['ybase'])*1e9
             ztemp = zpos*float(base_data['zbase'])*1e9
             self.vec.append([xtemp, ytemp, ztemp, xtemp+row[0], ytemp+row[1], ztemp+row[2]])
-            print(row)    
-            iterator -= 1
-        
-       
+            #print(row)
+
+
+
     def form_vector_field(self, df):
         #should worry about the size
         iterator = df.shape[0]
