@@ -59,9 +59,13 @@ class Window(pyglet.window.Window):
         zpos = 0
         skip = 0
         count = 0
+        b1 = vc.Vector(1,0,0)
+        b2 = vc.Vector(0,1,0)
+        b3 = vc.Vector(0,0,1)
+
         for index, row in df.iterrows():
             #if iterator%10 == 0:
-            if skip%10 == 0:
+            if skip%3 == 0:
                 if xpos>=int(base_data['xnodes']):
                     ypos+=1
                     xpos=0
@@ -74,21 +78,17 @@ class Window(pyglet.window.Window):
                 xtemp = xpos*float(base_data['xbase'])*1e9
                 ytemp = ypos*float(base_data['ybase'])*1e9
                 ztemp = zpos*float(base_data['zbase'])*1e9
-                self.vec.append([xtemp, ytemp, ztemp, xtemp+row[0], ytemp+row[1], ztemp+row[2]])
-                b1 = vc.Vector(1,0,0)
-                b2 = vc.Vector(0,1,0)
-                b3 = vc.Vector(0,0,1)
                 c = vc.Vector(row[0],row[1],row[2])
-                if row[0] == 0.0 and row[1] == 0.0 and row[2] == 0.0:
-                    count+=1
-                    continue
                 if c.isZero != 1:
-                    #print(c.x, c.y, c.z)
+                    self.vec.append([xtemp, ytemp, ztemp, xtemp+row[0]/c.norm,
+                                        ytemp+row[1]/c.norm, ztemp+row[2]/c.norm])
+
+                    c = vc.Vector(row[0],row[1],row[2])
                     colors.append((vc.color_map(vc.relative_direction(c, b1))/255,
-                                        vc.color_map(vc.relative_direction(c, b2))/255,
-                                        vc.color_map(vc.relative_direction(c, b3))/255))
+                                    vc.color_map(vc.relative_direction(c, b2))/255,
+                                    vc.color_map(vc.relative_direction(c, b3))/255))
                 else:
-                    colors.append((255,255,255))
+                    continue
             skip += 1
         print(count)
 
@@ -115,13 +115,7 @@ class Window(pyglet.window.Window):
         x=0
 
         for vector, color in zip(self.vec, colors):
-            #if x%10==0:
             self.draw_vector(vector, color=list(color))
-            #x+=1
-        #print(self.vec[0:5])
-        #exit()
-        #self.draw_vector(self.vec)
-
         # Pop Matrix off stack
         glPopMatrix()
 
