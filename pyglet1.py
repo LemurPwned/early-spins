@@ -32,7 +32,7 @@ class Window(pyglet.window.Window):
         width, height = self.get_size()
         uni.proj = perspective(60.0, width/height, 0.1, 256.0)
 
-    def draw_vector(self, vec, color=[1,1,1]):
+    def draw_vector(self, vec, color=(1,1,1)):
         #arr in format [[x1,x2,x3, y1,y2,y3], [], [], [], []...]
         #TODO create coloring algorithm
         #maybe multithreading?
@@ -62,19 +62,19 @@ class Window(pyglet.window.Window):
         b1 = vc.Vector(1,0,0)
         b2 = vc.Vector(0,1,0)
         b3 = vc.Vector(0,0,1)
-
+        step = 2
         for index, row in df.iterrows():
             #if iterator%10 == 0:
-            if skip%3 == 0:
+            if skip%step == 0:
                 if xpos>=int(base_data['xnodes']):
-                    ypos+=1
+                    ypos+=1+(xpos%int(base_data['xnodes']))
                     xpos=0
                 if ypos>=int(base_data['ynodes']):
-                    zpos+=1
+                    zpos+=1+(ypos%int(base_data['ynodes']))
                     ypos=0
                     xpos=0
 
-                xpos+=1
+                xpos+=1+step
                 xtemp = xpos*float(base_data['xbase'])*1e9
                 ytemp = ypos*float(base_data['ybase'])*1e9
                 ztemp = zpos*float(base_data['zbase'])*1e9
@@ -84,6 +84,8 @@ class Window(pyglet.window.Window):
                                         ytemp+row[1]/c.norm, ztemp+row[2]/c.norm])
 
                     c = vc.Vector(row[0],row[1],row[2])
+                    max_row = max(row)
+                    #colors.append((abs(row[0]/max_row), abs(row[1]/max_row), abs(row[2]/max_row)))
                     colors.append((vc.color_map(vc.relative_direction(c, b1))/255,
                                     vc.color_map(vc.relative_direction(c, b2))/255,
                                     vc.color_map(vc.relative_direction(c, b3))/255))
@@ -115,7 +117,7 @@ class Window(pyglet.window.Window):
         x=0
 
         for vector, color in zip(self.vec, colors):
-            self.draw_vector(vector, color=list(color))
+            self.draw_vector(vector, color=color)
         # Pop Matrix off stack
         glPopMatrix()
 
