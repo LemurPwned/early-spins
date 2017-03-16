@@ -4,10 +4,11 @@ from pyglet.window import key, mouse
 from OpenGL.GLUT import *
 from input_parser import *
 import pandas as pd
+import tiny_vectors as vc
 
 WINDOW   = 800
 INCREMENT = 5
-
+colors = []
 class Window(pyglet.window.Window):
 
     # Cube 3D start rotation
@@ -56,32 +57,41 @@ class Window(pyglet.window.Window):
         xpos = 0
         ypos = 0
         zpos = 0
-
+        skip = 0
+        count = 0
         for index, row in df.iterrows():
             #if iterator%10 == 0:
-            if xpos>=int(base_data['xnodes']):
-                ypos+=1
-                xpos=0
-            if ypos>=int(base_data['ynodes']):
-                zpos+=1
-                ypos=0
-                xpos=0
+            if skip%10 == 0:
+                if xpos>=int(base_data['xnodes']):
+                    ypos+=1
+                    xpos=0
+                if ypos>=int(base_data['ynodes']):
+                    zpos+=1
+                    ypos=0
+                    xpos=0
 
-            xpos+=1
-            xtemp = xpos*float(base_data['xbase'])*1e9
-            ytemp = ypos*float(base_data['ybase'])*1e9
-            ztemp = zpos*float(base_data['zbase'])*1e9
-            self.vec.append([xtemp, ytemp, ztemp, xtemp+row[0], ytemp+row[1], ztemp+row[2]])
-            #print(row)
+                xpos+=1
+                xtemp = xpos*float(base_data['xbase'])*1e9
+                ytemp = ypos*float(base_data['ybase'])*1e9
+                ztemp = zpos*float(base_data['zbase'])*1e9
+                self.vec.append([xtemp, ytemp, ztemp, xtemp+row[0], ytemp+row[1], ztemp+row[2]])
+                b1 = vc.Vector(1,0,0)
+                b2 = vc.Vector(0,1,0)
+                b3 = vc.Vector(0,0,1)
+                c = vc.Vector(row[0],row[1],row[2])
+                if row[0] == 0.0 and row[1] == 0.0 and row[2] == 0.0:
+                    count+=1
+                    continue
+                if c.isZero != 1:
+                    #print(c.x, c.y, c.z)
+                    colors.append((vc.color_map(vc.relative_direction(c, b1))/255,
+                                        vc.color_map(vc.relative_direction(c, b2))/255,
+                                        vc.color_map(vc.relative_direction(c, b3))/255))
+                else:
+                    colors.append((255,255,255))
+            skip += 1
+        print(count)
 
-
-
-    def form_vector_field(self, df):
-        #should worry about the size
-        iterator = df.shape[0]
-        self.field = []
-        while iterator>1:
-            field.append([next(df.iterrows())[1][0],next(df.iterrows())[1][1],next(df.iterrows())[1][2],iterator,0,0])
 
     def initial_transformation(self):
         self.rotation = [0,0,0] #xyz degrees in xyz axis
@@ -104,9 +114,9 @@ class Window(pyglet.window.Window):
         self.draw_cordinate_system()
         x=0
 
-        for vector in self.vec:
+        for vector, color in zip(self.vec, colors):
             #if x%10==0:
-            self.draw_vector(vector)
+            self.draw_vector(vector, color=list(color))
             #x+=1
         #print(self.vec[0:5])
         #exit()
