@@ -8,41 +8,48 @@ class Vector:
         self.z = z
         self.norm = np.sqrt(self.x**2 + self.y**2 + self.z**2)
 
-    def set_color(self, color):
-        self.color = color
+    def __str__(self):
+        return "{}, {}, {}".format(self.x, self.y, self.z)
+
 
 def dot(v1,v2):
         return v1.x*v2.x+v1.y*v2.y+v1.z*v2.z
 
-def df_color(data, v1, v2, v3):
-    # v1, v2, v3 = base_vectors
-    angle1 = pd.Series(data['x']*v1.x + data['y']*v1.y + data['z']*v1.z, dtype=np.float).apply(np.arccos).fillna(0).apply(color_map)
-    angle2 = pd.Series(data['x']*v2.x + data['y']*v2.y + data['z']*v2.z, dtype=np.float).apply(np.arccos).fillna(0).apply(color_map)
-    angle3 = pd.Series(data['x']*v3.x + data['y']*v3.y + data['z']*v3.z, dtype=np.float).apply(np.arccos).fillna(0).apply(color_map)
-    color = (angle1, angle2, angle3)
-    return color
-
-
 def relative_direction(v1, v2=Vector(1,0,0)):
         return np.arccos(dot(v1,v2)/(v1.norm*v2.norm))
-
-def color_mapping(angle1, angle2, angle3, scale=1):
-        #r - v1, g - v2, b - v3
-        if angle1 > 0:
-            r = np.ceil(np.array(angle1*255/scale)/np.pi)
-        else:
-            r = 0
-        if angle2 > 0:
-            g = np.ceil(np.array(angle2*255/scale)/np.pi)
-        else:
-            g = 0
-        if angle3 > 0:
-            b = np.ceil(np.array(angle3*255/scale)/np.pi)
-        else:
-            b = 0
-        return (r,g,b)
 
 def color_map(angle):
     return np.ceil(np.array(angle*255)/np.pi)
 
+def rescale(value, max_val, max_rescaled):
+    return (value*max_rescaled)/max_val
+
+
 #test
+def color_test():
+    v1 = Vector(1,0,0)
+    v2 = [Vector(np.random.randint(0,30),np.random.randint(0,30),np.random.randint(0,30)) for z in range(0,300)]
+    dot1 = []
+    dot2 = []
+    k = 7
+    max_vals = []
+    for vec in v2:
+        max_vals.append(color_map(relative_direction(v1,vec)**k))
+    max_val = np.max(max_vals)
+    print(np.max(max_vals))
+    print(max_val)
+    for vec in v2:
+        d1 = color_map(relative_direction(v1,vec))
+        d2 = color_map(rescale(relative_direction(v1,vec)**k,max_val,255))
+        print("Standard dot {} ".format(d1))
+        print("Sensitive dot {} ".format(d2))
+        print("\n")
+        dot1.append(d1)
+        dot2.append(d2)
+    print("PARAMETERS \n")
+    print(np.max(dot1), np.max(dot2))
+    print(np.min(dot1), np.min(dot2))
+    print(np.median(dot1), np.mean(dot1), np.std(dot1))
+    print(np.median(dot2), np.mean(dot2), np.std(dot2))
+
+#color_test()

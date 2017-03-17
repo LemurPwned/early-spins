@@ -62,7 +62,11 @@ class Window(pyglet.window.Window):
         b1 = vc.Vector(1,0,0)
         b2 = vc.Vector(0,1,0)
         b3 = vc.Vector(0,0,1)
-        step = 2
+        step = 1
+        xk = 2
+        yk = 3
+        zk = 3
+        angles = []
         for index, row in df.iterrows():
             #if iterator%10 == 0:
             if skip%step == 0:
@@ -74,26 +78,38 @@ class Window(pyglet.window.Window):
                     ypos=0
                     xpos=0
 
-                xpos+=1+step
+                xpos+=1*step
                 xtemp = xpos*float(base_data['xbase'])*1e9
                 ytemp = ypos*float(base_data['ybase'])*1e9
                 ztemp = zpos*float(base_data['zbase'])*1e9
                 c = vc.Vector(row[0],row[1],row[2])
-                if c.isZero != 1:
+
+                if np.abs(row[0]+row[1]+row[2]) > 0:
                     self.vec.append([xtemp, ytemp, ztemp, xtemp+row[0]/c.norm,
                                         ytemp+row[1]/c.norm, ztemp+row[2]/c.norm])
-
-                    c = vc.Vector(row[0],row[1],row[2])
-                    max_row = max(row)
-                    #colors.append((abs(row[0]/max_row), abs(row[1]/max_row), abs(row[2]/max_row)))
-                    colors.append((vc.color_map(vc.relative_direction(c, b1))/255,
-                                    vc.color_map(vc.relative_direction(c, b2))/255,
-                                    vc.color_map(vc.relative_direction(c, b3))/255))
+                    angles.append((vc.relative_direction(c, b1)**(2*xk + 1),
+                                    vc.relative_direction(c, b2)**(2*yk + 1),
+                                    vc.relative_direction(c, b3)**(2*zk + 1)))
                 else:
                     continue
             skip += 1
         print(count)
+        xmax = 0
+        ymax = 0
+        zmax = 0
+        for angle in angles:
+            if xmax < np.abs(angle[0]):
+                xmax = np.abs(angle[0])
+            if ymax < np.abs(angle[1]):
+                ymax = np.abs(angle[1])
+            if zmax < np.abs(angle[2]):
+                zmax = np.abs(angle[2])
 
+        for angle in angles:
+            colors.append((vc.rescale((angle[0]/xmax),xmax,255)*(10**(xk-1))/255,
+                            vc.rescale((angle[1]/ymax),ymax,255)*(10**(yk-1))/255,
+                            vc.rescale((angle[2]/zmax),zmax,255)*(10**(zk-1))/255))
+        #print(colors)
 
     def initial_transformation(self):
         self.rotation = [0,0,0] #xyz degrees in xyz axis
@@ -147,9 +163,6 @@ class Window(pyglet.window.Window):
         elif buttons & mouse.RIGHT != 0:
             self.position[0] += dx * 0.1
             self.position[1] += dy * 0.1
-
-
-
 
 if __name__ == '__main__':
     filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
