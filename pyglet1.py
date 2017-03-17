@@ -4,10 +4,11 @@ from pyglet.window import key, mouse
 from OpenGL.GLUT import *
 from input_parser import *
 import pandas as pd
+import tiny_vectors as vc
 
 WINDOW   = 800
 INCREMENT = 5
-
+colors = []
 class Window(pyglet.window.Window):
 
     # Cube 3D start rotation
@@ -31,7 +32,7 @@ class Window(pyglet.window.Window):
         width, height = self.get_size()
         uni.proj = perspective(60.0, width/height, 0.1, 256.0)
 
-    def draw_vector(self, vec, color=[1,1,1]):
+    def draw_vector(self, vec, color=(1,1,1)):
         #arr in format [[x1,x2,x3, y1,y2,y3], [], [], [], []...]
         #TODO create coloring algorithm
         #maybe multithreading?
@@ -56,32 +57,59 @@ class Window(pyglet.window.Window):
         xpos = 0
         ypos = 0
         zpos = 0
-
+        skip = 0
+        count = 0
+        b1 = vc.Vector(1,0,0)
+        b2 = vc.Vector(0,1,0)
+        b3 = vc.Vector(0,0,1)
+        step = 1
+        xk = 2
+        yk = 3
+        zk = 3
+        angles = []
         for index, row in df.iterrows():
             #if iterator%10 == 0:
-            if xpos>=int(base_data['xnodes']):
-                ypos+=1
-                xpos=0
-            if ypos>=int(base_data['ynodes']):
-                zpos+=1
-                ypos=0
-                xpos=0
+            if skip%step == 0:
+                if xpos>=int(base_data['xnodes']):
+                    ypos+=1+(xpos%int(base_data['xnodes']))
+                    xpos=0
+                if ypos>=int(base_data['ynodes']):
+                    zpos+=1+(ypos%int(base_data['ynodes']))
+                    ypos=0
+                    xpos=0
 
-            xpos+=1
-            xtemp = xpos*float(base_data['xbase'])*1e9
-            ytemp = ypos*float(base_data['ybase'])*1e9
-            ztemp = zpos*float(base_data['zbase'])*1e9
-            self.vec.append([xtemp, ytemp, ztemp, xtemp+row[0], ytemp+row[1], ztemp+row[2]])
-            #print(row)
+                xpos+=1*step
+                xtemp = xpos*float(base_data['xbase'])*1e9
+                ytemp = ypos*float(base_data['ybase'])*1e9
+                ztemp = zpos*float(base_data['zbase'])*1e9
+                c = vc.Vector(row[0],row[1],row[2])
 
+                if np.abs(row[0]+row[1]+row[2]) > 0:
+                    self.vec.append([xtemp, ytemp, ztemp, xtemp+row[0]/c.norm,
+                                        ytemp+row[1]/c.norm, ztemp+row[2]/c.norm])
+                    angles.append((vc.relative_direction(c, b1)**(2*xk + 1),
+                                    vc.relative_direction(c, b2)**(2*yk + 1),
+                                    vc.relative_direction(c, b3)**(2*zk + 1)))
+                else:
+                    continue
+            skip += 1
+        print(count)
+        xmax = 0
+        ymax = 0
+        zmax = 0
+        for angle in angles:
+            if xmax < np.abs(angle[0]):
+                xmax = np.abs(angle[0])
+            if ymax < np.abs(angle[1]):
+                ymax = np.abs(angle[1])
+            if zmax < np.abs(angle[2]):
+                zmax = np.abs(angle[2])
 
-
-    def form_vector_field(self, df):
-        #should worry about the size
-        iterator = df.shape[0]
-        self.field = []
-        while iterator>1:
-            field.append([next(df.iterrows())[1][0],next(df.iterrows())[1][1],next(df.iterrows())[1][2],iterator,0,0])
+        for angle in angles:
+            colors.append((vc.rescale((angle[0]/xmax),xmax,255)*(10**(xk-1))/255,
+                            vc.rescale((angle[1]/ymax),ymax,255)*(10**(yk-1))/255,
+                            vc.rescale((angle[2]/zmax),zmax,255)*(10**(zk-1))/255))
+        #print(colors)
 
     def initial_transformation(self):
         self.rotation = [0,0,0] #xyz degrees in xyz axis
@@ -104,14 +132,8 @@ class Window(pyglet.window.Window):
         self.draw_cordinate_system()
         x=0
 
-        for vector in self.vec:
-            if x%10==0:
-                self.draw_vector(vector)
-            x+=1
-        #print(self.vec[0:5])
-        #exit()
-        #self.draw_vector(self.vec)
-
+        for vector, color in zip(self.vec, colors):
+            self.draw_vector(vector, color=color)
         # Pop Matrix off stack
         glPopMatrix()
 
@@ -141,9 +163,6 @@ class Window(pyglet.window.Window):
         elif buttons & mouse.RIGHT != 0:
             self.position[0] += dx * 0.1
             self.position[1] += dy * 0.1
-
-
-
 
 if __name__ == '__main__':
     filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
