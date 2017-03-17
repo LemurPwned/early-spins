@@ -105,9 +105,9 @@ class Window(pyglet.window.Window):
         x=0
 
         for vector in self.vec:
-            #if x%10==0:
-            self.draw_vector(vector)
-            #x+=1
+            if x%10==0:
+                self.draw_vector(vector)
+            x+=1
         #print(self.vec[0:5])
         #exit()
         #self.draw_vector(self.vec)
