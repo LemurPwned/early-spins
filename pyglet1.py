@@ -5,6 +5,9 @@ from OpenGL.GLUT import *
 from input_parser import *
 import pandas as pd
 import tiny_vectors as vc
+import math as mt
+from camera_calculations import *
+
 
 WINDOW   = 800
 INCREMENT = 5
@@ -114,7 +117,8 @@ class Window(pyglet.window.Window):
 
     def initial_transformation(self):
         self.rotation = [0,0,0] #xyz degrees in xyz axis
-        self.position = [0,0,-50] #xyz
+        self.position = [0,0,-10] #xyz initial
+        #self.pointing = [0,0,0] #where camera points
 
     def transformate(self): #applies rotation and transformation
         glRotatef(self.rotation[0], 0, 1, 0)#weird
@@ -131,12 +135,13 @@ class Window(pyglet.window.Window):
 
         self.transformate()
         self.draw_cordinate_system()
-        x=0
+        #x=0
 
         for vector, color in zip(self.vec, colors):
             self.draw_vector(vector, color=color)
         # Pop Matrix off stack
         glPopMatrix()
+        print(self.position, self.rotation)
 
     def on_resize(self, width, height):
         # set the Viewport
@@ -155,15 +160,41 @@ class Window(pyglet.window.Window):
         self.create_vector(data)
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        self.position[2] += 0.8*scroll_y
+        #SMART SCROLL BETA
+        self.position[0] -= mt.sin(self.rotation[0]*mt.pi/180)*mt.cos(self.rotation[1]*mt.pi/180)*scroll_y
+        self.position[1] += mt.cos(self.rotation[0]*mt.pi/180)*mt.sin(self.rotation[1]*mt.pi/180)*scroll_y
+        self.position[2] += mt.cos(self.rotation[0]*mt.pi/180)*mt.cos(self.rotation[1]*mt.pi/180)*scroll_y
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if buttons & mouse.LEFT != 0:
-            self.rotation[0] += dx * 0.06
-            self.rotation[1] -= dy * 0.06
+
+            #self.rotation[0] -= dx * 0.06
+            rotation_speed = 0.5
+            self.rotation[0] += dx*rotation_speed
+            #self.rotation[1] -= dy
+            #temp = xpos
+            xpos = self.position[0] * mt.cos(dx*rotation_speed * mt.pi / 180) - self.position[2] * mt.sin(dx*rotation_speed * mt.pi / 180)
+            zpos = self.position[0] * mt.sin(dx*rotation_speed * mt.pi / 180) + self.position[2] * mt.cos(dx*rotation_speed * mt.pi / 180)
+
+            #ypos = self.position[1] * mt.cos(dy * mt.pi / 180) - self.position[2] * mt.sin(dy * mt.pi / 180)
+            #zpos = self.position[1] * mt.sin(dy * mt.pi / 180) + self.position[2] * mt.cos(dy * mt.pi / 180) + self.position[0] * mt.sin(dx * mt.pi / 180)
+
+            self.position[0] = xpos
+            #self.position[1] = ypos
+            self.position[2] = zpos
+
+
+            #self.rotation[0] +=
+
+            #self.rotation[1] += dy * 0.06
+            #self.position[0] += dx * 0.006
+            #self.position[1] += dy * 0.006
         elif buttons & mouse.RIGHT != 0:
             self.position[0] += dx * 0.1
             self.position[1] += dy * 0.1
+            #self.pointing[0] += dx * 0.1
+            #self.pointing[2] += dy * 0.1
+
 
 if __name__ == '__main__':
     filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
