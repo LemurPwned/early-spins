@@ -36,13 +36,13 @@ class Window(pyglet.window.Window):
         #arr in format [[x1,x2,x3, y1,y2,y3], [], [], [], []...]
         #TODO create coloring algorithm
         #maybe multithreading?
-
+        glLineWidth(3)
         glColor3f(color[0], color[1], color[2])
         glBegin(GL_LINES)
         glVertex3f(vec[0],vec[1],vec[2])
         glVertex3f(vec[3],vec[4],vec[5])
         glEnd()
-        glPointSize(3)
+        glPointSize(6)
         glBegin(GL_POINTS)
         glVertex3f(vec[3],vec[4],vec[5])
         glEnd()
@@ -63,9 +63,9 @@ class Window(pyglet.window.Window):
         b2 = vc.Vector(0,1,0)
         b3 = vc.Vector(0,0,1)
         step = 1
-        xk = 2
-        yk = 3
-        zk = 3
+        xk = np.sqrt(2)
+        yk = 4
+        zk = 0
         angles = []
         for index, row in df.iterrows():
             #if iterator%10 == 0:
@@ -93,6 +93,7 @@ class Window(pyglet.window.Window):
                 else:
                     continue
             skip += 1
+
         print(count)
         xmax = 0
         ymax = 0
@@ -106,9 +107,9 @@ class Window(pyglet.window.Window):
                 zmax = np.abs(angle[2])
 
         for angle in angles:
-            colors.append((vc.rescale((angle[0]/xmax),xmax,255)*(10**(xk-1))/255,
-                            vc.rescale((angle[1]/ymax),ymax,255)*(10**(yk-1))/255,
-                            vc.rescale((angle[2]/zmax),zmax,255)*(10**(zk-1))/255))
+            colors.append((vc.rescale((angle[0]/xmax),xmax,255)/255,
+                            vc.rescale((angle[1]/ymax),ymax,255)/255,
+                            vc.rescale((angle[2]/zmax),zmax,255)/255))
         #print(colors)
 
     def initial_transformation(self):
