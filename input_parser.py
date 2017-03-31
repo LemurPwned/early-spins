@@ -66,23 +66,27 @@ def form_dataframe(filename, to_skip, cols=['Whitespace', 'x','y','z']):
         data[['x','y','z']] = data[['x','y','z']].astype(float)
     return data
 
-def calculate_color(data, relate):
+def calculate_angle(data, relate):
     '''
     calculates the color of each vector
     '''
     norms = pd.Series(data['x']**2+data['y']**2+data['z']**2, dtype=np.float).apply(np.sqrt)
     dot = pd.Series(data['x']*relate.x+data['y']*relate.y+data['z']*relate.z, dtype=np.float)
     angle = pd.Series(dot/(relate.norm*norms), dtype=np.float).apply(np.arccos).fillna(np.float(-1))
-    color = pd.Series(angle, dtype=tuple).apply(vc.color_map)
-    return color
+    return angle
+
 
 def layer_splitter(data, base_data):
     '''
     splits data into n separate layers with proper indices
     '''
     (x,y,z) = (int(base_data['xnodes']),int(base_data['ynodes']),int(base_data['znodes']))
-    thickness = x*y
-    layers = [data.iloc[thickness*i:thickness*i + thickness , :] for i in range(z)]
+    print(x,y,z)
+    surface = x*y
+    layers = [data.iloc[surface*i:surface*i + surface , :] for i in range(z)]
+    #ask about the true layer size, should be divisible by 5
+    #caveat, an artificial value is added to the last layer to make these equal
+    layers[-1].loc[-1] = [0.0 for i in range(3)]
     return layers
 
 def plotters(data):
@@ -91,29 +95,35 @@ def plotters(data):
     sns.jointplot(data['mx'],data['Total energy'], kind="kde")
     plt.show()
 
-
-def color2d(data, base_vectors):
+def color2d(data, base_vectors, base_data):
     '''
     this function maps layer and shows 2d plot for that layer
     '''
     angles = []
     sens = []
     norms = pd.Series(data['x']**2+data['y']**2+data['z']**2, dtype=np.float).apply(np.sqrt)
+    #discretize position
+    point_list_x = []
+    point_list_y = []
+    for y_node in range(int(base_data['ynodes'])):
+        for x_node in range(int(base_data['xnodes'])):
+            point_list_x.append(x_node)
+            point_list_y.append(y_node)
+    #calculate angle, that each vector makes with base vectors; for each position
     for related_vec in base_vectors:
-        dot = pd.Series(data['x']*related_vec.x+data['y']*related_vec.y+data['z']*related_vec.z, dtype=np.float)
-        angle = pd.Series(dot/(related_vec.norm*norms), dtype=np.float).apply(np.arccos).fillna(np.float(0))
+        angle = calculate_angle(data, related_vec)
+        #increase standard deviation to have more visible effect
         angles.append(angle)
         sensitive = pd.Series(np.power(angle,25))
         sens.append(sensitive)
-    #sns.jointplot(data['x'], data['y'], hue=angles[0], kind="hex")
-    plt.scatter(data['x'],data['y'], c=sens[0], cmap=cm.jet)
-    plt.show()
-    print(np.max(angles[0]), np.max(sens[0]))
-    print(np.min(angles[0]), np.min(sens[0]))
-    print(np.mean(angles[0]), np.median(angles[0]), np.std(angles[0]))
-    print(np.mean(sens[0]), np.median(sens[0]), np.std(sens[0]))
 
-
+    for angle in sens:
+        plt.scatter(point_list_x, point_list_y, c=tuple(angle), cmap=cm.jet)
+        plt.show()
+    print("Angle, Senes :\n Maximum : {}, {}".format(np.max(angles[0]), np.max(sens[0])))
+    print("Angle, Senes :\n Minumum : {}, {}".format(np.min(angles[0]), np.min(sens[0])))
+    print("Angle: \n Mean : {}, \n Median : {}, \n Std : {}".format(np.mean(angles[0]), np.median(angles[0]), np.std(angles[0])))
+    print("Sens: \n Mean : {}, \n Median : {}, \n Std : {}".format(np.mean(sens[0]), np.median(sens[0]), np.std(sens[0])))
 
 
 if __name__=="__main__":
@@ -125,7 +135,6 @@ if __name__=="__main__":
     #print(base_data)
 
     relate = vc.Vector(1,0,0)
-    color = calculate_color(data, relate)
     #print(base_data)
 
     v1 = vc.Vector(1,0,0)
@@ -133,7 +142,8 @@ if __name__=="__main__":
     v3 = vc.Vector(0,0,1)
 
     layers = layer_splitter(data, base_data)
-    #color2d(layers[0], [v1, v2, v3])
+
+    color2d(layers[4], [v1, v2, v3], base_data)
     data[['x','y','z']] = data[['x','y','z']]/np.max(np.abs(data[['x','y','z']]))
     print(np.max(np.abs(data)))
     #print(data.columns.values.tolist())
@@ -143,7 +153,3 @@ if __name__=="__main__":
     #print(df.columns.values.tolist(), df.shape)
     #print(df['Iteration'].head())
     #plotters(df)
-
-    vc.df_color(data, v1, v2, v3)
-    #node_iterator(base_data, print)
-    #print(df.head())
