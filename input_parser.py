@@ -1,9 +1,6 @@
 import pandas as pd
 import numpy as np
-import tiny_vectors as vc
-import seaborn as sns
-import matplotlib.pyplot as plt
-from matplotlib import cm
+from graph_panels import *
 
 def extract_base_data(filename):
     base_data = {}
@@ -66,90 +63,23 @@ def form_dataframe(filename, to_skip, cols=['Whitespace', 'x','y','z']):
         data[['x','y','z']] = data[['x','y','z']].astype(float)
     return data
 
-def calculate_angle(data, relate):
-    '''
-    calculates the color of each vector
-    '''
-    norms = pd.Series(data['x']**2+data['y']**2+data['z']**2, dtype=np.float).apply(np.sqrt)
-    dot = pd.Series(data['x']*relate.x+data['y']*relate.y+data['z']*relate.z, dtype=np.float)
-    angle = pd.Series(dot/(relate.norm*norms), dtype=np.float).apply(np.arccos).fillna(np.float(-1))
-    return angle
-
-
-def layer_splitter(data, base_data):
-    '''
-    splits data into n separate layers with proper indices
-    '''
-    (x,y,z) = (int(base_data['xnodes']),int(base_data['ynodes']),int(base_data['znodes']))
-    print(x,y,z)
-    surface = x*y
-    layers = [data.iloc[surface*i:surface*i + surface , :] for i in range(z)]
-    #ask about the true layer size, should be divisible by 5
-    #caveat, an artificial value is added to the last layer to make these equal
-    layers[-1].loc[-1] = [0.0 for i in range(3)]
-    return layers
-
-def plotters(data):
-    cmap = sns.cubehelix_palette(as_cmap=True, dark=0, light=1, reverse=True)
-    #sns.kdeplot(data['Total energy'], cut=0, bw=0.2);
-    sns.jointplot(data['mx'],data['Total energy'], kind="kde")
-    plt.show()
-
-def color2d(data, base_vectors, base_data):
-    '''
-    this function maps layer and shows 2d plot for that layer
-    '''
-    angles = []
-    sens = []
-    norms = pd.Series(data['x']**2+data['y']**2+data['z']**2, dtype=np.float).apply(np.sqrt)
-    #discretize position
-    point_list_x = []
-    point_list_y = []
-    for y_node in range(int(base_data['ynodes'])):
-        for x_node in range(int(base_data['xnodes'])):
-            point_list_x.append(x_node)
-            point_list_y.append(y_node)
-    #calculate angle, that each vector makes with base vectors; for each position
-    for related_vec in base_vectors:
-        angle = calculate_angle(data, related_vec)
-        #increase standard deviation to have more visible effect
-        angles.append(angle)
-        sensitive = pd.Series(np.power(angle,25))
-        sens.append(sensitive)
-
-    for angle in sens:
-        plt.scatter(point_list_x, point_list_y, c=tuple(angle), cmap=cm.jet)
-        plt.show()
-    print("Angle, Senes :\n Maximum : {}, {}".format(np.max(angles[0]), np.max(sens[0])))
-    print("Angle, Senes :\n Minumum : {}, {}".format(np.min(angles[0]), np.min(sens[0])))
-    print("Angle: \n Mean : {}, \n Median : {}, \n Std : {}".format(np.mean(angles[0]), np.median(angles[0]), np.std(angles[0])))
-    print("Sens: \n Mean : {}, \n Median : {}, \n Std : {}".format(np.mean(sens[0]), np.median(sens[0]), np.std(sens[0])))
-
-
 if __name__=="__main__":
     filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
     filename2 = './data/voltage-spin-diode.odt'
     base_data, count = extract_base_data(filename)
     to_skip=[x for x in range(count)]
     data = form_dataframe(filename, to_skip)
-    #print(base_data)
 
-    relate = vc.Vector(1,0,0)
-    #print(base_data)
-
+    #set of base vectors
     v1 = vc.Vector(1,0,0)
     v2 = vc.Vector(0,1,0)
     v3 = vc.Vector(0,0,1)
 
     layers = layer_splitter(data, base_data)
 
-    color2d(layers[4], [v1, v2, v3], base_data)
-    data[['x','y','z']] = data[['x','y','z']]/np.max(np.abs(data[['x','y','z']]))
-    print(np.max(np.abs(data)))
-    #print(data.columns.values.tolist())
-    #print(data.shape[0])
-
+    figs = color2d(layers[4], [v1, v2, v3], base_data)
+    fig = figs[0]
+    fig.show()
+    #plt.show(figs[0])
     df = read_header_file(filename2)
-    #print(df.columns.values.tolist(), df.shape)
-    #print(df['Iteration'].head())
-    #plotters(df)
+    #plotters(df, ('Iteration', 'Total energy'), ('step','J'))
