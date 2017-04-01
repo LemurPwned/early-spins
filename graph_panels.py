@@ -2,22 +2,23 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from matplotlib import cm
 import tiny_vectors as vc
-
+from matplotlib import cm
 
 def callback_plotter(figures):
     '''
-    allows for displaying figures produced by functions in this file
+    allows for displaying figures produced by other functions in this file
     '''
 
     if isinstance(figures, list):
         for fig in figures:
             fig.show()
             input('Press key to skip figure')
+            plt.close(fig)
     else:
         figures.show()
         input('Press key to skip figure')
+        plt.close(figures)
 
 def plotters(data, pair, unit):
     '''
@@ -27,7 +28,7 @@ def plotters(data, pair, unit):
     e.g. pair('Iteration', 'Energy') would show Energy as function of Iteration
     '''
     fig = plt.figure()
-    fig.suptitle('Direction : Magnetization')
+    fig.suptitle(pair[1]+' '+ pair[0])
     ax = fig.add_subplot(111)
     ax.plot(data[pair[0]], data[pair[1]])
     ax.set_xlabel(pair[0] + ' [' + unit[0]+']')
@@ -39,9 +40,10 @@ def layer_splitter(data, base_data):
     data is DataFrame
     base_data is dictionary
     splits data into n separate layers with proper indices
+    returns DataFrame
     '''
     (x,y,z) = (int(base_data['xnodes']),int(base_data['ynodes']),int(base_data['znodes']))
-    print(x,y,z)
+    #print(x,y,z)
     surface = x*y
     layers = [data.iloc[surface*i:surface*i + surface , :] for i in range(z)]
     #ask about the true layer size, should be divisible by 5
@@ -52,17 +54,36 @@ def layer_splitter(data, base_data):
 def calculate_angle(data, relate):
     '''
     calculates the color of each vector
+    return Series
     '''
     norms = pd.Series(data['x']**2+data['y']**2+data['z']**2, dtype=np.float).apply(np.sqrt)
     dot = pd.Series(data['x']*relate.x+data['y']*relate.y+data['z']*relate.z, dtype=np.float)
     angle = pd.Series(dot/(relate.norm*norms), dtype=np.float).apply(np.arccos).fillna(np.float(-1))
     return angle
 
+def populate_list(x_nodes, y_nodes):
+    point_list_x = []
+    point_list_y = []
+    for y_node in range(y_nodes):
+        for x_node in range(x_nodes):
+            point_list_x.append(x_node)
+            point_list_y.append(y_node)
+    return (point_list_x, point_list_y)
+
+def increase_variance(data, scale):
+    '''
+    data is Series
+    scale is an integer
+    this function increases the variance artificially
+    returns Series
+    '''
+    return pd.Series(np.power(data,scale))
 def color2d(data, base_vectors, base_data):
     '''
     this function maps layer and shows 2d plot for that layer
-    show angular deviation from each base vectors
-    will print 3 different plots for each
+    show angular deviation from each base vector
+    will print 3 different plots for each direction
+    returns array of Figures
     '''
     angles = []
     sens = []
