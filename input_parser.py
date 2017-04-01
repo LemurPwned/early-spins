@@ -120,30 +120,31 @@ if __name__=="__main__":
     filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
     filename2 = './data/voltage-spin-diode.odt'
     base_data, count = extract_base_data(filename)
+    print(base_data, count)
     to_skip=[x for x in range(count)]
     data = form_dataframe(filename, to_skip)
-    #print(base_data)
+    print(data)
 
-    relate = vc.Vector(1,0,0)
-    color = calculate_color(data, relate)
-    #print(base_data)
-
-    v1 = vc.Vector(1,0,0)
-    v2 = vc.Vector(0,1,0)
-    v3 = vc.Vector(0,0,1)
-
-    layers = layer_splitter(data, base_data)
-    #color2d(layers[0], [v1, v2, v3])
-    data[['x','y','z']] = data[['x','y','z']]/np.max(np.abs(data[['x','y','z']]))
-    print(np.max(np.abs(data)))
-    #print(data.columns.values.tolist())
-    #print(data.shape[0])
-
-    df = read_header_file(filename2)
-    #print(df.columns.values.tolist(), df.shape)
-    #print(df['Iteration'].head())
-    #plotters(df)
-
-    vc.df_color(data, v1, v2, v3)
-    #node_iterator(base_data, print)
-    #print(df.head())
+    # relate = vc.Vector(1, 0, 0)
+    # color = calculate_color(data, relate)
+    # #print(base_data)
+    #
+    # v1 = vc.Vector(1,0,0)
+    # v2 = vc.Vector(0,1,0)
+    # v3 = vc.Vector(0,0,1)
+    #
+    # layers = layer_splitter(data, base_data)
+    # #color2d(layers[0], [v1, v2, v3])
+    # data[['x','y','z']] = data[['x','y','z']]/np.max(np.abs(data[['x','y','z']]))
+    # print(np.max(np.abs(data)))
+    # #print(data.columns.values.tolist())
+    # #print(data.shape[0])
+    #
+    # df = read_header_file(filename2)
+    # #print(df.columns.values.tolist(), df.shape)
+    # #print(df['Iteration'].head())
+    # #plotters(df)
+    #
+    # vc.df_color(data, v1, v2, v3)
+    # #node_iterator(base_data, print)
+    # #print(df.head())
