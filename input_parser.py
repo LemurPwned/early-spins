@@ -79,6 +79,7 @@ if __name__=="__main__":
     v2 = vc.Vector(0,1,0)
     v3 = vc.Vector(0,0,1)
 
+    #split layers
     layers = layer_splitter(data, base_data)
 
     figs = color2d(layers[4], [v1, v2, v3], base_data)
@@ -86,5 +87,3 @@ if __name__=="__main__":
 
     df = read_header_file(filename2)
     graph = plotters(df, ('Iteration', 'Total energy'), ('step','J'))
-
-    #callback_plotter(graph)

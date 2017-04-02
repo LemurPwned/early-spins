@@ -9,7 +9,6 @@ from graph_panels import calculate_angle, populate_list, increase_variance
 
 def update_batch_plot(i, data, scat):
     scat.set_array(pd.np.array(data[i], dtype=float))
-    #print(data[i].tolist())
     return scat
 
 def init_anim(data, title, frame_number, xnodes, ynodes):
@@ -48,7 +47,7 @@ def process_batch(filename):
 def batch_load(directory, iterations, function):
     '''
     iterates over directory and populates the list to sort
-    below: deprecataed use for now
+    below: deprecated use for now
     iterates over files in directory and performs a function on each ".omf" file
     '''
     handling_list = []
