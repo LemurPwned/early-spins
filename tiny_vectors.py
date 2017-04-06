@@ -11,6 +11,9 @@ class Vector:
     def __str__(self):
         return "{}, {}, {}".format(self.x, self.y, self.z)
 
+    def to_string(self):
+        return "{}, {}, {}".format(self.x, self.y, self.z)
+
 
 def dot(v1,v2):
         return v1.x*v2.x+v1.y*v2.y+v1.z*v2.z
@@ -25,7 +28,7 @@ def rescale(value, max_val, max_rescaled):
     return (value*max_rescaled)/max_val
 
 
-#test
+#UNIT TEST xD
 def color_test():
     v1 = Vector(1,0,0)
     v2 = [Vector(np.random.randint(0,30),np.random.randint(0,30),np.random.randint(0,30)) for z in range(0,300)]
