@@ -7,7 +7,7 @@ import pandas as pd
 import tiny_vectors as vc
 import math as mt
 from camera_calculations import *
-
+from graph_panels import calculate_angle, generate_color_series
 
 WINDOW   = 800
 INCREMENT = 5
@@ -57,21 +57,21 @@ class Window(pyglet.window.Window):
 
     def create_vector(self, df):
         self.vec = []
+        #this version assumes just one magnetization direction at the time
         xpos = 0
         ypos = 0
         zpos = 0
         skip = 0
-        count = 0
+        #pick just one vector at the time
         b1 = vc.Vector(1,0,0)
         b2 = vc.Vector(0,1,0)
         b3 = vc.Vector(0,0,1)
         step = 1
-        xk = np.sqrt(2)
-        yk = 4
-        zk = 0
         angles = []
+        #power is proportional to the variance
+        power = 25
+
         for index, row in df.iterrows():
-            #if iterator%10 == 0:
             if skip%step == 0:
                 if xpos>=int(base_data['xnodes']):
                     ypos+=1+(xpos%int(base_data['xnodes']))
@@ -90,30 +90,15 @@ class Window(pyglet.window.Window):
                 if np.abs(row[0]+row[1]+row[2]) > 0:
                     self.vec.append([xtemp, ytemp, ztemp, xtemp+row[0]/c.norm,
                                         ytemp+row[1]/c.norm, ztemp+row[2]/c.norm])
-                    angles.append((vc.relative_direction(c, b1)**(2*xk + 1),
-                                    vc.relative_direction(c, b2)**(2*yk + 1),
-                                    vc.relative_direction(c, b3)**(2*zk + 1)))
+                    angles.append(np.power(vc.relative_direction(c,b1),power))
                 else:
                     continue
             skip += 1
-
-        print(count)
-        xmax = 0
-        ymax = 0
-        zmax = 0
-        for angle in angles:
-            if xmax < np.abs(angle[0]):
-                xmax = np.abs(angle[0])
-            if ymax < np.abs(angle[1]):
-                ymax = np.abs(angle[1])
-            if zmax < np.abs(angle[2]):
-                zmax = np.abs(angle[2])
-
-        for angle in angles:
-            colors.append((vc.rescale((angle[0]/xmax),xmax,255)/255,
-                            vc.rescale((angle[1]/ymax),ymax,255)/255,
-                            vc.rescale((angle[2]/zmax),zmax,255)/255))
-        #print(colors)
+        series = generate_color_series(len(angles))
+        temp_color = [x for (y,x) in sorted(zip(angles,series))]
+        #repopulate color in a global scope
+        for color in temp_color:
+            colors.append(color)
 
     def initial_transformation(self):
         self.rotation = [0,0,0] #xyz degrees in xyz axis
