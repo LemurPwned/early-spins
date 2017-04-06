@@ -86,8 +86,3 @@ if __name__=="__main__":
 
     df = read_header_file(filename2)
     graph = plotters(df, ('Iteration', 'Total energy'), ('step','J'))
-
-    #callback_plotter(graph)
-    cols = generate_color_series(10)
-    for color in cols:
-        print(color)

@@ -12,6 +12,8 @@ from graph_panels import calculate_angle, generate_color_series
 WINDOW   = 800
 INCREMENT = 5
 colors = []
+#pick vector to see magnetization
+vector = vc.Vector(0,1,0)
 class Window(pyglet.window.Window):
 
     # Cube 3D start rotation
@@ -55,17 +57,13 @@ class Window(pyglet.window.Window):
         self.draw_vector([0,0,0,0,size,0], [0,1,0])
         self.draw_vector([0,0,0,0,0,size], [0,0,1])
 
-    def create_vector(self, df):
+    def create_vector(self, df, b1):
         self.vec = []
         #this version assumes just one magnetization direction at the time
         xpos = 0
         ypos = 0
         zpos = 0
         skip = 0
-        #pick just one vector at the time
-        b1 = vc.Vector(1,0,0)
-        b2 = vc.Vector(0,1,0)
-        b3 = vc.Vector(0,0,1)
         step = 1
         angles = []
         #power is proportional to the variance
@@ -142,7 +140,7 @@ class Window(pyglet.window.Window):
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         glTranslatef(0, 0, 0)
-        self.create_vector(data)
+        self.create_vector(data, vector)
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         #SMART SCROLL BETA
