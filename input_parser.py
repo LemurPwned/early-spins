@@ -74,3 +74,15 @@ if __name__=="__main__":
     print(base_data, count)
     to_skip=[x for x in range(count)]
     data = form_dataframe(filename, to_skip)
+    #set of base vectors
+    v1 = vc.Vector(1,0,0)
+    v2 = vc.Vector(0,1,0)
+    v3 = vc.Vector(0,0,1)
+
+    layers = layer_splitter(data, base_data)
+
+    figs = color2d(layers[4], [v1, v2, v3], base_data)
+    #callback_plotter(figs)
+
+    df = read_header_file(filename2)
+    graph = plotters(df, ('Iteration', 'Total energy'), ('step','J'))
