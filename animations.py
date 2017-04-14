@@ -7,29 +7,31 @@ from matplotlib import cm
 from input_parser import *
 from graph_panels import calculate_angle, populate_list, increase_variance
 
+
 def update_batch_plot(i, data, scat):
     scat.set_array(pd.np.array(data[i], dtype=float))
     return scat
 
+
 def init_anim(data, title, frame_number, xnodes, ynodes):
     color_data = data
-    point_list_x,point_list_y = populate_list(xnodes, ynodes)
+    point_list_x, point_list_y = populate_list(xnodes, ynodes)
     fig = plt.figure()
     c = data[0]
-    #color_data = np.random.random((frame_number, xnodes*ynodes))
     scat = plt.scatter(point_list_x, point_list_y, c=tuple(c), cmap=cm.jet)
     fig.suptitle(title)
     fig.colorbar(scat)
     ani = animation.FuncAnimation(fig, update_batch_plot,
-            frames=range(frame_number),
-            fargs=(color_data, scat))
+                                  frames=range(frame_number),
+                                  fargs=(color_data, scat))
     plt.show()
+
 
 def process_batch(filename):
     base_data, count = extract_base_data(filename)
     to_skip = [x for x in range(count)]
     df = form_dataframe(filename, to_skip)
-    #split layers
+    # split layers
     layers = layer_splitter(df, base_data)
     '''
     v1 = vc.Vector(1,0,0)
@@ -38,11 +40,12 @@ def process_batch(filename):
     figs = color2d(layers[4], [v1, v2, v3], base_data)
     callback_plotter(figs[0])
     '''
-    relate = vc.Vector(1,0,0)
-    #testing, just one layer for now
-    layer= calculate_angle(layers[0], relate)
+    relate = vc.Vector(1, 0, 0)
+    # testing, just one layer for now
+    layer = calculate_angle(layers[0], relate)
     layer = increase_variance(layer, 25)
     return layer
+
 
 def batch_load(directory, iterations, function):
     '''
@@ -55,8 +58,8 @@ def batch_load(directory, iterations, function):
         if iterations <= 0:
             break
         if filename.endswith(".omf"):
-            #handler = function(directory+'/'+filename)
-            handler = directory+'/'+filename
+            # handler = function(directory+'/'+filename)
+            handler = directory + '/' + filename
             handling_list.append(handler)
             iterations -= 1
         else:
