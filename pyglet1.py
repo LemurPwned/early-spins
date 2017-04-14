@@ -14,14 +14,14 @@ INCREMENT = 5
 colors = []
 class Window(pyglet.window.Window):
 
-    # Cube 3D start rotation
-    xRotation = yRotation = 30
+    #xRotation = yRotation = 30
 
     def __init__(self, width, height, title=''):
         super(Window, self).__init__(width, height, title)
         glClearColor(0, 0, 0, 1)
         glEnable(GL_DEPTH_TEST)
         self.initial_transformation()
+        self.i = 0
 
     def upload_uniforms(self):
         uni = self.shader.uniforms
@@ -180,12 +180,49 @@ class Window(pyglet.window.Window):
             #self.pointing[0] += dx * 0.1
             #self.pointing[2] += dy * 0.1
 
+    def on_key_press(self, symbol, modifiers):
+        if symbol == key.ENTER:
+            self.change_frame()
+
+    def change_frame(self):
+        self.i += 1
+        print(self.i)
+        data = tdata[self.i]
+        base_data = tbase_data[self.i]
+        count = tcount[self.i]
+
+def getAllFiles(directory, format):
+    #format = ".omf"
+    #directory = "./data/"
+    tFileList = os.listdir(directory)
+    # print(tFileList[0])
+    fileList = []
+    for file in tFileList:
+        # print(file)
+        if file.find(format) != -1:
+            fileList.append(directory + file)
+
+    #print(fileList)
+    i = 0
+    base_data = []
+    count = []
+    data = []
+    print("Reading data...")
+    for file in fileList:
+        tbase_data, tcount = extract_base_data(file)
+        base_data.append(tbase_data)
+        count.append(tcount)
+        to_skip = [x for x in range(tcount)]
+        data.append(form_dataframe(file, to_skip))
+
+    return data, base_data, count
 
 if __name__ == '__main__':
-    filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
-    base_data, count = extract_base_data(filename)
-    to_skip = [x for x in range(count)]
-    data = form_dataframe(filename, to_skip)
 
+    tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
+    data = tdata[0]
+    base_data = tbase_data[0]
+    count = tcount[0]
+    #i=0
     Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
     pyglet.app.run()
