@@ -10,7 +10,7 @@ from graph_panels import calculate_angle, generate_color_series
 WINDOW = 800
 INCREMENT = 5
 colors = []
-FREE_RUN = False
+
 TIME_INTERVAL = 1/60.0
 
 class Window(pyglet.window.Window):
@@ -19,6 +19,7 @@ class Window(pyglet.window.Window):
         glClearColor(0, 0, 0, 1)
         glEnable(GL_DEPTH_TEST)
         self.initial_transformation()
+        self.FREE_RUN = False
         self.i = 0
 
     def upload_uniforms(self):
@@ -54,7 +55,7 @@ class Window(pyglet.window.Window):
         self.draw_vector([0, 0, 0, 0, 0, size], [0, 0, 1])
 
     def create_vector(self, df):
-        print("Mean of data in create_vector", np.mean(df['x']))
+        print("Mean of data in create_vector{}".format(np.mean(df['x'])))
         self.vec = []
         # this version assumes just one magnetization direction at the time
         xpos = 0
@@ -79,7 +80,6 @@ class Window(pyglet.window.Window):
                     zpos += 1 + (ypos % int(base_data['ynodes']))
                     ypos = 0
                     xpos = 0
-
                 xpos += 1 * step
                 xtemp = xpos * float(base_data['xbase']) * 1e9
                 ytemp = ypos * float(base_data['ybase']) * 1e9
@@ -96,7 +96,7 @@ class Window(pyglet.window.Window):
         max_angle = np.max(angles)
         print(max_angle)
 
-        print("Mean of angles: ", np.mean(angles))
+        print("Mean of angles: {}".format(np.mean(angles)))
         series = generate_color_series(len(angles))
         temp_color = [x for (y, x) in sorted(zip(angles, series))]
         # repopulate color in a global scope
@@ -120,14 +120,10 @@ class Window(pyglet.window.Window):
     def on_draw(self):
         # Clear the current GL Window
         self.clear()
-
         # Push Matrix onto stack
         glPushMatrix()
-
         self.transformate()
         self.draw_cordinate_system()
-        # x=0
-
         for vector, color in zip(self.vec, colors):
             self.draw_vector(vector, color=color)
         # Pop Matrix off stack
@@ -136,23 +132,17 @@ class Window(pyglet.window.Window):
 
     def on_resize(self, width, height):
         # set the Viewport
-
         glViewport(0, 0, width, height)
-
         # using Projection mode
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-
         aspectRatio = width / height
         gluPerspective(85, aspectRatio, 1, 1000)
-
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         glTranslatef(0, 0, 0)
         self.create_vector(data[self.i])
-        if FREE_RUN == True:
-            sleep(10)
-            self.i += 1
+
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         # SMART SCROLL BETA
@@ -178,9 +168,10 @@ class Window(pyglet.window.Window):
 
     def on_key_press(self, symbol, modifiers):
         if symbol == key.ENTER:
-            FREE_RUN = True
-            pyglet.clock.schedule_interval(self.update, TIME_INTERVAL)
-            self.change_frame()
+            self.FREE_RUN = not self.FREE_RUN
+            if self.FREE_RUN:
+                pyglet.clock.schedule_interval(self.update, TIME_INTERVAL)
+                self.change_frame()
         elif symbol == key.RIGHT:
             self.i += 1
             self.list_guard()
@@ -192,18 +183,19 @@ class Window(pyglet.window.Window):
 
     def change_frame(self):
         print(self.i)
+        print(self.FREE_RUN)
         base_data = tbase_data[self.i]
         count = tcount[self.i]
         width, height = self.get_size()
         #print(colors)
-        print("Mean of colors ", np.mean(colors))
-        print("Mean of data in change frame: ", np.mean(data[self.i]['x']))
+        print("Mean of colors {}".format(np.mean(colors)))
+        print("Mean of data in change frame: {}".format(np.mean(data[self.i]['x'])))
         self.on_resize(width, height)
 
-
     def update(self, df):
-        self.i += 1
-        self.list_guard()
+        if self.FREE_RUN:
+            self.i += 1
+            self.list_guard()
         self.change_frame()
 
     def list_guard(self):
@@ -213,6 +205,7 @@ class Window(pyglet.window.Window):
             self.i = 0
         else: pass
 
+
 def getAllFiles(directory, format):
     tFileList = os.listdir(directory)
     fileList = []
@@ -221,14 +214,13 @@ def getAllFiles(directory, format):
         j += 1
         if j > 10:
             break
-        # print(file)
         if file.find(format) != -1:
             fileList.append(directory + file)
 
     base_data = []
     count = []
     data = []
-    print("Reading data...")
+    print("Reading data... {}".format(len(fileList)))
     fileList.sort()
     for filename in fileList:
         tbase_data, tcount = extract_base_data(filename)

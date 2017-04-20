@@ -4,6 +4,7 @@ from graph_panels import *
 
 def extract_base_data(filename):
     '''
+    .omf format reader
     returns dictionary with headers and their corresponding values
     and number of these headers
     '''
@@ -29,6 +30,9 @@ def extract_base_data(filename):
 
 
 def read_header_file(filename):
+    '''
+    .odt format reader
+    '''
     with open(filename, 'r') as f:
         lines = f.readlines()
     f.close()
