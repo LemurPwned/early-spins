@@ -10,8 +10,8 @@ from graph_panels import calculate_angle, generate_color_series
 WINDOW = 800
 INCREMENT = 5
 colors = []
-dataX = []
-
+FREE_RUN = False
+TIME_INTERVAL = 1/60.0
 
 class Window(pyglet.window.Window):
     def __init__(self, width, height, title=''):
@@ -68,7 +68,7 @@ class Window(pyglet.window.Window):
         step = 1
         angles = []
         # power is proportional to the variance
-        power = 35
+        power = 25
 
         for index, row in df.iterrows():
             if skip % step == 0:
@@ -136,6 +136,7 @@ class Window(pyglet.window.Window):
 
     def on_resize(self, width, height):
         # set the Viewport
+
         glViewport(0, 0, width, height)
 
         # using Projection mode
@@ -149,6 +150,9 @@ class Window(pyglet.window.Window):
         glLoadIdentity()
         glTranslatef(0, 0, 0)
         self.create_vector(data[self.i])
+        if FREE_RUN == True:
+            sleep(10)
+            self.i += 1
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         # SMART SCROLL BETA
@@ -174,24 +178,49 @@ class Window(pyglet.window.Window):
 
     def on_key_press(self, symbol, modifiers):
         if symbol == key.ENTER:
+            FREE_RUN = True
+            pyglet.clock.schedule_interval(self.update, TIME_INTERVAL)
+            self.change_frame()
+        elif symbol == key.RIGHT:
+            self.i += 1
+            self.list_guard()
+            self.change_frame()
+        elif symbol == key.LEFT:
+            self.i -= 1
+            self.list_guard()
             self.change_frame()
 
     def change_frame(self):
-        self.i += 1
         print(self.i)
         base_data = tbase_data[self.i]
         count = tcount[self.i]
         width, height = self.get_size()
-        print(colors)
+        #print(colors)
         print("Mean of colors ", np.mean(colors))
         print("Mean of data in change frame: ", np.mean(data[self.i]['x']))
         self.on_resize(width, height)
 
 
+    def update(self, df):
+        self.i += 1
+        self.list_guard()
+        self.change_frame()
+
+    def list_guard(self):
+        if self.i >= 10:
+            self.i = 0
+        if self.i > header['Iteration'].count():
+            self.i = 0
+        else: pass
+
 def getAllFiles(directory, format):
     tFileList = os.listdir(directory)
     fileList = []
+    j = 0
     for file in tFileList:
+        j += 1
+        if j > 10:
+            break
         # print(file)
         if file.find(format) != -1:
             fileList.append(directory + file)
@@ -201,20 +230,20 @@ def getAllFiles(directory, format):
     data = []
     print("Reading data...")
     fileList.sort()
-    for file in fileList:
-        tbase_data, tcount = extract_base_data(file)
+    for filename in fileList:
+        tbase_data, tcount = extract_base_data(filename)
         base_data.append(tbase_data)
         count.append(tcount)
         to_skip = [x for x in range(tcount)]
-        data.append(form_dataframe(file, to_skip))
+        data.append(form_dataframe(filename, to_skip))
 
     return data, base_data, count
 
 
 if __name__ == '__main__':
     tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
+    header = read_header_file("./data/voltage-spin-diode.odt")
     data = tdata
-    print(len(dataX))
     base_data = tbase_data[0]
     count = tcount[0]
     Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
