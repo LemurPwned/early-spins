@@ -12,8 +12,6 @@ from graph_panels import calculate_angle, generate_color_series
 WINDOW   = 800
 INCREMENT = 5
 colors = []
-#pick vector to see magnetization
-vector = vc.Vector(0,1,0)
 class Window(pyglet.window.Window):
 
     #xRotation = yRotation = 30
@@ -57,13 +55,20 @@ class Window(pyglet.window.Window):
         self.draw_vector([0,0,0,0,size,0], [0,1,0])
         self.draw_vector([0,0,0,0,0,size], [0,0,1])
 
-    def create_vector(self, df, b1):
+    def create_vector(self, df):
+        print("batch runup")
+        print(np.mean(df['x']))
         self.vec = []
+        del colors[:]
         #this version assumes just one magnetization direction at the time
         xpos = 0
         ypos = 0
         zpos = 0
         skip = 0
+        #pick just one vector at the time
+        b1 = vc.Vector(1,0,0)
+        b2 = vc.Vector(0,1,0)
+        b3 = vc.Vector(0,0,1)
         step = 1
         angles = []
         #power is proportional to the variance
@@ -118,13 +123,11 @@ class Window(pyglet.window.Window):
 
         self.transformate()
         self.draw_cordinate_system()
-        #x=0
-
         for vector, color in zip(self.vec, colors):
             self.draw_vector(vector, color=color)
         # Pop Matrix off stack
         glPopMatrix()
-        print(self.position, self.rotation)
+        #print(self.position, self.rotation)
 
     def on_resize(self, width, height):
         # set the Viewport
@@ -140,7 +143,7 @@ class Window(pyglet.window.Window):
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         glTranslatef(0, 0, 0)
-        self.create_vector(data, vector)
+        self.create_vector(data)
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         #SMART SCROLL BETA
@@ -151,32 +154,19 @@ class Window(pyglet.window.Window):
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if buttons & mouse.LEFT != 0:
 
-            #self.rotation[0] -= dx * 0.06
             rotation_speed = 0.5
             self.rotation[0] += dx*rotation_speed
-            #self.rotation[1] -= dy
-            #temp = xpos
+
             xpos = self.position[0] * mt.cos(dx*rotation_speed * mt.pi / 180) - self.position[2] * mt.sin(dx*rotation_speed * mt.pi / 180)
             zpos = self.position[0] * mt.sin(dx*rotation_speed * mt.pi / 180) + self.position[2] * mt.cos(dx*rotation_speed * mt.pi / 180)
-
-            #ypos = self.position[1] * mt.cos(dy * mt.pi / 180) - self.position[2] * mt.sin(dy * mt.pi / 180)
-            #zpos = self.position[1] * mt.sin(dy * mt.pi / 180) + self.position[2] * mt.cos(dy * mt.pi / 180) + self.position[0] * mt.sin(dx * mt.pi / 180)
-
             self.position[0] = xpos
             #self.position[1] = ypos
             self.position[2] = zpos
 
-
-            #self.rotation[0] +=
-
-            #self.rotation[1] += dy * 0.06
-            #self.position[0] += dx * 0.006
-            #self.position[1] += dy * 0.006
         elif buttons & mouse.RIGHT != 0:
             self.position[0] += dx * 0.1
             self.position[1] += dy * 0.1
-            #self.pointing[0] += dx * 0.1
-            #self.pointing[2] += dy * 0.1
+
 
     def on_key_press(self, symbol, modifiers):
         if symbol == key.ENTER:
@@ -186,33 +176,39 @@ class Window(pyglet.window.Window):
         self.i += 1
         print(self.i)
         data = tdata[self.i]
+        print(np.mean(data['x']))
         base_data = tbase_data[self.i]
         count = tcount[self.i]
+        width, height = self.get_size()
+        self.on_resize(width, height)
 
-def getAllFiles(directory, format):
-    #format = ".omf"
+def getAllFiles(directory, dformat):
+    #dformat = ".omf"
     #directory = "./data/"
+    N = 100
     tFileList = os.listdir(directory)
     # print(tFileList[0])
     fileList = []
     for file in tFileList:
         # print(file)
-        if file.find(format) != -1:
+        if file.find(dformat) != -1:
             fileList.append(directory + file)
 
     #print(fileList)
     i = 0
+    j = 0
     base_data = []
     count = []
     data = []
     print("Reading data...")
     for file in fileList:
-        tbase_data, tcount = extract_base_data(file)
-        base_data.append(tbase_data)
-        count.append(tcount)
-        to_skip = [x for x in range(tcount)]
-        data.append(form_dataframe(file, to_skip))
-
+        if j < N:
+            tbase_data, tcount = extract_base_data(file)
+            base_data.append(tbase_data)
+            count.append(tcount)
+            to_skip = [x for x in range(tcount)]
+            data.append(form_dataframe(file, to_skip))
+            j += 1
     return data, base_data, count
 
 if __name__ == '__main__':

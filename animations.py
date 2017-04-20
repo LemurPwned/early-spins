@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import os
 import tiny_vectors as vc
+from input_parser import *
 def update_batch_plot(i, data, scat,skip):
     input('Press enter to proceed')
     scat.set_array(pd.np.array(data[i%skip +skip], dtype=float))
