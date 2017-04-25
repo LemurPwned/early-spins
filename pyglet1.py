@@ -202,7 +202,7 @@ class Window(pyglet.window.Window):
         if self.i >= 10:
             self.i = 0
         if self.i > header['Iteration'].count():
-            self.i = 0
+            self.i = 0  
         else: pass
 
 
@@ -212,7 +212,7 @@ def getAllFiles(directory, format):
     j = 0
     for file in tFileList:
         j += 1
-        if j > 10:
+        if j > 1000000:
             break
         if file.find(format) != -1:
             fileList.append(directory + file)
