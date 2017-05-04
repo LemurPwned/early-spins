@@ -7,21 +7,21 @@ import pandas as pd
 import tiny_vectors as vc
 import math as mt
 from camera_calculations import *
-
+from graph_panels import calculate_angle, generate_color_series
 
 WINDOW   = 800
 INCREMENT = 5
 colors = []
 class Window(pyglet.window.Window):
 
-    # Cube 3D start rotation
-    xRotation = yRotation = 30
+    #xRotation = yRotation = 30
 
     def __init__(self, width, height, title=''):
         super(Window, self).__init__(width, height, title)
         glClearColor(0, 0, 0, 1)
         glEnable(GL_DEPTH_TEST)
         self.initial_transformation()
+        self.i = 0
 
     def upload_uniforms(self):
         uni = self.shader.uniforms
@@ -56,22 +56,25 @@ class Window(pyglet.window.Window):
         self.draw_vector([0,0,0,0,0,size], [0,0,1])
 
     def create_vector(self, df):
+        print("batch runup")
+        print(np.mean(df['x']))
         self.vec = []
+        del colors[:]
+        #this version assumes just one magnetization direction at the time
         xpos = 0
         ypos = 0
         zpos = 0
         skip = 0
-        count = 0
+        #pick just one vector at the time
         b1 = vc.Vector(1,0,0)
         b2 = vc.Vector(0,1,0)
         b3 = vc.Vector(0,0,1)
         step = 1
-        xk = np.sqrt(2)
-        yk = 4
-        zk = 0
         angles = []
+        #power is proportional to the variance
+        power = 25
+
         for index, row in df.iterrows():
-            #if iterator%10 == 0:
             if skip%step == 0:
                 if xpos>=int(base_data['xnodes']):
                     ypos+=1+(xpos%int(base_data['xnodes']))
@@ -90,30 +93,15 @@ class Window(pyglet.window.Window):
                 if np.abs(row[0]+row[1]+row[2]) > 0:
                     self.vec.append([xtemp, ytemp, ztemp, xtemp+row[0]/c.norm,
                                         ytemp+row[1]/c.norm, ztemp+row[2]/c.norm])
-                    angles.append((vc.relative_direction(c, b1)**(2*xk + 1),
-                                    vc.relative_direction(c, b2)**(2*yk + 1),
-                                    vc.relative_direction(c, b3)**(2*zk + 1)))
+                    angles.append(np.power(vc.relative_direction(c,b1),power))
                 else:
                     continue
             skip += 1
-
-        print(count)
-        xmax = 0
-        ymax = 0
-        zmax = 0
-        for angle in angles:
-            if xmax < np.abs(angle[0]):
-                xmax = np.abs(angle[0])
-            if ymax < np.abs(angle[1]):
-                ymax = np.abs(angle[1])
-            if zmax < np.abs(angle[2]):
-                zmax = np.abs(angle[2])
-
-        for angle in angles:
-            colors.append((vc.rescale((angle[0]/xmax),xmax,255)/255,
-                            vc.rescale((angle[1]/ymax),ymax,255)/255,
-                            vc.rescale((angle[2]/zmax),zmax,255)/255))
-        #print(colors)
+        series = generate_color_series(len(angles))
+        temp_color = [x for (y,x) in sorted(zip(angles,series))]
+        #repopulate color in a global scope
+        for color in temp_color:
+            colors.append(color)
 
     def initial_transformation(self):
         self.rotation = [0,0,0] #xyz degrees in xyz axis
@@ -135,13 +123,11 @@ class Window(pyglet.window.Window):
 
         self.transformate()
         self.draw_cordinate_system()
-        #x=0
-
         for vector, color in zip(self.vec, colors):
             self.draw_vector(vector, color=color)
         # Pop Matrix off stack
         glPopMatrix()
-        print(self.position, self.rotation)
+        #print(self.position, self.rotation)
 
     def on_resize(self, width, height):
         # set the Viewport
@@ -168,39 +154,69 @@ class Window(pyglet.window.Window):
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if buttons & mouse.LEFT != 0:
 
-            #self.rotation[0] -= dx * 0.06
             rotation_speed = 0.5
             self.rotation[0] += dx*rotation_speed
-            #self.rotation[1] -= dy
-            #temp = xpos
+
             xpos = self.position[0] * mt.cos(dx*rotation_speed * mt.pi / 180) - self.position[2] * mt.sin(dx*rotation_speed * mt.pi / 180)
             zpos = self.position[0] * mt.sin(dx*rotation_speed * mt.pi / 180) + self.position[2] * mt.cos(dx*rotation_speed * mt.pi / 180)
-
-            #ypos = self.position[1] * mt.cos(dy * mt.pi / 180) - self.position[2] * mt.sin(dy * mt.pi / 180)
-            #zpos = self.position[1] * mt.sin(dy * mt.pi / 180) + self.position[2] * mt.cos(dy * mt.pi / 180) + self.position[0] * mt.sin(dx * mt.pi / 180)
-
             self.position[0] = xpos
             #self.position[1] = ypos
             self.position[2] = zpos
 
-
-            #self.rotation[0] +=
-
-            #self.rotation[1] += dy * 0.06
-            #self.position[0] += dx * 0.006
-            #self.position[1] += dy * 0.006
         elif buttons & mouse.RIGHT != 0:
             self.position[0] += dx * 0.1
             self.position[1] += dy * 0.1
-            #self.pointing[0] += dx * 0.1
-            #self.pointing[2] += dy * 0.1
 
+
+    def on_key_press(self, symbol, modifiers):
+        if symbol == key.ENTER:
+            self.change_frame()
+
+    def change_frame(self):
+        self.i += 1
+        print(self.i)
+        data = tdata[self.i]
+        print(np.mean(data['x']))
+        base_data = tbase_data[self.i]
+        count = tcount[self.i]
+        width, height = self.get_size()
+        self.on_resize(width, height)
+
+def getAllFiles(directory, dformat):
+    #dformat = ".omf"
+    #directory = "./data/"
+    N = 100
+    tFileList = os.listdir(directory)
+    # print(tFileList[0])
+    fileList = []
+    for file in tFileList:
+        # print(file)
+        if file.find(dformat) != -1:
+            fileList.append(directory + file)
+
+    #print(fileList)
+    i = 0
+    j = 0
+    base_data = []
+    count = []
+    data = []
+    print("Reading data...")
+    for file in fileList:
+        if j < N:
+            tbase_data, tcount = extract_base_data(file)
+            base_data.append(tbase_data)
+            count.append(tcount)
+            to_skip = [x for x in range(tcount)]
+            data.append(form_dataframe(file, to_skip))
+            j += 1
+    return data, base_data, count
 
 if __name__ == '__main__':
-    filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
-    base_data, count = extract_base_data(filename)
-    to_skip = [x for x in range(count)]
-    data = form_dataframe(filename, to_skip)
 
+    tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
+    data = tdata[0]
+    base_data = tbase_data[0]
+    count = tcount[0]
+    #i=0
     Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
     pyglet.app.run()

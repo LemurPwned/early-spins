@@ -132,3 +132,17 @@ def color2d(data, base_vectors, base_data):
         print("Sens: \n Mean : {}, \n Median : {}, \n Std : {}".format(np.mean(sen), np.median(sen), np.std(sen)))
         counter += 1
     return figs
+
+def generate_color_series(length):
+    red = 1
+    green = 0
+    blue = 0
+    dec = float(2/length)
+    color_series = []
+    for i in range(int(length/2)):
+        green = green + dec
+        color_series.append((red, green, blue))
+    for i in range(int(length/2), length):
+        red = red - dec
+        color_series.append((red, green, blue))
+    return color_series

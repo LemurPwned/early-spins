@@ -12,6 +12,7 @@ def update_batch_plot(i, data, scat):
     return scat
 
 def init_anim(data, title, frame_number, xnodes, ynodes):
+
     color_data = data
     point_list_x,point_list_y = populate_list(xnodes, ynodes)
     fig = plt.figure()
@@ -23,6 +24,7 @@ def init_anim(data, title, frame_number, xnodes, ynodes):
     ani = animation.FuncAnimation(fig, update_batch_plot,
             frames=range(frame_number),
             fargs=(color_data, scat))
+
     plt.show()
 
 def process_batch(filename):
@@ -67,9 +69,11 @@ def batch_load(directory, iterations, function):
 
 if __name__ == "__main__":
     N = 100
+
     file_list = batch_load('./data', N, process_batch)
     batches_to_animate = []
     for filename in file_list:
         batches_to_animate.append(process_batch(filename))
     print(len(batches_to_animate))
     init_anim(batches_to_animate, 'Magnetization direction', N, 35, 35)
+
