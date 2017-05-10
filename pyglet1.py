@@ -6,11 +6,13 @@ from input_parser import *
 import tiny_vectors as vc
 from camera_calculations import *
 from graph_panels import calculate_angle, generate_color_series
+import concurrent.futures
+from multiprocessing import Pool
 
 WINDOW = 800
 INCREMENT = 5
 #colors = []
-control = 30
+control = 10
 
 TIME_INTERVAL = 1/60.0
 
@@ -55,6 +57,7 @@ class Window(pyglet.window.Window):
         self.draw_vector([0, 0, 0, 0, size, 0], [0, 1, 0])
         self.draw_vector([0, 0, 0, 0, 0, size], [0, 0, 1])
 
+    #redundant function
     def create_vector(self, df):
         self.vec = vectors_list[self.i]
         self.colors = color_list[self.i]
@@ -159,7 +162,7 @@ class Window(pyglet.window.Window):
         if self.i >= control-1:
             self.i = 0
         if self.i > header['Iteration'].count():
-            self.i = 0  
+            self.i = 0
         else:
             pass
 
@@ -190,18 +193,66 @@ def getAllFiles(directory, extension):
 
     return data, base_data, count
 
+def process_whole(data):
+    tdata = data[0]
+    tbase_data = data[1]
+    for i in range(len(tdata)):
+        angle, vectors, colors = process_batch(tdata[i], tbase_data[i])
+        angle_list.append(angle)
+        vectors_list.append(vectors)
+        color_list.append(colors)
+    return angle_list, vectors_list, color_list
+
 
 if __name__ == '__main__':
     tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
     angle_list = []
     vectors_list = []
     color_list = []
+
+
+    import time
+    data1 = []
+    data1.append(tdata)
+    data1.append(tbase_data)
+    start = time.time()
+    pool = Pool(2)
+    result = pool.apply_async(process_whole, (data1,))
+    angle_list, vectors_list, color_list = result.get(timeout=35)
+    '''
+    for 5i in range(len(tdata)):
+        pool = Pool(processes=5)
+        result = pool.apply_async(process_batch, (tdata[i], tbase_data[i]))
+        angle, vectors, colors = result.get(timeout=4)
+        angle_list.append(angle)
+        vectors_list.append(vectors)
+        color_list.append(colors)
+    '''
+
+    '''
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        return_future = [executor.submit(process_batch, data, base_data) for data, base_data in zip(tdata, tbase_data)]
+        for future in concurrent.futures.as_completed(return_future):
+            l = 'data'
+            try:
+                angle, vectors, colors = future.result()
+                angle_list.append(angle)
+                vectors_list.append(vectors)
+                color_list.append(colors)
+            except Exception as exc:
+                print("Exception for {}: {}".format(l, exc))
+            else:
+                pass
+
     for i in range(len(tdata)):
         angle, vectors, colors = process_batch(tdata[i], tbase_data[i])
         angle_list.append(angle)
         vectors_list.append(vectors)
         color_list.append(colors)
-        print(i)
+        #print(i)
+    '''
+    end = time.time()
+    print("It has taken {}".format(end-start))
 
     header = read_header_file("./data/voltage-spin-diode.odt")
     data = tdata

@@ -113,7 +113,7 @@ def process_batch(df, base_data):
     series = generate_color_series(len(angles))
     temp_color = [x for (y, x) in sorted(zip(angles, series))]
     end = time.time()
-    print("TIME : {}\n".format(end - start))
+    #print("TIME : {}\n".format(end - start))
     return angles, vectors, temp_color
 
 
