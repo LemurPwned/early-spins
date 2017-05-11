@@ -48,7 +48,7 @@ def layer_splitter(data, base_data):
     surface = x * y
     layers = [data.iloc[surface * i:surface * i + surface, :] for i in range(z)]
     # ask about the true layer size, should be divisible by 5
-    # caveat, an artificial value is added to the last layer to make these equal
+    # TODO caveat, an artificial value is added to the last layer to make these equal
     layers[-1].loc[-1] = [0.0 for i in range(3)]
     return layers
 
