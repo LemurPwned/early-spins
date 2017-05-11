@@ -231,6 +231,10 @@ def getAllFiles(directory, format):
 
 def simulateDirectory(path_to_folder, extension, path_to_header_file):
     tdata, tbase_data, tcount = getAllFiles(path_to_folder, extension)
+    global header
+    global data
+    global base_data
+    global count
     header = read_header_file(path_to_header_file)
     data = tdata
     base_data = tbase_data[0]
