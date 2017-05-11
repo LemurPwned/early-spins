@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'MainWindow2.ui'
+# Form implementation generated from reading ui file 'MainWindow.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -25,7 +25,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(390, 159)
+        MainWindow.resize(390, 293)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.groupBox = QtGui.QGroupBox(self.centralwidget)
@@ -47,9 +47,31 @@ class Ui_MainWindow(object):
         self.stop_button = QtGui.QPushButton(self.groupBox)
         self.stop_button.setGeometry(QtCore.QRect(190, 30, 86, 25))
         self.stop_button.setObjectName(_fromUtf8("stop_button"))
+        self.groupBox_2 = QtGui.QGroupBox(self.centralwidget)
+        self.groupBox_2.setGeometry(QtCore.QRect(0, 110, 391, 201))
+        self.groupBox_2.setObjectName(_fromUtf8("groupBox_2"))
+        self.directory_lineEdit = QtGui.QLineEdit(self.groupBox_2)
+        self.directory_lineEdit.setGeometry(QtCore.QRect(90, 30, 281, 27))
+        self.directory_lineEdit.setObjectName(_fromUtf8("directory_lineEdit"))
+        self.directory_label = QtGui.QLabel(self.groupBox_2)
+        self.directory_label.setGeometry(QtCore.QRect(10, 35, 68, 17))
+        self.directory_label.setObjectName(_fromUtf8("directory_label"))
+        self.number_of_files_label = QtGui.QLabel(self.groupBox_2)
+        self.number_of_files_label.setGeometry(QtCore.QRect(10, 70, 121, 17))
+        self.number_of_files_label.setObjectName(_fromUtf8("number_of_files_label"))
+        self.number_of_files_value_label = QtGui.QLabel(self.groupBox_2)
+        self.number_of_files_value_label.setGeometry(QtCore.QRect(130, 70, 68, 17))
+        self.number_of_files_value_label.setObjectName(_fromUtf8("number_of_files_value_label"))
+        self.format_label = QtGui.QLabel(self.groupBox_2)
+        self.format_label.setGeometry(QtCore.QRect(10, 100, 101, 17))
+        self.format_label.setObjectName(_fromUtf8("format_label"))
+        self.format_value_label = QtGui.QLabel(self.groupBox_2)
+        self.format_value_label.setGeometry(QtCore.QRect(130, 100, 68, 17))
+        self.format_value_label.setText(_fromUtf8(""))
+        self.format_value_label.setObjectName(_fromUtf8("format_value_label"))
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 390, 20))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 390, 25))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName(_fromUtf8("menuFile"))
@@ -104,6 +126,11 @@ class Ui_MainWindow(object):
         self.prevFrame_button.setText(_translate("MainWindow", "<<", None))
         self.playPause_button.setText(_translate("MainWindow", "Play", None))
         self.stop_button.setText(_translate("MainWindow", "Stop", None))
+        self.groupBox_2.setTitle(_translate("MainWindow", "Chosen Directory", None))
+        self.directory_label.setText(_translate("MainWindow", "Directory", None))
+        self.number_of_files_label.setText(_translate("MainWindow", "Number of files", None))
+        self.number_of_files_value_label.setText(_translate("MainWindow", "0", None))
+        self.format_label.setText(_translate("MainWindow", "File format", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
         self.menuEdit.setTitle(_translate("MainWindow", "Edit", None))
         self.menuColors.setTitle(_translate("MainWindow", "Colors", None))
