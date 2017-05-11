@@ -148,6 +148,7 @@ class Window(pyglet.window.Window):
         print("Mean of data in change frame: {}".format(np.mean(data[self.i]['x'])))
         self.on_resize(width, height)
 
+    #DO NOT REMOVE DF FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
     def update(self, df):
         if self.FREE_RUN:
             self.i += 1
