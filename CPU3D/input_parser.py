@@ -21,8 +21,12 @@ if __name__ == "__main__":
     df = read_header_file(filename2)
     graph = plotters(df, ('Iteration', 'Total energy'), ('step', 'J'))
 else:
-    from CPU3D.tiny_vectors import *
-    from CPU3D.graph_panels import *
+    try:
+        from tiny_vectors import *
+        from graph_panels import *
+    except:
+        from CPU3D.tiny_vectors import *
+        from CPU3D.graph_panels import *
 
 def extract_base_data(filename):
     '''

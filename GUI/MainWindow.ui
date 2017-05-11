@@ -131,7 +131,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>70</y>
+       <y>90</y>
        <width>121</width>
        <height>17</height>
       </rect>
@@ -144,7 +144,7 @@
      <property name="geometry">
       <rect>
        <x>130</x>
-       <y>70</y>
+       <y>90</y>
        <width>68</width>
        <height>17</height>
       </rect>
@@ -157,7 +157,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>100</y>
+       <y>110</y>
        <width>101</width>
        <height>17</height>
       </rect>
@@ -170,13 +170,36 @@
      <property name="geometry">
       <rect>
        <x>130</x>
-       <y>100</y>
+       <y>110</y>
        <width>68</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string/>
+      <string>.</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="header_file_lineEdit">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>55</y>
+       <width>281</width>
+       <height>27</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="directory_label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>81</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Header File</string>
      </property>
     </widget>
    </widget>
@@ -198,6 +221,7 @@
     <addaction name="actionLoad_File"/>
     <addaction name="actionLoad_Data"/>
     <addaction name="separator"/>
+    <addaction name="actionLoad_Header_File"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -267,6 +291,11 @@
   <action name="actionShow_2D_layer_Plot">
    <property name="text">
     <string>Show 2D layer Plot</string>
+   </property>
+  </action>
+  <action name="actionLoad_Header_File">
+   <property name="text">
+    <string>Load Header File</string>
    </property>
   </action>
  </widget>

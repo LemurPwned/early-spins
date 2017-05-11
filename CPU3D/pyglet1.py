@@ -3,25 +3,6 @@ from pyglet.gl import *
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
 
-if __name__ == '__main__':
-    from input_parser import *
-    from tiny_vectors import *
-    from camera_calculations import *
-    from graph_panels import calculate_angle, generate_color_series
-    tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
-    header = read_header_file("./data/voltage-spin-diode.odt")
-    data = tdata
-    base_data = tbase_data[0]
-    count = tcount[0]
-    Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
-    pyglet.app.run()
-else:
-    from CPU3D.input_parser import *
-    from CPU3D.tiny_vectors import *
-    from CPU3D.camera_calculations import *
-    from CPU3D.graph_panels import calculate_angle, generate_color_series
-
-
 WINDOW = 800
 INCREMENT = 5
 colors = []
@@ -256,6 +237,7 @@ def simulateDirectory(path_to_folder, extension, path_to_header_file):
     count = tcount[0]
     Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
     pyglet.app.run()
+    
 
     
 def simulateFile(path_to_file, path_to_header_file): 
@@ -265,4 +247,20 @@ def simulateFile(path_to_file, path_to_header_file):
     pyglet.app.run()
 	
 	
-
+if __name__ == '__main__':
+    from input_parser import *
+    from tiny_vectors import *
+    from camera_calculations import *
+    from graph_panels import calculate_angle, generate_color_series
+    tdata, tbase_data, tcount = getAllFiles("../data/", ".omf")
+    header = read_header_file("../data/voltage-spin-diode.odt")
+    data = tdata
+    base_data = tbase_data[0]
+    count = tcount[0]
+    Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
+    pyglet.app.run()
+else:
+    from CPU3D.input_parser import *
+    from CPU3D.tiny_vectors import *
+    from CPU3D.camera_calculations import *
+    from CPU3D.graph_panels import calculate_angle, generate_color_series

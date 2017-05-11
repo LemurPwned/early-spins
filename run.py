@@ -13,7 +13,11 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.window()
 
     def window(self):
-    #LAYOUT
+        self.headerFile = ""
+        self.directory = ""
+        self.fformat = ""
+        
+        #LAYOUT
         self.playPause_button.clicked.connect(self.playPause)
         self.stop_button.clicked.connect(self.stop)
         self.nextFrame_button.clicked.connect(self.nextFrame)
@@ -22,7 +26,9 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         #MENU
         self.actionLoad_File.triggered.connect(self.loadSingleFile)
         self.actionLoad_Data.triggered.connect(self.loadDirectory)
+        self.actionLoad_Header_File.triggered.connect(self.loadHeader)
         self.actionShow_3D_Model.triggered.connect(self.load3Dsim)
+        
 
 
     def loadSingleFile(self):
@@ -44,13 +50,24 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
             if(f[f.rfind("."):]==self.fformat):
                 c+=1
         
-        
         self.number_of_files_value_label.setText(str(c))
-		#print(filename)
 	
+    def loadHeader(self):
+        w = QtGui.QWidget()
+        filename = QtGui.QFileDialog.getOpenFileName(w, 'Open File', '.')
+        self.headerFile = filename
+        self.header_file_lineEdit.setText(self.headerFile)
 	
     def load3Dsim(self):
-        pyglet1.simulateDirectory(self.directory, self.fformat, self.directory+"voltage-spin-diode.odt") #TODO
+        if self.headerFile == "":
+            #TODO error
+            pass
+        
+        if self.directory == "":
+            #TODO error
+            pass
+        
+        pyglet1.simulateDirectory(self.directory, self.fformat, self.headerFile)
 	
 	
     #INSTEAD OF THESE WE WILL GIVE OUR FUNCTIONS!
