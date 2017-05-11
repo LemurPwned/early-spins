@@ -144,12 +144,11 @@ class Window(pyglet.window.Window):
         base_data = tbase_data[self.i]
         count = tcount[self.i]
         width, height = self.get_size()
-        #print(colors)
         print("Mean of colors {}".format(np.mean(colors)))
         print("Mean of data in change frame: {}".format(np.mean(data[self.i]['x'])))
         self.on_resize(width, height)
 
-    def update(self):
+    def update(self, df):
         if self.FREE_RUN:
             self.i += 1
             self.list_guard()
@@ -191,20 +190,6 @@ def getAllFiles(directory, extension):
     return data, base_data, count
 
 
-def process_whole(data):
-    tdata = data[0]
-    tbase_data = data[1]
-    angle_list = []
-    vectors_list = []
-    color_list = []
-    for i in range(len(tdata)):
-        angle, vectors, colors = process_batch(tdata[i], tbase_data[i])
-        angle_list.append(angle)
-        vectors_list.append(vectors)
-        color_list.append(colors)
-    return angle_list, vectors_list, color_list
-
-
 if __name__ == '__main__':
     tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
     angle_list = []
@@ -212,18 +197,11 @@ if __name__ == '__main__':
     color_list = []
 
     start = time.time()
-    '''
+
     pool = Pool()
     multiple_results = [pool.apply_async(process_batch, (tdata[i], tbase_data[i])) for i in range(len(tdata))]
     for result in multiple_results:
         angle, vectors, colors = result.get(timeout=7)
-        angle_list.append(angle)
-        vectors_list.append(vectors)
-        color_list.append(colors)
-    '''
-    #Below is the iterative version
-    for i in range(len(tdata)):
-        angle, vectors, colors = process_batch(tdata[i], tbase_data[i])
         angle_list.append(angle)
         vectors_list.append(vectors)
         color_list.append(colors)
