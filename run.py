@@ -1,7 +1,7 @@
 from PyQt4 import QtGui, QtCore
 import sys 
 
-from MainWindow import Ui_MainWindow
+from GUI.MainWindow import Ui_MainWindow
 
 class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
 	def __init__(self, parent=None):

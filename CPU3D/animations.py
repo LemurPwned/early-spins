@@ -2,10 +2,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import os
-import tiny_vectors as vc
 from matplotlib import cm
-from input_parser import *
-from graph_panels import calculate_angle, populate_list, increase_variance
+
+
+if __name__ == "__main__":
+    from input_parser import *
+    from graph_panels import calculate_angle, populate_list, increase_variance
+    import tiny_vectors as 
+    
+    N = 100
+
+    file_list = batch_load('./data', N, process_batch)
+    batches_to_animate = []
+    for filename in file_list:
+        batches_to_animate.append(process_batch(filename))
+    print(len(batches_to_animate))
+    init_anim(batches_to_animate, 'Magnetization direction', N, 35, 35)
+else:
+    from CPU3D.input_parser import *
+    from CPU3D.graph_panels import calculate_angle, populate_list, increase_variance
+    from CPU3D.tiny_vectors import *
 
 
 def update_batch_plot(i, data, scat):
@@ -35,13 +51,13 @@ def process_batch(filename):
     # split layers
     layers = layer_splitter(df, base_data)
     '''
-    v1 = vc.Vector(1,0,0)
-    v2 = vc.Vector(0,1,0)
-    v3 = vc.Vector(0,0,1)
+    v1 = .Vector(1,0,0)
+    v2 = .Vector(0,1,0)
+    v3 = .Vector(0,0,1)
     figs = color2d(layers[4], [v1, v2, v3], base_data)
     callback_plotter(figs[0])
     '''
-    relate = vc.Vector(1, 0, 0)
+    relate = .Vector(1, 0, 0)
     # testing, just one layer for now
     layer = calculate_angle(layers[0], relate)
     layer = increase_variance(layer, 25)
@@ -69,13 +85,5 @@ def batch_load(directory, iterations, function):
     return handling_list
 
 
-if __name__ == "__main__":
-    N = 100
 
-    file_list = batch_load('./data', N, process_batch)
-    batches_to_animate = []
-    for filename in file_list:
-        batches_to_animate.append(process_batch(filename))
-    print(len(batches_to_animate))
-    init_anim(batches_to_animate, 'Magnetization direction', N, 35, 35)
 

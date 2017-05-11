@@ -2,10 +2,25 @@ import pyglet
 from pyglet.gl import *
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
-from input_parser import *
-import tiny_vectors as vc
-from camera_calculations import *
-from graph_panels import calculate_angle, generate_color_series
+
+if __name__ == '__main__':
+    from input_parser import *
+    from tiny_vectors import *
+    from camera_calculations import *
+    from graph_panels import calculate_angle, generate_color_series
+    tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
+    header = read_header_file("./data/voltage-spin-diode.odt")
+    data = tdata
+    base_data = tbase_data[0]
+    count = tcount[0]
+    Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
+    pyglet.app.run()
+else:
+    from CPU3D.input_parser import *
+    from CPU3D.tiny_vectors import *
+    from CPU3D.camera_calculations import *
+    from CPU3D.graph_panels import calculate_angle, generate_color_series
+
 
 WINDOW = 800
 INCREMENT = 5
@@ -63,9 +78,9 @@ class Window(pyglet.window.Window):
         zpos = 0
         skip = 0
         # pick just one vector at the time
-        b1 = vc.Vector(1, 0, 0)
-        b2 = vc.Vector(0, 1, 0)
-        b3 = vc.Vector(0, 0, 1)
+        b1 = Vector(1, 0, 0)
+        b2 = Vector(0, 1, 0)
+        b3 = Vector(0, 0, 1)
         step = 1
         angles = []
         # power is proportional to the variance
@@ -84,12 +99,12 @@ class Window(pyglet.window.Window):
                 xtemp = xpos * float(base_data['xbase']) * 1e9
                 ytemp = ypos * float(base_data['ybase']) * 1e9
                 ztemp = zpos * float(base_data['zbase']) * 1e9
-                c = vc.Vector(row[0], row[1], row[2])
+                c = Vector(row[0], row[1], row[2])
 
                 if np.abs(row[0] + row[1] + row[2]) > 0:
                     self.vec.append([xtemp, ytemp, ztemp, xtemp + row[0] / c.norm,
                                      ytemp + row[1] / c.norm, ztemp + row[2] / c.norm])
-                    angles.append(np.power(vc.relative_direction(c, b1), power))
+                    angles.append(np.power(relative_direction(c, b1), power))
                 else:
                     continue
             skip += 1
@@ -233,11 +248,21 @@ def getAllFiles(directory, format):
     return data, base_data, count
 
 
-if __name__ == '__main__':
-    tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
-    header = read_header_file("./data/voltage-spin-diode.odt")
+def simulateDirectory(path_to_folder, extension, path_to_header_file):
+    tdata, tbase_data, tcount = getAllFiles(path_to_folder, extension)
+    header = read_header_file(path_to_header_file)
     data = tdata
     base_data = tbase_data[0]
     count = tcount[0]
     Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
     pyglet.app.run()
+
+    
+def simulateFile(path_to_file, path_to_header_file): 
+    data, count = extract_base_data(path_to_file)
+    header = read_header_file(path_to_header_file)
+    Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
+    pyglet.app.run()
+	
+	
+
