@@ -102,9 +102,9 @@ def process_batch(df, base_data):
         ztemp = zpos * zb
 
         c = vc.Vector(row[0], row[1], row[2])
-        if np.abs(row[0] + row[1] + row[2]) > 0:
-            vectors.append([xtemp, ytemp, ztemp, xtemp + row[0] / c.norm,
-                            ytemp + row[1] / c.norm, ztemp + row[2] / c.norm])
+        if np.abs(c.x + c.y + c.z) > 0:
+            vectors.append([xtemp, ytemp, ztemp, xtemp + c.x / c.norm,
+                            ytemp + c.y / c.norm, ztemp + c.z / c.norm])
             angles.append(np.power(vc.relative_direction(c, b1), power))
         else:
             continue
@@ -138,42 +138,7 @@ def topology(base_data):
         vectors_init.append([xtemp, ytemp, ztemp, xtemp])
     return vectors_init
 
-def form_layer_structure(df, base_data):
-    xpos = 0
-    ypos = 0
-    zpos = 0
-    b1 = vc.Vector(1, 0, 0)
-    norm = (np.square(df['x']) + np.square(df['y']) + np.square(df['z'])).apply(np.sqrt)
-    _angles = df['x']*b1.x + df['y']*b1.y + df['z']*b1.z
-    _angles = (((_angles/norm).apply(np.arccos)**25)/np.max(_angles)).fillna(0)
-    df['norm'] = norm
-    df['angles'] = _angles
-    vectors = []
-    angles = []
-    colors = []
-    for index, row in df.iterrows():
-        if xpos >= int(base_data['xnodes']):
-            ypos += 1 + (xpos % int(base_data['xnodes']))
-            xpos = 0
-        if ypos >= int(base_data['ynodes']):
-            zpos += 1 + (ypos % int(base_data['ynodes']))
-            ypos = 0
-            xpos = 0
-        xpos += 1
-        xtemp = xpos * float(base_data['xbase']) * 1e9
-        ytemp = ypos * float(base_data['ybase']) * 1e9
-        ztemp = zpos * float(base_data['zbase']) * 1e9
-        if row[3] > 0:
-            vectors.append([xtemp, ytemp, ztemp, xtemp + row[0] / row[3],
-                            ytemp + row[1] / row[3], ztemp + row[2] / row[3]])
-            angles.append(row[4])
-        else:
-            continue
 
-        series = generate_color_series(len(angles))
-        colors = [x for (y, x) in sorted(zip(angles, series))]
-
-    return vectors, angles, colors
 
 def histeresis(angle):
     low = np.percentile(angle[angle > 0], 66, interpolation='higher')
@@ -189,6 +154,7 @@ def colorify(dataframe, low, high):
     return dataframe
 
 if __name__ == "__main__":
+
     filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
     filename2 = './data/voltage-spin-diode.odt'
     base_data, count = extract_base_data(filename)
