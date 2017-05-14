@@ -1,4 +1,5 @@
 import pyglet
+pyglet.options['debug_gl'] = False
 from pyglet.gl import *
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
