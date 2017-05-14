@@ -2,14 +2,21 @@ import pyglet
 from pyglet.gl import *
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
-from input_parser import *
-from camera_calculations import *
+try:
+    from input_parser import *
+except:
+    from CPU3D.input_parser import *
+
+try:
+    from camera_calculations import *
+except:
+    from CPU3D.camera_calculations import *
 from multiprocessing import Pool
 import time
 
 WINDOW = 800
 INCREMENT = 5
-control = 300
+control = 10
 
 TIME_INTERVAL = 1/60.0
 
@@ -193,12 +200,40 @@ def getAllFiles(directory, extension):
 
 
 def simulateDirectory(path_to_folder, extension, path_to_header_file):
-    tdata, tbase_data, tcount = getAllFiles(path_to_folder, extension)
     global header
     global data
     global base_data
     global count
+    global angle_list
+    global vectors_list
+    global color_list
+    global tbase_data
+    global tcount
+    global colors
+    
+    tdata, tbase_data, tcount = getAllFiles(path_to_folder, extension)
+    
     header = read_header_file(path_to_header_file)
+    
+
+    angle_list = []
+    vectors_list = []
+    color_list = []
+
+    start = time.time()
+
+    pool = Pool()
+    multiple_results = [pool.apply_async(process_batch, (tdata[i], tbase_data[i])) for i in range(len(tdata))]
+    for result in multiple_results:
+        angle, vectors, colors = result.get(timeout=7)
+        angle_list.append(angle)
+        vectors_list.append(vectors)
+        color_list.append(colors)
+
+    end = time.time()
+    print("It has taken {}".format(end-start))
+    
+    
     data = tdata
     base_data = tbase_data[0]
     count = tcount[0]
@@ -221,7 +256,7 @@ if __name__ == '__main__':
     from graph_panels import calculate_angle, generate_color_series
     tdata, tbase_data, tcount = getAllFiles("../data/", ".omf")
     header = read_header_file("../data/voltage-spin-diode.odt")
-    tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
+    #tdata, tbase_data, tcount = getAllFiles("../data/", ".omf")
     angle_list = []
     vectors_list = []
     color_list = []
@@ -239,7 +274,7 @@ if __name__ == '__main__':
     end = time.time()
     print("It has taken {}".format(end-start))
 
-    header = read_header_file("./data/voltage-spin-diode.odt")
+    #header = read_header_file("../data/voltage-spin-diode.odt")
     data = tdata
     base_data = tbase_data[0]
     count = tcount[0]

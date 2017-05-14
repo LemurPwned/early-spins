@@ -1,3 +1,5 @@
+import time
+
 if __name__ == "__main__":
     from tiny_vectors import *
     from graph_panels import *
@@ -99,7 +101,7 @@ def form_dataframe(filename, to_skip, cols=['Whitespace', 'x', 'y', 'z']):
     return data
 
 def process_batch(df, base_data):
-    b1 = vc.Vector(1, 0, 0)
+    b1 = Vector(1, 0, 0)
     angles = []
     vectors = []
     xpos = 0
@@ -125,11 +127,11 @@ def process_batch(df, base_data):
         ytemp = ypos * yb
         ztemp = zpos * zb
 
-        c = vc.Vector(row[0], row[1], row[2])
+        c = Vector(row[0], row[1], row[2])
         if np.abs(row[0] + row[1] + row[2]) > 0:
             vectors.append([xtemp, ytemp, ztemp, xtemp + row[0] / c.norm,
                             ytemp + row[1] / c.norm, ztemp + row[2] / c.norm])
-            angles.append(np.power(vc.relative_direction(c, b1), power))
+            angles.append(np.power(relative_direction(c, b1), power))
         else:
             continue
 
@@ -166,7 +168,7 @@ def form_layer_structure(df, base_data):
     xpos = 0
     ypos = 0
     zpos = 0
-    b1 = vc.Vector(1, 0, 0)
+    b1 = Vector(1, 0, 0)
     norm = (np.square(df['x']) + np.square(df['y']) + np.square(df['z'])).apply(np.sqrt)
     _angles = df['x']*b1.x + df['y']*b1.y + df['z']*b1.z
     _angles = (((_angles/norm).apply(np.arccos)**25)/np.max(_angles)).fillna(0)
