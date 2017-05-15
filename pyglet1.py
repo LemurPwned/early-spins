@@ -1,5 +1,6 @@
 import pyglet
 from pyglet.gl import *
+pyglet.options['debug_gl'] = False
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
 from input_parser import *
@@ -9,7 +10,7 @@ import time
 
 WINDOW = 800
 INCREMENT = 5
-control = 300
+control = 10
 
 TIME_INTERVAL = 1/60.0
 

@@ -87,7 +87,7 @@ def process_batch(df, base_data):
     xb = float(base_data['xbase']) * 1e9
     yb = float(base_data['ybase']) * 1e9
     zb = float(base_data['zbase']) * 1e9
-    start = time.time()
+    #start = time.time()
     for index, row in df.iterrows():
         if xpos >= xc:
             ypos += 1 + (xpos % xc)
@@ -111,8 +111,8 @@ def process_batch(df, base_data):
             continue
     series = generate_color_series(len(angles))
     temp_color = [x for (y, x) in sorted(zip(angles, series))]
-    end = time.time()
-    print("TIME : {}\n".format(end - start))
+    #end = time.time()
+    #print("TIME : {}\n".format(end - start))
     return angles, vectors, temp_color
 
 if __name__ == "__main__":
