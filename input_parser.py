@@ -105,53 +105,15 @@ def process_batch(df, base_data):
         if np.abs(c.x + c.y + c.z) > 0:
             vectors.append([xtemp, ytemp, ztemp, xtemp + c.x / c.norm,
                             ytemp + c.y / c.norm, ztemp + c.z / c.norm])
-            angles.append(np.power(vc.relative_direction(c, b1), power))
+            angle = np.power(vc.relative_direction(c, b1), power)
+            angles.append(angle)
         else:
             continue
-
-    max_angle = np.max(angles)
     series = generate_color_series(len(angles))
     temp_color = [x for (y, x) in sorted(zip(angles, series))]
     end = time.time()
-    #print("TIME : {}\n".format(end - start))
+    print("TIME : {}\n".format(end - start))
     return angles, vectors, temp_color
-
-
-def topology(base_data):
-    xpos = 0
-    ypos = 0
-    zpos = 0
-    vectors_init = []
-    iterations = base_data['xnodes']*base_data['ynodes']*base_data['znodes']
-    for i in range(iterations):
-        if xpos >= int(base_data['xnodes']):
-            ypos += 1 + (xpos % int(base_data['xnodes']))
-            xpos = 0
-        if ypos >= int(base_data['ynodes']):
-            zpos += 1 + (ypos % int(base_data['ynodes']))
-            ypos = 0
-            xpos = 0
-        xpos += 1
-        xtemp = xpos * float(base_data['xbase']) * 1e9
-        ytemp = ypos * float(base_data['ybase']) * 1e9
-        ztemp = zpos * float(base_data['zbase']) * 1e9
-        vectors_init.append([xtemp, ytemp, ztemp, xtemp])
-    return vectors_init
-
-
-
-def histeresis(angle):
-    low = np.percentile(angle[angle > 0], 66, interpolation='higher')
-    high = np.percentile(angle[angle > 0], 33, interpolation='lower')
-    return low, high
-
-
-def colorify(dataframe, low, high):
-    dataframe['color'] = np.zeros(dataframe.shape[0])
-    dataframe['color'][(dataframe['angles'] > low) & (dataframe['angles'] < high) & (dataframe['angles'] > 0)] = 1
-    dataframe['color'][(dataframe['angles'] > high) & (dataframe['angles'] > 0)] = 2
-    dataframe['color'][(dataframe['angles'] < low) & (dataframe['angles'] > 0)] = 3
-    return dataframe
 
 if __name__ == "__main__":
 
