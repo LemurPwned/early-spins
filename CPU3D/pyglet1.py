@@ -211,11 +211,11 @@ def simulateDirectory(path_to_folder, extension, path_to_header_file):
     global tbase_data
     global tcount
     global colors
-    
+
     tdata, tbase_data, tcount = getAllFiles(path_to_folder, extension)
-    
+
     header = read_header_file(path_to_header_file)
-    
+
 
     angle_list = []
     vectors_list = []
@@ -226,30 +226,30 @@ def simulateDirectory(path_to_folder, extension, path_to_header_file):
     pool = Pool()
     multiple_results = [pool.apply_async(process_batch, (tdata[i], tbase_data[i])) for i in range(len(tdata))]
     for result in multiple_results:
-        angle, vectors, colors = result.get(timeout=7)
+        angle, vectors, colors = result.get(timeout=25)
         angle_list.append(angle)
         vectors_list.append(vectors)
         color_list.append(colors)
 
     end = time.time()
     print("It has taken {}".format(end-start))
-    
-    
+
+
     data = tdata
     base_data = tbase_data[0]
     count = tcount[0]
     Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
     pyglet.app.run()
-    
 
-    
-def simulateFile(path_to_file, path_to_header_file): 
+
+
+def simulateFile(path_to_file, path_to_header_file):
     data, count = extract_base_data(path_to_file)
     header = read_header_file(path_to_header_file)
     Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
     pyglet.app.run()
-	
-	
+
+
 if __name__ == '__main__':
     from input_parser import *
     from tiny_vectors import *
@@ -279,7 +279,7 @@ if __name__ == '__main__':
     data = tdata
     base_data = tbase_data[0]
     count = tcount[0]
-    Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
+    x = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
     pyglet.app.run()
 else:
     from CPU3D.input_parser import *
