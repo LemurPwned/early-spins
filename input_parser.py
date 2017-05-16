@@ -127,6 +127,7 @@ def process_batch_sensitive(df, base_data):
     zb = float(base_data['zbase']) * 1e9
     #start = time.time()
     for index, row in df.iterrows():
+        xpos += 1
         if xpos >= xc:
             ypos += 1 + (xpos % xc)
             xpos = 0
@@ -134,11 +135,10 @@ def process_batch_sensitive(df, base_data):
             zpos += 1 + (ypos % yc)
             ypos = 0
             xpos = 0
-        xpos += 1
+
         xtemp = xpos * xb
         ytemp = ypos * yb
         ztemp = zpos * zb
-
         c = vc.Vector(row[0], row[1], row[2])
         if np.abs(c.x + c.y + c.z) > 0:
             k = c.norm

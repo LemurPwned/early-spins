@@ -192,7 +192,8 @@ def getAllFiles(directory, extension):
 
 
 if __name__ == '__main__':
-    tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
+    #tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
+    tdata, tbase_data, tcount = getAllFiles("./0520nm/", ".omf")
     vectors_list = []
     color_list = []
 
@@ -208,7 +209,8 @@ if __name__ == '__main__':
     end = time.time()
     print("It has taken {}".format(end-start))
 
-    header = read_header_file("./data/voltage-spin-diode.odt")
+    #header = read_header_file("./data/voltage-spin-diode.odt")
+    header = read_header_file("./0520nm/proba1.odt")
     data = tdata
     base_data = tbase_data[0]
     count = tcount[0]
