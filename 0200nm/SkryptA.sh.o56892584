@@ -1,0 +1,26 @@
+Fri Mar  6 13:59:33 CET 2015
+Start  Proba200.mif, no params
+Boxsi version 1.2.0.5
+Running on: n0528-g7x.zeus
+OS/machine: Linux/x86_64
+User: plgjchecin	PID: 26804
+Number of threads: 12
+Mesh geometry: 40 x 40 x 32 = 51 200 cells
+Multi-level launch lists ---
+Thread  0:  3  6  9  1  2
+Thread  3:  4  5
+Thread  6:  7  8
+Thread  9: 10 11
+Thread 0 runs on node 0
+Thread 1 runs on node 0
+Thread 2 runs on node 0
+Thread 3 runs on node 0
+Thread 4 runs on node 0
+Thread 5 runs on node 0
+Thread 6 runs on node 0
+Thread 7 runs on node 0
+Thread 8 runs on node 0
+Thread 9 runs on node 0
+Thread 10 runs on node 0
+Thread 11 runs on node 0
+Fri Mar  6 14:44:33 CET 2015

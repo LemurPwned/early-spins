@@ -10,7 +10,7 @@ import time
 
 WINDOW = 800
 INCREMENT = 5
-control = 50
+control = 10
 
 TIME_INTERVAL = 1/60.0
 
@@ -51,9 +51,9 @@ class Window(pyglet.window.Window):
         glEnd()
 
     def draw_cordinate_system(self, size=5):
-        self.draw_vector([0, 0, 0, size, 0, 0], [1, 0, 0])
-        self.draw_vector([0, 0, 0, 0, size, 0], [0, 1, 0])
-        self.draw_vector([0, 0, 0, 0, 0, size], [0, 0, 1])
+        self.draw_vector([0, 0, 0, size, 0, 0], [1, 0, 0]) #x
+        self.draw_vector([0, 0, 0, 0, size, 0], [0, 1, 0]) #y
+        self.draw_vector([0, 0, 0, 0, 0, size], [0, 0, 1]) #z
 
     #redundant function
     def create_vector(self, df):
@@ -193,17 +193,15 @@ def getAllFiles(directory, extension):
 
 if __name__ == '__main__':
     tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
-    angle_list = []
     vectors_list = []
     color_list = []
 
     start = time.time()
 
     pool = Pool()
-    multiple_results = [pool.apply_async(process_batch2, (tdata[i], tbase_data[i])) for i in range(len(tdata))]
+    multiple_results = [pool.apply_async(process_batch, (tdata[i], tbase_data[i])) for i in range(len(tdata))]
     for result in multiple_results:
-        angle, vectors, colors = result.get(timeout=7)
-        angle_list.append(angle)
+        vectors, colors = result.get(timeout=7)
         vectors_list.append(vectors)
         color_list.append(colors)
 

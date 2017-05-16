@@ -73,20 +73,21 @@ def form_dataframe(filename, to_skip, cols=['Whitespace', 'x', 'y', 'z']):
         data[['x', 'y', 'z']] = data[['x', 'y', 'z']].astype(float)
     return data
 
-
-def process_batch2(df, base_data):
+def process_batch(df, base_data):
     vectors = []
+    temp_color = []
     xpos = 0
     ypos = 0
     zpos = 0
-    power = 5
-    temp_color = []
     xc = int(base_data['xnodes'])
     yc = int(base_data['ynodes'])
     xb = float(base_data['xbase']) * 1e9
     yb = float(base_data['ybase']) * 1e9
     zb = float(base_data['zbase']) * 1e9
-    for index, row in df.iterrows():
+    xv = df['x'].tolist()
+    yv = df['y'].tolist()
+    zv = df['z'].tolist()
+    for x, y, z in zip(xv,yv,zv):
         if xpos >= xc:
             ypos += 1 + (xpos % xc)
             xpos = 0
@@ -98,17 +99,20 @@ def process_batch2(df, base_data):
         xtemp = xpos * xb
         ytemp = ypos * yb
         ztemp = zpos * zb
-        c = vc.Vector(row[0], row[1], row[2])
+        c = vc.Vector(x, y, z)
         if np.abs(c.x + c.y + c.z) > 0:
-            vectors.append([xtemp, ytemp, ztemp, xtemp + c.x / c.norm,
-                            ytemp + c.y / c.norm, ztemp + c.z / c.norm])
-            temp_color.append((c.x/c.norm, c.y/c.norm, c.z/c.norm))
+            k = c.norm
+            vectors.append([xtemp, ytemp, ztemp, xtemp + c.x / k,
+                            ytemp + c.y / k, ztemp + c.z / k])
+            temp_color.append((c.x/k, c.y/k, c.z/k))
         else:
             continue
-    return angles, vectors, temp_color
+    return vectors, temp_color
 
-
-def process_batch(df, base_data):
+def process_batch_sensitive(df, base_data):
+    '''
+    increases the displayed sensitivity of data
+    '''
     b1 = vc.Vector(1, 0, 0)
     angles = []
     vectors = []
@@ -137,8 +141,9 @@ def process_batch(df, base_data):
 
         c = vc.Vector(row[0], row[1], row[2])
         if np.abs(c.x + c.y + c.z) > 0:
-            vectors.append([xtemp, ytemp, ztemp, xtemp + c.x / c.norm,
-                            ytemp + c.y / c.norm, ztemp + c.z / c.norm])
+            k = c.norm
+            vectors.append([xtemp, ytemp, ztemp, xtemp + c.x / k,
+                            ytemp + c.y / k, ztemp + c.z / k])
             angle = np.power(vc.relative_direction(c, b1), power)
             angles.append(angle)
         else:
