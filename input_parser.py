@@ -2,7 +2,6 @@ import tiny_vectors as vc
 import time
 from graph_panels import *
 
-
 def extract_base_data(filename):
     '''
     .omf format reader
