@@ -8,7 +8,7 @@ from matplotlib import cm
 if __name__ == "__main__":
     from input_parser import *
     from graph_panels import calculate_angle, populate_list, increase_variance
-    import tiny_vectors as 
+    from tiny_vectors import *
     
     N = 100
 
@@ -51,13 +51,13 @@ def process_batch(filename):
     # split layers
     layers = layer_splitter(df, base_data)
     '''
-    v1 = .Vector(1,0,0)
-    v2 = .Vector(0,1,0)
-    v3 = .Vector(0,0,1)
+    v1 = Vector(1,0,0)
+    v2 = Vector(0,1,0)
+    v3 = Vector(0,0,1)
     figs = color2d(layers[4], [v1, v2, v3], base_data)
     callback_plotter(figs[0])
     '''
-    relate = .Vector(1, 0, 0)
+    relate = Vector(1, 0, 0)
     # testing, just one layer for now
     layer = calculate_angle(layers[0], relate)
     layer = increase_variance(layer, 25)

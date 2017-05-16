@@ -9,7 +9,12 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainScreen, self).__init__(parent)
         self.setupUi(self)
-        self.progressBar.setProperty("value", 0)
+        
+        self.worker = WorkerObject()
+        self.worker_thread = QtCore.QThread()
+        self.worker.moveToThread(self.worker_thread)
+        self.worker_thread.start()
+        
         self.window()
 
     def window(self):
@@ -84,9 +89,18 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         print("prev frame")
     #INSTEAD OF THESE WE WILL GIVE OUR FUNCTIONS!
 
+class WorkerObject(QtCore.QObject):
 
-def test():
-    print("test")
+    signalStatus = QtCore.pyqtSignal(str)
+
+    def __init__(self, parent=None):
+        super(self.__class__, self).__init__(parent)
+    
+    def startWork(self):
+        for i in range(1000):
+            print("test")
+            tm.sleep(1)
+
 
 def main():
     app = QtGui.QApplication(sys.argv)
