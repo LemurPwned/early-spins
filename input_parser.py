@@ -80,6 +80,7 @@ def process_batch(df, base_data):
     zpos = 0
     xc = int(base_data['xnodes'])
     yc = int(base_data['ynodes'])
+    zc = int(base_data['znodes'])
     xb = float(base_data['xbase']) * 1e9
     yb = float(base_data['ybase']) * 1e9
     zb = float(base_data['zbase']) * 1e9
@@ -87,6 +88,7 @@ def process_batch(df, base_data):
     yv = df['y'].tolist()
     zv = df['z'].tolist()
     for x, y, z in zip(xv,yv,zv):
+        xpos += 1
         if xpos >= xc:
             ypos += 1 + (xpos % xc)
             xpos = 0
@@ -94,15 +96,14 @@ def process_batch(df, base_data):
             zpos += 1 + (ypos % yc)
             ypos = 0
             xpos = 0
-        xpos += 1
         xtemp = xpos * xb
         ytemp = ypos * yb
         ztemp = zpos * zb
         c = vc.Vector(x, y, z)
         if np.abs(c.x + c.y + c.z) > 0:
             k = c.norm
-            vectors.append([xtemp, ytemp, ztemp, xtemp + c.x / k,
-                            ytemp + c.y / k, ztemp + c.z / k])
+            vectors.append([xtemp, ytemp, ztemp, xtemp + (c.x / k),
+                            ytemp + (c.y / k), ztemp + (c.z/k)])
             temp_color.append((c.x/k, c.y/k, c.z/k))
         else:
             continue
