@@ -10,7 +10,7 @@ import time
 
 WINDOW = 800
 INCREMENT = 5
-control = 10
+control = 50
 
 TIME_INTERVAL = 1/60.0
 
@@ -82,7 +82,6 @@ class Window(pyglet.window.Window):
             self.draw_vector(vector, color=color)
         # Pop Matrix off stack
         glPopMatrix()
-        print(self.position, self.rotation)
 
     def on_resize(self, width, height):
         # set the Viewport
@@ -139,14 +138,14 @@ class Window(pyglet.window.Window):
             self.change_frame()
 
     def change_frame(self):
-        print("Frame {}, Len {}".format(self.i, len(tbase_data)))
-        print(self.FREE_RUN)
+        #print("Frame {}, Len {}".format(self.i, len(tbase_data)))
+        #print(self.FREE_RUN)
         self.list_guard()
         base_data = tbase_data[self.i]
         count = tcount[self.i]
         width, height = self.get_size()
-        print("Mean of colors {}".format(np.mean(colors)))
-        print("Mean of data in change frame: {}".format(np.mean(data[self.i]['x'])))
+        #print("Mean of colors {}".format(np.mean(colors)))
+        #print("Mean of data in change frame: {}".format(np.mean(data[self.i]['x'])))
         self.on_resize(width, height)
 
     #DO NOT REMOVE DF FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
@@ -201,7 +200,7 @@ if __name__ == '__main__':
     start = time.time()
 
     pool = Pool()
-    multiple_results = [pool.apply_async(process_batch, (tdata[i], tbase_data[i])) for i in range(len(tdata))]
+    multiple_results = [pool.apply_async(process_batch2, (tdata[i], tbase_data[i])) for i in range(len(tdata))]
     for result in multiple_results:
         angle, vectors, colors = result.get(timeout=7)
         angle_list.append(angle)
