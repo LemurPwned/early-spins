@@ -1,8 +1,10 @@
+from PyQt4 import QtGui, QtCore
 import pyglet
 pyglet.options['debug_gl'] = False
 from pyglet.gl import *
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
+import time as tm
 try:
     from input_parser import *
 except:
@@ -248,6 +250,22 @@ def simulateFile(path_to_file, path_to_header_file):
     header = read_header_file(path_to_header_file)
     Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
     pyglet.app.run()
+
+
+class PygletRunner(QtCore.QObject):
+    def __init__(self, parent = None):
+        super(self.__class__, self).__init__(parent)
+        self.play = False
+        self.directory = ""
+        self.fformat = ""
+        self.headerFile = ""
+        
+    def playAnimation(self):
+        while(True):
+            if self.play:
+                print("next_frame")
+            tm.sleep(1)
+
 
 
 if __name__ == '__main__':
