@@ -5,6 +5,9 @@ from pyglet.gl import *
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
 import time as tm
+
+import threading
+
 try:
     from input_parser import *
 except:
@@ -19,7 +22,7 @@ import time
 
 WINDOW = 800
 INCREMENT = 5
-control = 10
+control = 3
 
 TIME_INTERVAL = 1/60.0
 
@@ -71,7 +74,7 @@ class Window(pyglet.window.Window):
 
     def initial_transformation(self):
         self.rotation = [0, 0, 0]  # xyz degrees in xyz axis
-        self.position = [0, 0, -10]  # xyz initial
+        self.position = [-10, -10, -40]  # xyz initial
         # self.pointing = [0,0,0] #where camera points
 
     def transformate(self):  # applies rotation and transformation
@@ -133,7 +136,7 @@ class Window(pyglet.window.Window):
             self.position[1] += dy * 0.1
 
 
-    def on_key_press(self, symbol, modifiers):
+    '''def on_key_press(self, symbol, modifiers):
         if symbol == key.ENTER:
             self.FREE_RUN = not self.FREE_RUN
             if self.FREE_RUN:
@@ -147,6 +150,11 @@ class Window(pyglet.window.Window):
             self.i -= 1
             self.list_guard()
             self.change_frame()
+    '''
+    
+    def next_frame(self):
+        self.i+=1
+        self.change_frame()
 
     def change_frame(self):
         print("Frame {}, Len {}".format(self.i, len(tbase_data)))
@@ -240,8 +248,8 @@ def simulateDirectory(path_to_folder, extension, path_to_header_file):
     data = tdata
     base_data = tbase_data[0]
     count = tcount[0]
-    Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
-    pyglet.app.run()
+    #Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
+    #pyglet.app.run()
 
 
 
@@ -259,13 +267,28 @@ class PygletRunner(QtCore.QObject):
         self.directory = ""
         self.fformat = ""
         self.headerFile = ""
+        #path_to_folder, extension, path_to_header_file
+        
+    
         
     def playAnimation(self):
+        simulateDirectory(self.directory, self.fformat, self.headerFile)
+        print("start")
+        animation3d = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
+        t1 = threading.Thread(target = pyglet.app.run)
+        t1.start()
+        
         while(True):
             if self.play:
-                print("next_frame")
+                #print("next_frame")
+                animation3d.i+=1
+                pyglet.clock.schedule_interval(animation3d.update, TIME_INTERVAL)
+                #animation3d.update()
+                animation3d.list_guard()
+                #animation3d.change_frame()
+                
             tm.sleep(1)
-
+        
 
 
 if __name__ == '__main__':

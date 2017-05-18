@@ -87,6 +87,8 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         else:
             self.worker.play = True
 
+    
+
     def stop(self):
         print("Stop")
 
