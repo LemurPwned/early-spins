@@ -2,6 +2,7 @@ import tiny_vectors as vc
 import time
 from graph_panels import *
 
+
 def extract_base_data(filename):
     '''
     .omf format reader
@@ -154,8 +155,69 @@ def process_batch_sensitive(df, base_data):
     #print("TIME : {}\n".format(end - start))
     return angles, vectors, temp_color
 
-if __name__ == "__main__":
 
+def read_binary(filename):
+    nums = []
+    ascii_w = []
+    text = []
+    flag = False
+    c_s = []
+    c_s2 = ""
+    text2 = []
+    x = []
+    y = []
+    z = []
+    with open(filename, mode='rb') as f:
+        byte = f.read(1)
+        while byte:
+            byte = f.read(1)
+            print(chr(byte))
+            if str(byte).startswith("b'\\"): #if byte is num
+                #print(byte, ord(byte))
+                nums.append(byte)
+            elif byte == b'#' and flag == False:
+                flag = True
+                c_s.append(byte)
+                c_s2 += str(byte)
+            elif flag == True:
+                c_s.append(byte)
+                c_s2 += str(byte)
+            if byte == b'\n':
+                flag = False
+                text.append(c_s)
+                c_s2 = c_s2.replace("b","")
+                c_s2 = c_s2.replace(" ","")
+                c_s2 = c_s2.replace("''","")
+                text2.append(c_s2)
+                c_s = []
+                c_s2 = ""
+            if "Begin" in text2[-1] and "Data" in text2[-1]:
+                x.append(ord(byte))
+                y.append(ord(byte))
+                z.append(ord(byte))
+
+    print(text2[0:5])
+    for el in text2:
+        el = el.replace("b","")
+        el = el.replace(" ","")
+        el = el.replace("''","")
+        if "End" in el or "Begin" in el:
+            print(el)
+    #for el in bytefile:
+        #print(el)
+def test(filename):
+    from functools import partial
+    import sys
+    chunk_size = 1
+    with open(filename, 'rb') as in_file:
+        for data in iter(partial(in_file.read, chunk_size), b''):
+            x = int.from_bytes(data, byteorder='big')
+            if (x > 64 and x < 91) or (x > 96 and x < 123) :
+                sys.stdout.write(chr(x))
+            else:
+                sys.stdout.write('.')
+if __name__ == "__main__":
+    '''
     filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
     filename2 = './data/voltage-spin-diode.odt'
     base_data, count = extract_base_data(filename)
@@ -175,9 +237,11 @@ if __name__ == "__main__":
 
     df = read_header_file(filename2)
     graph = plotters(df, ('Iteration', 'Total energy'), ('step', 'J'))
-    callback_plotter(graph)
+    #callback_plotter(graph)
     #anglify
-
+    '''
+    filename = './0200nm/proba1-Oxs_MinDriver-Magnetization-00-0021617.omf'
+    read_binary(filename)
     #data.loc[~(data == 0).all(axis=1)] = np.nan
     #sdf = data.to_sparse()
     #print(sdf.density)
