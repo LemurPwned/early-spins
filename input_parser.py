@@ -155,20 +155,33 @@ def process_batch_sensitive(df, base_data):
     #print("TIME : {}\n".format(end - start))
     return vectors, temp_color
 
+def process_header(headers):
+    base_data = {}
+    headers = headers.replace('\'', "")
+    headers = headers.replace(' ', "")
+    headers = headers.replace('\\n', "")
+    headers = headers.split('#')
+    for header in headers:
+        if ':' in header:
+            components = header.split(':')
+            try:
+                base_data[components[0]] = float(components[1])
+            except:
+                base_data[components[0]] = components[1]
+    return base_data
 
 def binary_read(filename):
     lists = []
     a_tuple = []
     c = 0
+    base_data = {}
     with open(filename, 'rb') as f:
-        headers = f.read(24*38 + 7)
-        print(str(headers).count('#'))
-        print(headers)
-        #add_ = f.read(7)
-        #print(add_)
+        headers = f.read(24*38 + 7) #idk xD
+        headers = str(headers)
+        base_data = process_header(headers)
         check_value = struct.unpack('d', f.read(8))[0]
         validation = 123456789012345.0
-
+        print(base_data)
         print("Check value for 8-binary {}".format(check_value))
         if check_value == validation:
             print("Proper reading commences ...")
@@ -194,27 +207,14 @@ def binary_read(filename):
             except struct.error:
                 print(b)
             b = f.read(8)
-        #print(b)
-        b = f.read(36 + 8)
+        b = f.read(36 + 8) #pro debug process
         print("last line {}".format(b))
     f.close()
     print(len(lists))
-
-    for triplet in lists[-10:]:
+    '''
+    for triplet in lists[-200:]:
         print(triplet)
-
     '''
-        byte = f.read(8)
-        while byte:
-            try:
-                print(float(byte))
-            except TypeError:
-                print(byte.decode('ascii'))
-            except ValueError:
-                print(byte.decode('utf'))
-            byte = f.read(8)
-    '''
-
 if __name__ == "__main__":
     '''
     filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
