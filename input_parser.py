@@ -1,7 +1,7 @@
 import tiny_vectors as vc
 import time
 from graph_panels import *
-
+import struct
 
 def extract_base_data(filename):
     '''
@@ -153,69 +153,68 @@ def process_batch_sensitive(df, base_data):
     temp_color = [x for (y, x) in sorted(zip(angles, series))]
     #end = time.time()
     #print("TIME : {}\n".format(end - start))
-    return angles, vectors, temp_color
+    return vectors, temp_color
 
 
-def read_binary(filename):
-    nums = []
-    ascii_w = []
-    text = []
-    flag = False
-    c_s = []
-    c_s2 = ""
-    text2 = []
-    x = []
-    y = []
-    z = []
-    with open(filename, mode='rb') as f:
-        byte = f.read(1)
+def binary_read(filename):
+    lists = []
+    a_tuple = []
+    c = 0
+    with open(filename, 'rb') as f:
+        headers = f.read(24*38 + 7)
+        print(str(headers).count('#'))
+        print(headers)
+        #add_ = f.read(7)
+        #print(add_)
+        check_value = struct.unpack('d', f.read(8))[0]
+        validation = 123456789012345.0
+
+        print("Check value for 8-binary {}".format(check_value))
+        if check_value == validation:
+            print("Proper reading commences ...")
+        else:
+            print("Validity check failed")
+            return None
+        b = f.read(8)
+        #counter = 52100
+        k = (51200)*3 - 1
+        counter = 0
+        while b and counter < k:
+            try:
+                p = struct.unpack('d', b)[0]
+                c += 1
+                counter += 1
+                if c%3 == 0:
+                    a_tuple.append(p)
+                    lists.append(tuple(a_tuple))
+                    a_tuple = []
+                    c = 0
+                else:
+                    a_tuple.append(p)
+            except struct.error:
+                print(b)
+            b = f.read(8)
+        #print(b)
+        b = f.read(36 + 8)
+        print("last line {}".format(b))
+    f.close()
+    print(len(lists))
+
+    for triplet in lists[-10:]:
+        print(triplet)
+
+    '''
+        byte = f.read(8)
         while byte:
-            byte = f.read(1)
-            print(chr(byte))
-            if str(byte).startswith("b'\\"): #if byte is num
-                #print(byte, ord(byte))
-                nums.append(byte)
-            elif byte == b'#' and flag == False:
-                flag = True
-                c_s.append(byte)
-                c_s2 += str(byte)
-            elif flag == True:
-                c_s.append(byte)
-                c_s2 += str(byte)
-            if byte == b'\n':
-                flag = False
-                text.append(c_s)
-                c_s2 = c_s2.replace("b","")
-                c_s2 = c_s2.replace(" ","")
-                c_s2 = c_s2.replace("''","")
-                text2.append(c_s2)
-                c_s = []
-                c_s2 = ""
-            if "Begin" in text2[-1] and "Data" in text2[-1]:
-                x.append(ord(byte))
-                y.append(ord(byte))
-                z.append(ord(byte))
+            try:
+                print(float(byte))
+            except TypeError:
+                print(byte.decode('ascii'))
+            except ValueError:
+                print(byte.decode('utf'))
+            byte = f.read(8)
+    '''
 
-    print(text2[0:5])
-    for el in text2:
-        el = el.replace("b","")
-        el = el.replace(" ","")
-        el = el.replace("''","")
-        if "End" in el or "Begin" in el:
-            print(el)
-    #for el in bytefile:
-        #print(el)
-def test(filename):
-    from functools import partial
-    import sys
-    chunk_size = 1
-    with open(filename, 'rb') as in_file:
-        for data in iter(partial(in_file.read, chunk_size), b''):
-            x = int.from_bytes(data, byteorder='big')
-            if (x > 64 and x < 91) or (x > 96 and x < 123) :
-                sys.stdout.write(chr(x))
-            else:
-                sys.stdout.write('.')
 if __name__ == "__main__":
     '''
     filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
@@ -241,7 +240,7 @@ if __name__ == "__main__":
     #anglify
     '''
     filename = './0200nm/proba1-Oxs_MinDriver-Magnetization-00-0021617.omf'
-    read_binary(filename)
+    binary_read(filename)
     #data.loc[~(data == 0).all(axis=1)] = np.nan
     #sdf = data.to_sparse()
     #print(sdf.density)
