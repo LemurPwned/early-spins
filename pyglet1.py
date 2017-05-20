@@ -142,7 +142,7 @@ class Window(pyglet.window.Window):
         #print(self.FREE_RUN)
         self.list_guard()
         base_data = tbase_data[self.i]
-        count = tcount[self.i]
+        #count = tcount[self.i]
         width, height = self.get_size()
         #print("Mean of colors {}".format(np.mean(colors)))
         #print("Mean of data in change frame: {}".format(np.mean(data[self.i]['x'])))
@@ -164,7 +164,7 @@ class Window(pyglet.window.Window):
             pass
 
 
-def getAllFiles(directory, extension):
+def getAllFiles(directory, extension, filetype = 'binary'):
     tFileList = os.listdir(directory)
     fileList = []
     j = 0
@@ -178,22 +178,27 @@ def getAllFiles(directory, extension):
     base_data = []
     count = []
     data = []
-    print("Reading data... {}".format(len(fileList)))
+    print("Reading data... {}, fileformat: {}".format(len(fileList), filetype))
     fileList.sort()
-    for filename in fileList:
-        tbase_data, tcount = extract_base_data(filename)
-        base_data.append(tbase_data)
-        count.append(tcount)
-        to_skip = [x for x in range(tcount)]
-        df = form_dataframe(filename, to_skip)
-        data.append(df)
+    if filetype == 'binary':
+        for filename in fileList:
+            tbase_data, tdf = binary_read(filename)
+            base_data.append(tbase_data)
+            data.append(tdf)
+    elif filetype == 'text':
+        for filename in fileList:
+            tbase_data, tcount = extract_base_data(filename)
+            base_data.append(tbase_data)
+            count.append(tcount)
+            to_skip = [x for x in range(tcount)]
+            df = form_dataframe(filename, to_skip)
+            data.append(df)
 
     return data, base_data, count
 
-
 if __name__ == '__main__':
     #tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
-    tdata, tbase_data, tcount = getAllFiles("./0520nm/", ".omf")
+    tdata, tbase_data, tcount = getAllFiles("./0200nm/", ".omf")
     vectors_list = []
     color_list = []
 
@@ -202,7 +207,7 @@ if __name__ == '__main__':
     pool = Pool()
     multiple_results = [pool.apply_async(process_batch, (tdata[i], tbase_data[i])) for i in range(len(tdata))]
     for result in multiple_results:
-        vectors, colors = result.get(timeout=7)
+        vectors, colors = result.get(timeout=20)
         vectors_list.append(vectors)
         color_list.append(colors)
 
@@ -210,9 +215,9 @@ if __name__ == '__main__':
     print("It has taken {}".format(end-start))
 
     #header = read_header_file("./data/voltage-spin-diode.odt")
-    header = read_header_file("./0520nm/proba1.odt")
+    #header = read_header_file("./0200nm/proba1.odt")
     data = tdata
     base_data = tbase_data[0]
-    count = tcount[0]
+    #count = tcount[0]
     Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
     pyglet.app.run()

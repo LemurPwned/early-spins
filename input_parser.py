@@ -170,26 +170,60 @@ def process_header(headers):
                 base_data[components[0]] = components[1]
     return base_data
 
-def binary_read(filename):
+def odt_reader(filename):
+    header_lines = 4
+    header = []
+    i = 0
+    with open(filename, 'r') as f:
+        while i < header_lines:
+            lines = f.readline()
+            header.append(lines)
+            i += 1
+        units = f.readline()
+        lines = f.readlines()
+    f.close()
+    cols = header[-1]
+    cols = cols.replace("} ", "")
+    cols = cols.replace("{", "")
+    cols = cols.split("Oxs_")
+    del cols[0]
+    cols = [x.strip() for x in cols]
+
+    units = units.split(" ")
+    units
+    units = [x.strip() for x in units]
+    #print(lines[0:10])
+
+def binary_read(filename, cols = ['x', 'y', 'z']):
     lists = []
     a_tuple = []
     c = 0
     base_data = {}
+    validity = False
+    iterator = 2
+    validation = 123456789012345.0
     with open(filename, 'rb') as f:
-        headers = f.read(24*38 + 7) #idk xD
-        headers = str(headers)
+        while validity == False and iterator < 12:
+            headers = f.read(24*38 + iterator) #idk xD
+            #print("Header \n",headers)
+            headers = str(headers)
+            check_value = struct.unpack('d', f.read(8))[0]
+            #print(base_data)
+            #print("Check value for 8-binary {}".format(check_value))
+            if check_value == validation:
+                #print("Proper reading commences ...")
+                validity = True
+                break
+            else:
+                #print("Validity check failed")
+                #print("Adjusting binary size read")
+                f.seek(0)
+                iterator += 1
+        if iterator == 12  : raise TypeError
         base_data = process_header(headers)
-        check_value = struct.unpack('d', f.read(8))[0]
-        validation = 123456789012345.0
-        print(base_data)
-        print("Check value for 8-binary {}".format(check_value))
-        if check_value == validation:
-            print("Proper reading commences ...")
-        else:
-            print("Validity check failed")
-            return None
+        #print(base_data)
         b = f.read(8)
-        #counter = 52100
+        #TODO quantize below
         k = (51200)*3 - 1
         counter = 0
         while b and counter < k:
@@ -205,12 +239,15 @@ def binary_read(filename):
                 else:
                     a_tuple.append(p)
             except struct.error:
-                print(b)
+                #print(b)
+                pass
             b = f.read(8)
         b = f.read(36 + 8) #pro debug process
-        print("last line {}".format(b))
+        #print("last line {}".format(b))
     f.close()
     print(len(lists))
+    df = pd.DataFrame.from_records(lists, columns=cols)
+    return base_data, df
     '''
     for triplet in lists[-200:]:
         print(triplet)
@@ -240,7 +277,13 @@ if __name__ == "__main__":
     #anglify
     '''
     filename = './0200nm/proba1-Oxs_MinDriver-Magnetization-00-0021617.omf'
-    binary_read(filename)
+    filename2 = './0200nm/proba1-Oxs_MinDriver-Magnetization-20-0115207.omf'
+    head =  './0200nm/proba1.odt'
+    odt_reader(head)
+    #base_data, df = binary_read(filename2)
+    #print("Printing head {}:".format(df.head()))
+    #print("Printing tail {}:".format(df.tail()))
+    #print(base_data)
     #data.loc[~(data == 0).all(axis=1)] = np.nan
     #sdf = data.to_sparse()
     #print(sdf.density)
