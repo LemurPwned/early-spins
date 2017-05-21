@@ -3,9 +3,14 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import os
 from matplotlib import cm
-from input_parser import *
-from graph_panels import calculate_angle, populate_list, increase_variance
-from tiny_vectors import *
+try:
+    from input_parser import *
+    from graph_panels import calculate_angle, populate_list, increase_variance
+    from tiny_vectors import *
+except:
+    from CPU3D.input_parser import *
+    from CPU3D.graph_panels import calculate_angle, populate_list, increase_variance
+    from CPU3D.tiny_vectors import *
 
 
 def update_batch_plot(i, data, scat):
@@ -80,8 +85,4 @@ if __name__ == "__main__":
         batches_to_animate.append(process_batch(filename))
     print(len(batches_to_animate))
     init_anim(batches_to_animate, 'Magnetization direction', N, 35, 35)
-else:
-    from CPU3D.input_parser import *
-    from CPU3D.graph_panels import calculate_angle, populate_list, increase_variance
-    from CPU3D.tiny_vectors import *
 

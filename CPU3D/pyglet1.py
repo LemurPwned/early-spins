@@ -51,17 +51,6 @@ class Window(pyglet.window.Window):
         self.tcount = data[3]
         self.header = data[4]
         
-        '''self.header = data[0]
-        self.data = data[1]
-        self.base_data = data[2]
-        self.count = data[3]
-        self.angle_list = data[4]
-        self.vectors_list = data[5]
-        self.color_list = data[6]
-        self.tbase_data = data[7]
-        self.tcount = data[8]
-        self.colors = data[9]'''
-        
     
     def upload_uniforms(self):
         uni = self.shader.uniforms
