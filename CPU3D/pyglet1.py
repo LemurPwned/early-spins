@@ -45,12 +45,13 @@ class Window(pyglet.window.Window):
         self.i = 0
     
     def getDataFromRunner(self, data):
-        '''self.vectors_list = data[0]
+        self.vectors_list = data[0]
         self.color_list = data[1]
         self.tbase_data = data[2]
-        self.tcount = data[3]'''
+        self.tcount = data[3]
+        self.header = data[4]
         
-        self.header = data[0]
+        '''self.header = data[0]
         self.data = data[1]
         self.base_data = data[2]
         self.count = data[3]
@@ -59,7 +60,7 @@ class Window(pyglet.window.Window):
         self.color_list = data[6]
         self.tbase_data = data[7]
         self.tcount = data[8]
-        self.colors = data[9]
+        self.colors = data[9]'''
         
     
     def upload_uniforms(self):
