@@ -3,6 +3,8 @@ import sys
 import os
 
 from GUI.MainWindow import Ui_MainWindow
+#from GUI.WarningWindow import Ui_Window
+
 from CPU3D import pygletRunner
 
 class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
@@ -14,7 +16,9 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.worker_thread = QtCore.QThread()
         self.worker.moveToThread(self.worker_thread)
         self.worker_thread.start()
-
+        
+        self.WarningDialog = WarningScreen(self)
+        
         self.window()
 
     def window(self):
@@ -70,8 +74,10 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
 
     def load3Dsim(self):
         if self.headerFile == "":
-            #TODO error
-            pass
+            #self.WarningDialog.exec_()
+            #self.WarningDialog.message = "Header file not specified!"
+            #self.WarningDialog.showMsg()
+            #pass
 
         if self.directory == "":
             #TODO error
