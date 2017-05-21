@@ -33,7 +33,7 @@ class Ui_MainWindow(object):
         self.groupBox.setObjectName(_fromUtf8("groupBox"))
         self.progressBar = QtGui.QProgressBar(self.groupBox)
         self.progressBar.setGeometry(QtCore.QRect(10, 70, 361, 23))
-        self.progressBar.setProperty("value", 24)
+        self.progressBar.setProperty("value", 0)
         self.progressBar.setObjectName(_fromUtf8("progressBar"))
         self.nextFrame_button = QtGui.QPushButton(self.groupBox)
         self.nextFrame_button.setGeometry(QtCore.QRect(280, 30, 86, 25))

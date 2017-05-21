@@ -4,8 +4,8 @@ pyglet.options['debug_gl'] = False
 from pyglet.gl import *
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
-import time as tm
-
+import time
+from multiprocessing import Pool
 import threading
 
 try:
@@ -17,16 +17,24 @@ try:
     from camera_calculations import *
 except:
     from CPU3D.camera_calculations import *
-from multiprocessing import Pool
-import time
-
+    
+try:
+    from tiny_vectors import *
+except:
+    from CPU3D.tiny_vectors import *
+    
+try:
+    from graph_panels import calculate_angle, generate_color_series
+except:
+    from CPU3D.graph_panels import calculate_angle, generate_color_series
+    
 WINDOW = 800
 INCREMENT = 5
-control = 3
+control = 30
 
 TIME_INTERVAL = 1/60.0
 
-class Window(pyglet.window.Window):
+class Window(pyglet.window.Window, PygletRunner):
     def __init__(self, width, height, title=''):
         super(Window, self).__init__(width, height, title)
         glClearColor(0, 0, 0, 1)
@@ -157,14 +165,14 @@ class Window(pyglet.window.Window):
         self.change_frame()
 
     def change_frame(self):
-        print("Frame {}, Len {}".format(self.i, len(tbase_data)))
-        print(self.FREE_RUN)
+        #print("Frame {}, Len {}".format(self.i, len(tbase_data)))
+        #print(self.FREE_RUN)
         self.list_guard()
         base_data = tbase_data[self.i]
         count = tcount[self.i]
         width, height = self.get_size()
-        print("Mean of colors {}".format(np.mean(colors)))
-        print("Mean of data in change frame: {}".format(np.mean(data[self.i]['x'])))
+        #print("Mean of colors {}".format(np.mean(colors)))
+        #print("Mean of data in change frame: {}".format(np.mean(data[self.i]['x'])))
         self.on_resize(width, height)
 
     #DO NOT REMOVE DF FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
@@ -182,120 +190,11 @@ class Window(pyglet.window.Window):
         else:
             pass
 
-
-def getAllFiles(directory, extension):
-    tFileList = os.listdir(directory)
-    fileList = []
-    j = 0
-    for file in tFileList:
-        j += 1
-        if j > control:
-            break
-        if file.find(extension) != -1:
-            fileList.append(directory + file)
-
-    base_data = []
-    count = []
-    data = []
-    print("Reading data... {}".format(len(fileList)))
-    fileList.sort()
-    for filename in fileList:
-        tbase_data, tcount = extract_base_data(filename)
-        base_data.append(tbase_data)
-        count.append(tcount)
-        to_skip = [x for x in range(tcount)]
-        df = form_dataframe(filename, to_skip)
-        data.append(df)
-
-    return data, base_data, count
-
-
-def simulateDirectory(path_to_folder, extension, path_to_header_file):
-    global header
-    global data
-    global base_data
-    global count
-    global angle_list
-    global vectors_list
-    global color_list
-    global tbase_data
-    global tcount
-    global colors
-
-    tdata, tbase_data, tcount = getAllFiles(path_to_folder, extension)
-
-    header = read_header_file(path_to_header_file)
-
-
-    angle_list = []
-    vectors_list = []
-    color_list = []
-
-    start = time.time()
-
-    pool = Pool()
-    multiple_results = [pool.apply_async(process_batch, (tdata[i], tbase_data[i])) for i in range(len(tdata))]
-    for result in multiple_results:
-        angle, vectors, colors = result.get(timeout=25)
-        angle_list.append(angle)
-        vectors_list.append(vectors)
-        color_list.append(colors)
-
-    end = time.time()
-    print("It has taken {}".format(end-start))
-
-
-    data = tdata
-    base_data = tbase_data[0]
-    count = tcount[0]
-    #Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
-    #pyglet.app.run()
-
-
-
-def simulateFile(path_to_file, path_to_header_file):
-    data, count = extract_base_data(path_to_file)
-    header = read_header_file(path_to_header_file)
-    Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
-    pyglet.app.run()
-
-
-class PygletRunner(QtCore.QObject):
-    def __init__(self, parent = None):
-        super(self.__class__, self).__init__(parent)
-        self.play = False
-        self.directory = ""
-        self.fformat = ""
-        self.headerFile = ""
-        #path_to_folder, extension, path_to_header_file
-        
-    
-        
-    def playAnimation(self):
-        simulateDirectory(self.directory, self.fformat, self.headerFile)
-        print("start")
-        animation3d = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
-        t1 = threading.Thread(target = pyglet.app.run)
-        t1.start()
-        
-        while(True):
-            if self.play:
-                #print("next_frame")
-                animation3d.i+=1
-                pyglet.clock.schedule_interval(animation3d.update, TIME_INTERVAL)
-                #animation3d.update()
-                animation3d.list_guard()
-                #animation3d.change_frame()
-                
-            tm.sleep(1)
-        
-
-
 if __name__ == '__main__':
-    from input_parser import *
-    from tiny_vectors import *
-    from camera_calculations import *
-    from graph_panels import calculate_angle, generate_color_series
+    #from input_parser import *
+    #from tiny_vectors import *
+    #from camera_calculations import *
+    #from graph_panels import calculate_angle, generate_color_series
     tdata, tbase_data, tcount = getAllFiles("../data/", ".omf")
     header = read_header_file("../data/voltage-spin-diode.odt")
     #tdata, tbase_data, tcount = getAllFiles("../data/", ".omf")
@@ -322,8 +221,3 @@ if __name__ == '__main__':
     count = tcount[0]
     x = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
     pyglet.app.run()
-else:
-    from CPU3D.input_parser import *
-    from CPU3D.tiny_vectors import *
-    from CPU3D.camera_calculations import *
-    from CPU3D.graph_panels import calculate_angle, generate_color_series

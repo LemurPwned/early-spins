@@ -3,14 +3,14 @@ import sys
 import os
 
 from GUI.MainWindow import Ui_MainWindow
-from CPU3D import pyglet1
+from CPU3D import pygletRunner
 
 class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainScreen, self).__init__(parent)
         self.setupUi(self)
 
-        self.worker = pyglet1.PygletRunner()
+        self.worker = pygletRunner.PygletRunner()
         self.worker_thread = QtCore.QThread()
         self.worker.moveToThread(self.worker_thread)
         self.worker_thread.start()
