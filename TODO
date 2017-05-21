@@ -1,0 +1,8 @@
+ - get status of parsing files (percent of finished files or sth like that)
+ - GUI warning window
+ - implement stop button as well as forward and backward
+ - changing play/pause button
+ - finally connect animations with GUI
+ - improve 3D movement in pyglet
+ - add slidebar to set up size of cell approximation (how many cells to one vector)
+
