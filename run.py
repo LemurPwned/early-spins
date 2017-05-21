@@ -68,7 +68,6 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.header_file_lineEdit.setText(self.headerFile)
         self.worker.headerFile = self.headerFile
 
-
     def load3Dsim(self):
         if self.headerFile == "":
             #TODO error
@@ -87,8 +86,6 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         else:
             self.worker.play = True
 
-    
-
     def stop(self):
         print("Stop")
 
@@ -99,22 +96,7 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         print("prev frame")
     #INSTEAD OF THESE WE WILL GIVE OUR FUNCTIONS!
 
-'''class WorkerObject(QtCore.QObject):
 
-    #signalStatus = QtCore.pyqtSignal(str)
-    def __init__(self, parent=None):
-        super(self.__class__, self).__init__(parent)
-        self.directory = ""
-        self.fformat = ""
-        self.headerFile = ""
-
-    def startWork(self):
-        pyglet1.simulateDirectory(self.directory, self.fformat, self.headerFile)
-        #for i in range(1000):
-        #    print("test")
-        #    tm.sleep(1)
-
-'''
 def main():
     app = QtGui.QApplication(sys.argv)
     window = MainScreen()
