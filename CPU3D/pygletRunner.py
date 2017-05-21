@@ -18,9 +18,13 @@ class PygletRunner(QtCore.QObject):
         self.simulateDirectory(self.directory, self.fformat, self.headerFile)
         print("generating 3d structure...")
         animation3d = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
+        animation3d.getDataFromRunner([self.header, self.data, self.base_data, self.count, self.angle_list, self.vectors_list, self.color_list, self.tbase_data, self.tcount, self.color_list])
+        #animation3d.getDataFromRunner([self.vectors_list, self.color_list, self.tbase_data, self.tcount])
         t1 = threading.Thread(target = pyglet.app.run)
         t1.start()
         print("done!")
+        
+        
         
         while(True):
             if self.play:
@@ -30,10 +34,8 @@ class PygletRunner(QtCore.QObject):
                 #animation3d.update()
                 animation3d.list_guard()
                 #animation3d.change_frame()
-                sleep(0.1)
+            sleep(0.01)
             #print(self.play)
-            else:
-                sleep(1)
             
     def getAllFiles(self, directory, extension):
         tFileList = os.listdir(directory)
@@ -85,20 +87,20 @@ class PygletRunner(QtCore.QObject):
         #start = time.time()
 
         pool = Pool()
-        multiple_results = [pool.apply_async(process_batch, (self.tdata[i], self.tbase_data[i])) for i in range(len(tdata))]
+        multiple_results = [pool.apply_async(process_batch, (self.tdata[i], self.tbase_data[i])) for i in range(len(self.tdata))]
         for result in multiple_results:
             angle, vectors, colors = result.get(timeout=25)
-            angle_list.append(angle)
-            vectors_list.append(vectors)
-            color_list.append(colors)
+            self.angle_list.append(angle)
+            self.vectors_list.append(vectors)
+            self.color_list.append(colors)
 
         #end = time.time()
         #print("It has taken {}".format(end-start))
 
 
-        self.data = tdata
-        self.base_data = tbase_data[0]
-        self.count = tcount[0]
+        self.data = self.tdata
+        self.base_data = self.tbase_data[0]
+        self.count = self.tcount[0]
         #Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
         #pyglet.app.run()
 

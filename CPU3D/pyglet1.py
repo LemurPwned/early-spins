@@ -34,7 +34,8 @@ control = 30
 
 TIME_INTERVAL = 1/60.0
 
-class Window(pyglet.window.Window, PygletRunner):
+class Window(pyglet.window.Window):
+    
     def __init__(self, width, height, title=''):
         super(Window, self).__init__(width, height, title)
         glClearColor(0, 0, 0, 1)
@@ -42,7 +43,25 @@ class Window(pyglet.window.Window, PygletRunner):
         self.initial_transformation()
         self.FREE_RUN = False
         self.i = 0
-
+    
+    def getDataFromRunner(self, data):
+        '''self.vectors_list = data[0]
+        self.color_list = data[1]
+        self.tbase_data = data[2]
+        self.tcount = data[3]'''
+        
+        self.header = data[0]
+        self.data = data[1]
+        self.base_data = data[2]
+        self.count = data[3]
+        self.angle_list = data[4]
+        self.vectors_list = data[5]
+        self.color_list = data[6]
+        self.tbase_data = data[7]
+        self.tcount = data[8]
+        self.colors = data[9]
+        
+    
     def upload_uniforms(self):
         uni = self.shader.uniforms
 
@@ -117,9 +136,8 @@ class Window(pyglet.window.Window, PygletRunner):
         glTranslatef(0, 0, 0)
         # TODO Replace create_vector with dataframe ops.
         #self.create_vector(data[self.i])
-        self.vec = vectors_list[self.i]
-        self.colors = color_list[self.i]
-
+        self.vec = self.vectors_list[self.i]
+        self.colors = self.color_list[self.i]
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         # SMART SCROLL BETA
@@ -168,8 +186,8 @@ class Window(pyglet.window.Window, PygletRunner):
         #print("Frame {}, Len {}".format(self.i, len(tbase_data)))
         #print(self.FREE_RUN)
         self.list_guard()
-        base_data = tbase_data[self.i]
-        count = tcount[self.i]
+        self.base_data = self.tbase_data[self.i]
+        self.count = self.tcount[self.i]
         width, height = self.get_size()
         #print("Mean of colors {}".format(np.mean(colors)))
         #print("Mean of data in change frame: {}".format(np.mean(data[self.i]['x'])))
@@ -185,7 +203,7 @@ class Window(pyglet.window.Window, PygletRunner):
     def list_guard(self):
         if self.i >= control-1:
             self.i = 0
-        if self.i > header['Iteration'].count():
+        if self.i > self.header['Iteration'].count():
             self.i = 0
         else:
             pass
