@@ -1,9 +1,5 @@
 from PyQt4 import QtGui, QtCore #TODO not neccesary later
-
-try:
-    from animations import *
-except:
-    from CPU3D.animations import *
+from CPU3D.animations import *
     
 class AnimationsRunner(QtCore.QObject):
     def __init__(self, parent=None):

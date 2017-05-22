@@ -17,7 +17,7 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.worker.moveToThread(self.worker_thread)
         self.worker_thread.start()
         
-        self.WarningDialog = WarningScreen(self)
+        #self.WarningDialog = WarningScreen(self)
         
         self.window()
 
@@ -74,6 +74,7 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
 
     def load3Dsim(self):
         if self.headerFile == "":
+            pass
             #self.WarningDialog.exec_()
             #self.WarningDialog.message = "Header file not specified!"
             #self.WarningDialog.showMsg()

@@ -1,8 +1,4 @@
-try:
-    from pyglet1 import *
-except:
-    from CPU3D.pyglet1 import *
-
+from CPU3D.pyglet1 import *
 from time import *
 
 class PygletRunner(QtCore.QObject):
@@ -22,8 +18,6 @@ class PygletRunner(QtCore.QObject):
         t1 = threading.Thread(target = pyglet.app.run)
         t1.start()
         print("done!")
-        
-        
         
         while(True):
             if self.play:
@@ -63,17 +57,6 @@ class PygletRunner(QtCore.QObject):
         return data, base_data, count
     
     def simulateDirectory(self, path_to_folder, extension, path_to_header_file):
-        '''global header ok
-        global data
-        global base_data
-        global count
-        global angle_list ok
-        global vectors_list ok
-        global color_list ok
-        global tbase_data ok
-        global tcount ok
-        global colors'''
-
         self.tdata, self.tbase_data, self.tcount = self.getAllFiles(path_to_folder, extension)
 
         self.header = read_header_file(path_to_header_file)

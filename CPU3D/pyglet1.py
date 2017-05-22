@@ -7,26 +7,10 @@ from OpenGL.GLUT import *
 import time
 from multiprocessing import Pool
 import threading
-
-try:
-    from input_parser import *
-except:
-    from CPU3D.input_parser import *
-
-try:
-    from camera_calculations import *
-except:
-    from CPU3D.camera_calculations import *
-    
-try:
-    from tiny_vectors import *
-except:
-    from CPU3D.tiny_vectors import *
-    
-try:
-    from graph_panels import calculate_angle, generate_color_series
-except:
-    from CPU3D.graph_panels import calculate_angle, generate_color_series
+from CPU3D.input_parser import *
+from CPU3D.camera_calculations import *
+from CPU3D.tiny_vectors import *
+from CPU3D.graph_panels import calculate_angle, generate_color_series
     
 WINDOW = 800
 INCREMENT = 5
@@ -199,10 +183,6 @@ class Window(pyglet.window.Window):
             pass
 
 if __name__ == '__main__':
-    #from input_parser import *
-    #from tiny_vectors import *
-    #from camera_calculations import *
-    #from graph_panels import calculate_angle, generate_color_series
     tdata, tbase_data, tcount = getAllFiles("../data/", ".omf")
     header = read_header_file("../data/voltage-spin-diode.odt")
     #tdata, tbase_data, tcount = getAllFiles("../data/", ".omf")

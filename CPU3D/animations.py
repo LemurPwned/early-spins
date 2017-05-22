@@ -3,14 +3,9 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import os
 from matplotlib import cm
-try:
-    from input_parser import *
-    from graph_panels import calculate_angle, populate_list, increase_variance
-    from tiny_vectors import *
-except:
-    from CPU3D.input_parser import *
-    from CPU3D.graph_panels import calculate_angle, populate_list, increase_variance
-    from CPU3D.tiny_vectors import *
+from CPU3D.input_parser import *
+from CPU3D.graph_panels import calculate_angle, populate_list, increase_variance
+from CPU3D.tiny_vectors import *
 
 
 def update_batch_plot(i, data, scat):
