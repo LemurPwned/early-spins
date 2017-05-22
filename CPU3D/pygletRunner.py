@@ -64,7 +64,7 @@ class PygletRunner(QtCore.QObject):
         return data, base_data
 
     def simulateDirectory(self, path_to_folder, extension, path_to_header_file, filetype):
-        self.tdata, self.tbase_data= self.getAllFiles(path_to_folder, extension, filetype)
+        self.tdata, self.tbase_data = self.getAllFiles(path_to_folder, extension, filetype)
         self.header = read_header_file(path_to_header_file)
 
 
@@ -79,6 +79,7 @@ class PygletRunner(QtCore.QObject):
             self.color_list.append(colors)
 
         self.data = self.tdata
+        print(len(self.tbase_data))
         self.base_data = self.tbase_data[0]
 
     '''
