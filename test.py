@@ -15,10 +15,6 @@ if(str(sys.argv[1]) == "pyglet"):
     x.fformat = ".omf"
     x.filetype = 'text'
     x.headerFile = "data/voltage-spin-diode.odt"
-<<<<<<< HEAD
-    #x.headerFile = "0200nm/proba1.odt"
-=======
->>>>>>> 4161641602d74f5d45d635d3e03c5822b0f031d7
     x.playAnimation()
 
 # u can create your own simulations and then add it to makefile

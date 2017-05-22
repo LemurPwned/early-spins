@@ -106,7 +106,6 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         print("prev frame")
     #INSTEAD OF THESE WE WILL GIVE OUR FUNCTIONS!
 
-
 def main():
     app = QtGui.QApplication(sys.argv)
     window = MainScreen()
