@@ -8,17 +8,18 @@ class PygletRunner(QtCore.QObject):
         self.directory = ""
         self.fformat = ""
         self.headerFile = ""
-        self.TIME_INTERVAL = 1/60
-        
+        self.filetype = ""
+        self.TIME_INTERVAL = 1/30
+
     def playAnimation(self):
-        self.simulateDirectory(self.directory, self.fformat, self.headerFile)
+        self.simulateDirectory(self.directory, self.fformat, self.headerFile, self.filetype)
         print("generating 3d structure...")
         animation3d = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
-        animation3d.getDataFromRunner([self.vectors_list, self.color_list, self.tbase_data, self.tcount, self.header])
+        animation3d.getDataFromRunner([self.vectors_list, self.color_list, self.tbase_data, self.header])
         t1 = threading.Thread(target = pyglet.app.run)
         t1.start()
         print("done!")
-        
+
         while(True):
             if self.play:
                 #print("next_frame")
@@ -29,8 +30,8 @@ class PygletRunner(QtCore.QObject):
                 #animation3d.change_frame()
             sleep(0.01)
             #print(self.play)
-            
-    def getAllFiles(self, directory, extension):
+
+    def getAllFiles(self, directory, extension, filetype = 'binary'):
         tFileList = os.listdir(directory)
         fileList = []
         j = 0
@@ -44,47 +45,42 @@ class PygletRunner(QtCore.QObject):
         base_data = []
         count = []
         data = []
-        print("Reading data... {}".format(len(fileList)))
+        print("Reading data... {}, fileformat: {}".format(len(fileList), filetype))
         fileList.sort()
-        for filename in fileList:
-            tbase_data, tcount = extract_base_data(filename)
-            base_data.append(tbase_data)
-            count.append(tcount)
-            to_skip = [x for x in range(tcount)]
-            df = form_dataframe(filename, to_skip)
-            data.append(df)
+        if filetype == 'binary':
+            for filename in fileList:
+                tbase_data, tdf = binary_read(filename)
+                base_data.append(tbase_data)
+                data.append(tdf)
+        elif filetype == 'text':
+            for filename in fileList:
+                tbase_data, tcount = extract_base_data(filename)
+                base_data.append(tbase_data)
+                count.append(tcount)
+                to_skip = [x for x in range(tcount)]
+                df = form_dataframe(filename, to_skip)
+                data.append(df)
 
-        return data, base_data, count
-    
-    def simulateDirectory(self, path_to_folder, extension, path_to_header_file):
-        self.tdata, self.tbase_data, self.tcount = self.getAllFiles(path_to_folder, extension)
+        return data, base_data
 
+    def simulateDirectory(self, path_to_folder, extension, path_to_header_file, filetype):
+        self.tdata, self.tbase_data= self.getAllFiles(path_to_folder, extension, filetype)
         self.header = read_header_file(path_to_header_file)
 
 
-        self.angle_list = []
         self.vectors_list = []
         self.color_list = []
-
-        #start = time.time()
 
         pool = Pool()
         multiple_results = [pool.apply_async(process_batch, (self.tdata[i], self.tbase_data[i])) for i in range(len(self.tdata))]
         for result in multiple_results:
-            angle, vectors, colors = result.get(timeout=25)
-            self.angle_list.append(angle)
+            vectors, colors = result.get(timeout=25)
             self.vectors_list.append(vectors)
             self.color_list.append(colors)
 
-        #end = time.time()
-        #print("It has taken {}".format(end-start))
-
-
         self.data = self.tdata
         self.base_data = self.tbase_data[0]
-        self.count = self.tcount[0]
-        #Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
-        #pyglet.app.run()
+
     '''
     def simulateFile(self, path_to_file, path_to_header_file):
         data, count = extract_base_data(path_to_file)

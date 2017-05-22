@@ -100,7 +100,7 @@ def process_batch(df, base_data):
         xtemp = xpos * xb
         ytemp = ypos * yb
         ztemp = zpos * zb
-        c = vc.Vector(x, y, z)
+        c = Vector(x, y, z)
         if np.abs(c.x + c.y + c.z) > 0:
             k = c.norm
             vectors.append([xtemp, ytemp, ztemp, xtemp + (c.x / k),
@@ -114,7 +114,7 @@ def process_batch_sensitive(df, base_data):
     '''
     increases the displayed sensitivity of data
     '''
-    b1 = vc.Vector(1, 0, 0)
+    b1 = Vector(1, 0, 0)
     angles = []
     vectors = []
     xpos = 0
@@ -139,12 +139,12 @@ def process_batch_sensitive(df, base_data):
         xtemp = xpos * xb
         ytemp = ypos * yb
         ztemp = zpos * zb
-        c = vc.Vector(row[0], row[1], row[2])
+        c =  Vector(row[0], row[1], row[2])
         if np.abs(c.x + c.y + c.z) > 0:
             k = c.norm
             vectors.append([xtemp, ytemp, ztemp, xtemp + c.x / k,
                             ytemp + c.y / k, ztemp + c.z / k])
-            angle = np.power(vc.relative_direction(c, b1), power)
+            angle = np.power(relative_direction(c, b1), power)
             angles.append(angle)
         else:
             continue

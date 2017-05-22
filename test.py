@@ -6,11 +6,13 @@ if(len(sys.argv)>2):
 if(str(sys.argv[1]) == "pyglet"):
     from CPU3D.pygletRunner import PygletRunner
     x = PygletRunner()
-    x.play = True
-    
+    x.play = False
+
     #example of usage
-    x.directory = "data/"
+    #x.directory = "data/"
+    x.directory = "0200nm/"
     x.fformat = ".omf"
+    x.filetype = 'binary'
     x.headerFile = "data/voltage-spin-diode.odt"
     x.playAnimation()
 

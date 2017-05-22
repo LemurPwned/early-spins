@@ -33,8 +33,7 @@ class Window(pyglet.window.Window):
         self.vectors_list = data[0]
         self.color_list = data[1]
         self.tbase_data = data[2]
-        self.tcount = data[3]
-        self.header = data[4]
+        self.header = data[3]
 
 
     def upload_uniforms(self):
@@ -135,30 +134,13 @@ class Window(pyglet.window.Window):
             self.position[0] += dx * 0.1
             self.position[1] += dy * 0.1
 
-
-    '''def on_key_press(self, symbol, modifiers):
-        if symbol == key.ENTER:
-            self.FREE_RUN = not self.FREE_RUN
-            if self.FREE_RUN:
-                pyglet.clock.schedule_interval(self.update, TIME_INTERVAL)
-                self.change_frame()
-        elif symbol == key.RIGHT:
-            self.i += 1
-            self.list_guard()
-            self.change_frame()
-        elif symbol == key.LEFT:
-            self.i -= 1
-            self.list_guard()
-            self.change_frame()
-    '''
-
     def next_frame(self):
         self.i+=1
         self.change_frame()
 
     def change_frame(self):
         self.list_guard()
-        base_data = tbase_data[self.i]
+        base_data = self.tbase_data[self.i]
         width, height = self.get_size()
         self.on_resize(width, height)
 
@@ -176,61 +158,3 @@ class Window(pyglet.window.Window):
             self.i = 0
         else:
             pass
-
-def getAllFiles(directory, extension, filetype = 'binary'):
-    tFileList = os.listdir(directory)
-    fileList = []
-    j = 0
-    for file in tFileList:
-        j += 1
-        if j > control:
-            break
-        if file.find(extension) != -1:
-            fileList.append(directory + file)
-
-    base_data = []
-    count = []
-    data = []
-    print("Reading data... {}, fileformat: {}".format(len(fileList), filetype))
-    fileList.sort()
-    if filetype == 'binary':
-        for filename in fileList:
-            tbase_data, tdf = binary_read(filename)
-            base_data.append(tbase_data)
-            data.append(tdf)
-    elif filetype == 'text':
-        for filename in fileList:
-            tbase_data, tcount = extract_base_data(filename)
-            base_data.append(tbase_data)
-            count.append(tcount)
-            to_skip = [x for x in range(tcount)]
-            df = form_dataframe(filename, to_skip)
-            data.append(df)
-
-    return data, base_data, count
-
-if __name__ == '__main__':
-    #tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
-    tdata, tbase_data, tcount = getAllFiles("./0200nm/", ".omf")
-    vectors_list = []
-    color_list = []
-
-    start = time.time()
-
-    pool = Pool()
-    multiple_results = [pool.apply_async(process_batch, (tdata[i], tbase_data[i])) for i in range(len(tdata))]
-    for result in multiple_results:
-        vectors, colors = result.get(timeout=20)
-        vectors_list.append(vectors)
-        color_list.append(colors)
-
-    end = time.time()
-    print("It has taken {}".format(end-start))
-
-    #header = read_header_file("./data/voltage-spin-diode.odt")
-    #header = read_header_file("./0200nm/proba1.odt")
-    data = tdata
-    base_data = tbase_data[0]
-    #count = tcount[0]
-    Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
-    pyglet.app.run()
