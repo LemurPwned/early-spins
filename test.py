@@ -6,14 +6,15 @@ if(len(sys.argv)>2):
 if(str(sys.argv[1]) == "pyglet"):
     from CPU3D.pygletRunner import PygletRunner
     x = PygletRunner()
-    x.play = False
+    x.play = True
 
     #example of usage
     #x.directory = "data/"
     x.directory = "0200nm/"
     x.fformat = ".omf"
     x.filetype = 'binary'
-    x.headerFile = "data/voltage-spin-diode.odt"
+    #x.headerFile = "data/voltage-spin-diode.odt"
+    x.headerFile = "0200nm/proba1.odt"
     x.playAnimation()
 
 # u can create your own simulations and then add it to makefile

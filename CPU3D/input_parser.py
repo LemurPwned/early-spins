@@ -189,7 +189,24 @@ def odt_reader(filename):
     units = units.split(" ")
     units
     units = [x.strip() for x in units]
-    #print(lines[0:10])
+
+    dataset = []
+    lines = [x.strip() for x in lines]
+    print("{} lines have been read ".format(len(lines)))
+    lines = [x.split(' ') for x in lines]
+    for line in lines:
+        temp_line = []
+        for el in line:
+            try:
+                new_el = float(el)
+                temp_line.append(new_el)
+            except:
+                pass
+        dataset.append(temp_line)
+    dataset = dataset[:-1]
+    df = pd.DataFrame.from_records(dataset, columns=cols)
+    iterations = len(lines) -1
+    return df, iterations
 
 def binary_read(filename, cols = ['x', 'y', 'z']):
     lists = []
@@ -198,7 +215,7 @@ def binary_read(filename, cols = ['x', 'y', 'z']):
     base_data = {}
     validity = False
     iterator = 2
-    validation = 123456789012345.0
+    validation = 123456789012345.0 #this is IEEE validation value
     with open(filename, 'rb') as f:
         while validity == False and iterator < 12:
             headers = f.read(24*38 + iterator) #idk xD
@@ -222,6 +239,7 @@ def binary_read(filename, cols = ['x', 'y', 'z']):
         b = f.read(8)
         #TODO quantize below
         k = (51200)*3 - 1
+        # = x_nodes*y_nodes*z_nodes*3 - 1
         counter = 0
         while b and counter < k:
             try:
@@ -242,7 +260,6 @@ def binary_read(filename, cols = ['x', 'y', 'z']):
         b = f.read(36 + 8) #pro debug process
         #print("last line {}".format(b))
     f.close()
-    print(len(lists))
     df = pd.DataFrame.from_records(lists, columns=cols)
     return base_data, df
 

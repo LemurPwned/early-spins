@@ -10,12 +10,13 @@ class PygletRunner(QtCore.QObject):
         self.headerFile = ""
         self.filetype = ""
         self.TIME_INTERVAL = 1/30
+        self.control = 10 #TODO: parametrize it
 
     def playAnimation(self):
         self.simulateDirectory(self.directory, self.fformat, self.headerFile, self.filetype)
-        print("generating 3d structure...")
+        print("Generating 3d structure...")
         animation3d = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
-        animation3d.getDataFromRunner([self.vectors_list, self.color_list, self.tbase_data, self.header])
+        animation3d.getDataFromRunner([self.vectors_list, self.color_list, self.tbase_data, self.header, self.iterations])
         t1 = threading.Thread(target = pyglet.app.run)
         t1.start()
         print("done!")
@@ -37,13 +38,11 @@ class PygletRunner(QtCore.QObject):
         j = 0
         for file in tFileList:
             j += 1
-            if j > control:
+            if j > self.control:
                 break
             if file.find(extension) != -1:
                 fileList.append(directory + file)
-
         base_data = []
-        count = []
         data = []
         print("Reading data... {}, fileformat: {}".format(len(fileList), filetype))
         fileList.sort()
@@ -56,7 +55,7 @@ class PygletRunner(QtCore.QObject):
             for filename in fileList:
                 tbase_data, tcount = extract_base_data(filename)
                 base_data.append(tbase_data)
-                count.append(tcount)
+                #count.append(tcount)
                 to_skip = [x for x in range(tcount)]
                 df = form_dataframe(filename, to_skip)
                 data.append(df)
@@ -65,8 +64,7 @@ class PygletRunner(QtCore.QObject):
 
     def simulateDirectory(self, path_to_folder, extension, path_to_header_file, filetype):
         self.tdata, self.tbase_data= self.getAllFiles(path_to_folder, extension, filetype)
-        self.header = read_header_file(path_to_header_file)
-
+        self.header, self.iterations = odt_reader(path_to_header_file) #new odt format reader, more universal
 
         self.vectors_list = []
         self.color_list = []
@@ -80,10 +78,3 @@ class PygletRunner(QtCore.QObject):
 
         self.data = self.tdata
         self.base_data = self.tbase_data[0]
-
-    '''
-    def simulateFile(self, path_to_file, path_to_header_file):
-        data, count = extract_base_data(path_to_file)
-        header = read_header_file(path_to_header_file)
-        #Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
-        #pyglet.app.run()'''
