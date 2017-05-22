@@ -1,5 +1,5 @@
 run:
-	python3 -m run
+	python3 -m main
 	
 pyglet:
-	python3 -m CPU3D.pyglet1
+	python3 -m test pyglet

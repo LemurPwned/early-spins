@@ -85,9 +85,9 @@ class PygletRunner(QtCore.QObject):
         self.count = self.tcount[0]
         #Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
         #pyglet.app.run()
-
+    '''
     def simulateFile(self, path_to_file, path_to_header_file):
         data, count = extract_base_data(path_to_file)
         header = read_header_file(path_to_header_file)
-        Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
-        pyglet.app.run()
+        #Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
+        #pyglet.app.run()'''
