@@ -2,7 +2,6 @@ from PyQt4 import QtGui, QtCore
 import pyglet
 pyglet.options['debug_gl'] = False
 from pyglet.gl import *
-pyglet.options['debug_gl'] = False
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
 import time
@@ -15,9 +14,7 @@ from CPU3D.graph_panels import calculate_angle, generate_color_series
 
 WINDOW = 800
 INCREMENT = 5
-control = 10
-
-TIME_INTERVAL = 1/60.0
+#control = 100
 
 class Window(pyglet.window.Window):
 
@@ -68,11 +65,6 @@ class Window(pyglet.window.Window):
         self.draw_vector([0, 0, 0, size, 0, 0], [1, 0, 0]) #x
         self.draw_vector([0, 0, 0, 0, size, 0], [0, 1, 0]) #y
         self.draw_vector([0, 0, 0, 0, 0, size], [0, 0, 1]) #z
-
-    #redundant function
-    def create_vector(self, df):
-        self.vec = vectors_list[self.i]
-        self.colors = color_list[self.i]
 
     def initial_transformation(self):
         self.rotation = [0, 0, 0]  # xyz degrees in xyz axis
@@ -135,10 +127,6 @@ class Window(pyglet.window.Window):
             self.position[0] += dx * 0.1
             self.position[1] += dy * 0.1
 
-    def next_frame(self):
-        self.i+=1
-        self.change_frame()
-
     def change_frame(self):
         self.list_guard()
         base_data = self.tbase_data[self.i]
@@ -147,15 +135,13 @@ class Window(pyglet.window.Window):
 
     #DO NOT REMOVE DF FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
     def update(self, df):
-        if self.FREE_RUN:
-            self.i += 1
-            self.list_guard()
         self.change_frame()
+        print(self.i)
 
     def list_guard(self):
-        if self.i >= control-1:
-            self.i = 0
-        if self.i > self.iterations:
+        #if self.i >= control-1:
+        #    self.i = 0
+        if self.i > self.iterations-1:
             self.i = 0
         else:
             pass

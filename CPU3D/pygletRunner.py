@@ -9,8 +9,8 @@ class PygletRunner(QtCore.QObject):
         self.fformat = ""
         self.headerFile = ""
         self.filetype = ""
-        self.TIME_INTERVAL = 1/30
-        self.control = 10 #TODO: parametrize it
+        self.TIME_INTERVAL = 1/60
+        self.control = 100 #TODO: parametrize it
 
     def playAnimation(self):
         self.simulateDirectory(self.directory, self.fformat, self.headerFile, self.filetype)
@@ -18,34 +18,28 @@ class PygletRunner(QtCore.QObject):
         animation3d = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
         animation3d.getDataFromRunner([self.vectors_list, self.color_list, self.tbase_data, self.header, self.iterations])
         t1 = threading.Thread(target = pyglet.app.run)
+        pyglet.clock.schedule_interval(animation3d.update, self.TIME_INTERVAL)
         t1.start()
         print("done!")
-
+        sleep(2)
         while(True):
             if self.play:
-                #print("next_frame")
                 animation3d.i+=1
-                pyglet.clock.schedule_interval(animation3d.update, self.TIME_INTERVAL)
-                #animation3d.update()
                 animation3d.list_guard()
-                #animation3d.change_frame()
-            sleep(0.01)
-            #print(self.play)
+            sleep(0.1)
 
     def getAllFiles(self, directory, extension, filetype = 'binary'):
         tFileList = os.listdir(directory)
         fileList = []
         j = 0
         for file in tFileList:
-            j += 1
-            if j > self.control:
-                break
             if file.find(extension) != -1:
                 fileList.append(directory + file)
         base_data = []
         data = []
         print("Reading data... {}, fileformat: {}".format(len(fileList), filetype))
         fileList.sort()
+        #fileList = fileList[:self.control]
         if filetype == 'binary':
             for filename in fileList:
                 tbase_data, tdf = binary_read(filename)
@@ -55,7 +49,6 @@ class PygletRunner(QtCore.QObject):
             for filename in fileList:
                 tbase_data, tcount = extract_base_data(filename)
                 base_data.append(tbase_data)
-                #count.append(tcount)
                 to_skip = [x for x in range(tcount)]
                 df = form_dataframe(filename, to_skip)
                 data.append(df)
