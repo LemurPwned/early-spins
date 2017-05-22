@@ -16,9 +16,9 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.worker_thread = QtCore.QThread()
         self.worker.moveToThread(self.worker_thread)
         self.worker_thread.start()
-        
+
         #self.WarningDialog = WarningScreen(self)
-        
+
         self.window()
 
     def window(self):
@@ -53,6 +53,9 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
 
         self.worker.directory = self.directory
         self.worker.fformat = self.fformat
+
+        #TODO we have to detect it or make checkbox
+        self.worker.filetype = "text"
 
         #prawokultury/kurs
 

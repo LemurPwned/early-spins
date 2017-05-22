@@ -49,6 +49,7 @@ class PygletRunner(QtCore.QObject):
             for filename in fileList:
                 tbase_data, tcount = extract_base_data(filename)
                 base_data.append(tbase_data)
+                #count.append(tcount)
                 to_skip = [x for x in range(tcount)]
                 df = form_dataframe(filename, to_skip)
                 data.append(df)
