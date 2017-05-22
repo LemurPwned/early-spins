@@ -1,6 +1,7 @@
 import time
 from CPU3D.tiny_vectors import *
 from CPU3D.graph_panels import *
+import struct
 
 def extract_base_data(filename):
     '''
@@ -73,7 +74,47 @@ def form_dataframe(filename, to_skip, cols=['Whitespace', 'x', 'y', 'z']):
     return data
 
 def process_batch(df, base_data):
-    b1 = Vector(1, 0, 0)
+    vectors = []
+    temp_color = []
+    xpos = 0
+    ypos = 0
+    zpos = 0
+    xc = int(base_data['xnodes'])
+    yc = int(base_data['ynodes'])
+    zc = int(base_data['znodes'])
+    xb = float(base_data['xbase']) * 1e9
+    yb = float(base_data['ybase']) * 1e9
+    zb = float(base_data['zbase']) * 1e9
+    xv = df['x'].tolist()
+    yv = df['y'].tolist()
+    zv = df['z'].tolist()
+    for x, y, z in zip(xv,yv,zv):
+        xpos += 1
+        if xpos >= xc:
+            ypos += 1 + (xpos % xc)
+            xpos = 0
+        if ypos >= yc:
+            zpos += 1 + (ypos % yc)
+            ypos = 0
+            xpos = 0
+        xtemp = xpos * xb
+        ytemp = ypos * yb
+        ztemp = zpos * zb
+        c = vc.Vector(x, y, z)
+        if np.abs(c.x + c.y + c.z) > 0:
+            k = c.norm
+            vectors.append([xtemp, ytemp, ztemp, xtemp + (c.x / k),
+                            ytemp + (c.y / k), ztemp + (c.z/k)])
+            temp_color.append((c.x/k, c.y/k, c.z/k))
+        else:
+            continue
+    return vectors, temp_color
+
+def process_batch_sensitive(df, base_data):
+    '''
+    increases the displayed sensitivity of data
+    '''
+    b1 = vc.Vector(1, 0, 0)
     angles = []
     vectors = []
     xpos = 0
@@ -85,8 +126,8 @@ def process_batch(df, base_data):
     xb = float(base_data['xbase']) * 1e9
     yb = float(base_data['ybase']) * 1e9
     zb = float(base_data['zbase']) * 1e9
-    start = time.time()
     for index, row in df.iterrows():
+        xpos += 1
         if xpos >= xc:
             ypos += 1 + (xpos % xc)
             xpos = 0
@@ -94,100 +135,119 @@ def process_batch(df, base_data):
             zpos += 1 + (ypos % yc)
             ypos = 0
             xpos = 0
-        xpos += 1
+
         xtemp = xpos * xb
         ytemp = ypos * yb
         ztemp = zpos * zb
-
-        c = Vector(row[0], row[1], row[2])
-        if np.abs(row[0] + row[1] + row[2]) > 0:
-            vectors.append([xtemp, ytemp, ztemp, xtemp + row[0] / c.norm,
-                            ytemp + row[1] / c.norm, ztemp + row[2] / c.norm])
-            angles.append(np.power(relative_direction(c, b1), power))
+        c = vc.Vector(row[0], row[1], row[2])
+        if np.abs(c.x + c.y + c.z) > 0:
+            k = c.norm
+            vectors.append([xtemp, ytemp, ztemp, xtemp + c.x / k,
+                            ytemp + c.y / k, ztemp + c.z / k])
+            angle = np.power(vc.relative_direction(c, b1), power)
+            angles.append(angle)
         else:
             continue
-
-    max_angle = np.max(angles)
     series = generate_color_series(len(angles))
     temp_color = [x for (y, x) in sorted(zip(angles, series))]
-    end = time.time()
-    #print("TIME : {}\n".format(end - start))
-    return angles, vectors, temp_color
+    return vectors, temp_color
 
+def process_header(headers):
+    base_data = {}
+    headers = headers.replace('\'', "")
+    headers = headers.replace(' ', "")
+    headers = headers.replace('\\n', "")
+    headers = headers.split('#')
+    for header in headers:
+        if ':' in header:
+            components = header.split(':')
+            try:
+                base_data[components[0]] = float(components[1])
+            except:
+                base_data[components[0]] = components[1]
+    return base_data
 
-def topology(base_data):
-    xpos = 0
-    ypos = 0
-    zpos = 0
-    vectors_init = []
-    iterations = base_data['xnodes']*base_data['ynodes']*base_data['znodes']
-    for i in range(iterations):
-        if xpos >= int(base_data['xnodes']):
-            ypos += 1 + (xpos % int(base_data['xnodes']))
-            xpos = 0
-        if ypos >= int(base_data['ynodes']):
-            zpos += 1 + (ypos % int(base_data['ynodes']))
-            ypos = 0
-            xpos = 0
-        xpos += 1
-        xtemp = xpos * float(base_data['xbase']) * 1e9
-        ytemp = ypos * float(base_data['ybase']) * 1e9
-        ztemp = zpos * float(base_data['zbase']) * 1e9
-        vectors_init.append([xtemp, ytemp, ztemp, xtemp])
-    return vectors_init
+def odt_reader(filename):
+    header_lines = 4
+    header = []
+    i = 0
+    with open(filename, 'r') as f:
+        while i < header_lines:
+            lines = f.readline()
+            header.append(lines)
+            i += 1
+        units = f.readline()
+        lines = f.readlines()
+    f.close()
+    cols = header[-1]
+    cols = cols.replace("} ", "")
+    cols = cols.replace("{", "")
+    cols = cols.split("Oxs_")
+    del cols[0]
+    cols = [x.strip() for x in cols]
 
-def form_layer_structure(df, base_data):
-    xpos = 0
-    ypos = 0
-    zpos = 0
-    b1 = Vector(1, 0, 0)
-    norm = (np.square(df['x']) + np.square(df['y']) + np.square(df['z'])).apply(np.sqrt)
-    _angles = df['x']*b1.x + df['y']*b1.y + df['z']*b1.z
-    _angles = (((_angles/norm).apply(np.arccos)**25)/np.max(_angles)).fillna(0)
-    df['norm'] = norm
-    df['angles'] = _angles
-    vectors = []
-    angles = []
-    colors = []
-    for index, row in df.iterrows():
-        if xpos >= int(base_data['xnodes']):
-            ypos += 1 + (xpos % int(base_data['xnodes']))
-            xpos = 0
-        if ypos >= int(base_data['ynodes']):
-            zpos += 1 + (ypos % int(base_data['ynodes']))
-            ypos = 0
-            xpos = 0
-        xpos += 1
-        xtemp = xpos * float(base_data['xbase']) * 1e9
-        ytemp = ypos * float(base_data['ybase']) * 1e9
-        ztemp = zpos * float(base_data['zbase']) * 1e9
-        if row[3] > 0:
-            vectors.append([xtemp, ytemp, ztemp, xtemp + row[0] / row[3],
-                            ytemp + row[1] / row[3], ztemp + row[2] / row[3]])
-            angles.append(row[4])
-        else:
-            continue
+    units = units.split(" ")
+    units
+    units = [x.strip() for x in units]
+    #print(lines[0:10])
 
-        series = generate_color_series(len(angles))
-        colors = [x for (y, x) in sorted(zip(angles, series))]
-
-    return vectors, angles, colors
-
-def histeresis(angle):
-    low = np.percentile(angle[angle > 0], 66, interpolation='higher')
-    high = np.percentile(angle[angle > 0], 33, interpolation='lower')
-    return low, high
-
-
-def colorify(dataframe, low, high):
-    dataframe['color'] = np.zeros(dataframe.shape[0])
-    dataframe['color'][(dataframe['angles'] > low) & (dataframe['angles'] < high) & (dataframe['angles'] > 0)] = 1
-    dataframe['color'][(dataframe['angles'] > high) & (dataframe['angles'] > 0)] = 2
-    dataframe['color'][(dataframe['angles'] < low) & (dataframe['angles'] > 0)] = 3
-    return dataframe
-
+def binary_read(filename, cols = ['x', 'y', 'z']):
+    lists = []
+    a_tuple = []
+    c = 0
+    base_data = {}
+    validity = False
+    iterator = 2
+    validation = 123456789012345.0
+    with open(filename, 'rb') as f:
+        while validity == False and iterator < 12:
+            headers = f.read(24*38 + iterator) #idk xD
+            #print("Header \n",headers)
+            headers = str(headers)
+            check_value = struct.unpack('d', f.read(8))[0]
+            #print(base_data)
+            #print("Check value for 8-binary {}".format(check_value))
+            if check_value == validation:
+                #print("Proper reading commences ...")
+                validity = True
+                break
+            else:
+                #print("Validity check failed")
+                #print("Adjusting binary size read")
+                f.seek(0)
+                iterator += 1
+        if iterator == 12  : raise TypeError
+        base_data = process_header(headers)
+        #print(base_data)
+        b = f.read(8)
+        #TODO quantize below
+        k = (51200)*3 - 1
+        counter = 0
+        while b and counter < k:
+            try:
+                p = struct.unpack('d', b)[0]
+                c += 1
+                counter += 1
+                if c%3 == 0:
+                    a_tuple.append(p)
+                    lists.append(tuple(a_tuple))
+                    a_tuple = []
+                    c = 0
+                else:
+                    a_tuple.append(p)
+            except struct.error:
+                #print(b)
+                pass
+            b = f.read(8)
+        b = f.read(36 + 8) #pro debug process
+        #print("last line {}".format(b))
+    f.close()
+    print(len(lists))
+    df = pd.DataFrame.from_records(lists, columns=cols)
+    return base_data, df
 
 if __name__ == "__main__":
+    '''
     filename = './data/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
     filename2 = './data/voltage-spin-diode.odt'
     base_data, count = extract_base_data(filename)
@@ -206,4 +266,22 @@ if __name__ == "__main__":
     # callback_plotter(figs)
 
     df = read_header_file(filename2)
+
     graph = plotters(df, ('Iteration', 'Total energy'), ('step', 'J'))
+
+    graph = plotters(df, ('Iteration', 'Total energy'), ('step', 'J'))
+    #callback_plotter(graph)
+    #anglify
+    '''
+    filename = './0200nm/proba1-Oxs_MinDriver-Magnetization-00-0021617.omf'
+    filename2 = './0200nm/proba1-Oxs_MinDriver-Magnetization-20-0115207.omf'
+    head =  './0200nm/proba1.odt'
+    odt_reader(head)
+    #base_data, df = binary_read(filename2)
+    #print("Printing head {}:".format(df.head()))
+    #print("Printing tail {}:".format(df.tail()))
+    #print(base_data)
+    #data.loc[~(data == 0).all(axis=1)] = np.nan
+    #sdf = data.to_sparse()
+    #print(sdf.density)
+    #print(base_data)

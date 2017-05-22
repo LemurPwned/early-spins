@@ -1,0 +1,44 @@
+Embed block size=48
+Embed yz-block size=1
+C++-level run time (secs)1944281.92 cpu /306065.16 wall
+Full Step time (secs)1943796.97 cpu /305876.97 wall, module Oxs_TimeDriver: (535796 iterations)
+               timer  0 ...   3001.10 cpu / 289.32 wall, (Oxs_RungeKuttaEvolve:evolve/ComputeEnergyChange)
+                \---> passes = 572575, bytes=3023911.72 MB, 10.21 GB/sec
+               timer  1 ...   1940721.49 cpu /305574.08 wall, (Oxs_RungeKuttaEvolve:evolve/RKFB54 total)
+                \---> passes = 575695, bytes=0.00 MB, 0.00 GB/sec
+               timer  2 ...      3.96 cpu /   0.53 wall, (Oxs_RungeKuttaEvolve:evolve/RKFB54 setup)
+                \---> passes = 575695, bytes=0.00 MB, 0.00 GB/sec
+               timer  3 ...   8408.97 cpu / 752.48 wall, (Oxs_RungeKuttaEvolve:evolve/RKF54 step 1)
+                \---> passes = 575695, bytes=13681751.48 MB, 17.76 GB/sec
+               timer  4 ...   17530.61 cpu /1544.68 wall, (Oxs_RungeKuttaEvolve:evolve/RKF54 step 2)
+                \---> passes = 575695, bytes=36484670.62 MB, 23.07 GB/sec
+               timer  5 ...   20461.33 cpu /1781.28 wall, (Oxs_RungeKuttaEvolve:evolve/RKF54 step 4)
+                \---> passes = 575695, bytes=41045254.45 MB, 22.50 GB/sec
+               timer  6 ...   23271.88 cpu /2018.80 wall, (Oxs_RungeKuttaEvolve:evolve/RKF54 step 6)
+                \---> passes = 575695, bytes=45605838.28 MB, 22.06 GB/sec
+               timer  7 ...   23241.12 cpu /2025.16 wall, (Oxs_RungeKuttaEvolve:evolve/RKF54 step 8)
+                \---> passes = 575695, bytes=50166422.11 MB, 24.19 GB/sec
+               timer  8 ...   24086.35 cpu /2093.68 wall, (Oxs_RungeKuttaEvolve:evolve/RKF54 step 9)
+                \---> passes = 575695, bytes=50166422.11 MB, 23.40 GB/sec
+               timer  9 ...   12409.17 cpu /1111.44 wall, (Oxs_RungeKuttaEvolve:evolve/RKF54 step 10)
+                \---> passes = 575695, bytes=22802919.14 MB, 20.04 GB/sec
+   Step-only    .....   132609.97 cpu /11671.10 wall, (Oxs_RungeKuttaEvolve:evolve)
+GetEnergy time (secs)163675.36 cpu /117762.72 wall, module Oxs_MR: (3454231 evals)
+      subtime ...   init   8.21 cpu /   8.13 wall, (Oxs_Demag:)
+      subtime ... f-fftx103256.64 cpu /9405.59 wall, (Oxs_Demag:)
+      subtime ... i-fftx129835.92 cpu /11691.12 wall, (Oxs_Demag:)
+      subtime ...   conv1139047.98 cpu /110974.36 wall, (Oxs_Demag:)
+GetEnergy time (secs)1372349.73 cpu /132150.23 wall, module Oxs_Demag: (3454231 evals)
+GetEnergy time (secs)196696.43 cpu /18507.01 wall, ChunkEnergies total (3454231 evals)
+GetEnergy time (secs)78206.08 cpu /25750.18 wall, module Oxs_TwoSurfaceExchange:FF (3454231 evals)
+Ending child thread #11
+Ending child thread #10
+Ending child thread #9
+Ending child thread #8
+Ending child thread #7
+Ending child thread #6
+Ending child thread #5
+Ending child thread #4
+Ending child thread #3
+Ending child thread #2
+Ending child thread #1

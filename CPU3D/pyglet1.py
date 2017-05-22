@@ -2,6 +2,7 @@ from PyQt4 import QtGui, QtCore
 import pyglet
 pyglet.options['debug_gl'] = False
 from pyglet.gl import *
+pyglet.options['debug_gl'] = False
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
 import time
@@ -11,7 +12,7 @@ from CPU3D.input_parser import *
 from CPU3D.camera_calculations import *
 from CPU3D.tiny_vectors import *
 from CPU3D.graph_panels import calculate_angle, generate_color_series
-    
+
 WINDOW = 800
 INCREMENT = 5
 control = 30
@@ -19,7 +20,7 @@ control = 30
 TIME_INTERVAL = 1/60.0
 
 class Window(pyglet.window.Window):
-    
+
     def __init__(self, width, height, title=''):
         super(Window, self).__init__(width, height, title)
         glClearColor(0, 0, 0, 1)
@@ -27,15 +28,15 @@ class Window(pyglet.window.Window):
         self.initial_transformation()
         self.FREE_RUN = False
         self.i = 0
-    
+
     def getDataFromRunner(self, data):
         self.vectors_list = data[0]
         self.color_list = data[1]
         self.tbase_data = data[2]
         self.tcount = data[3]
         self.header = data[4]
-        
-    
+
+
     def upload_uniforms(self):
         uni = self.shader.uniforms
 
@@ -64,9 +65,9 @@ class Window(pyglet.window.Window):
         glEnd()
 
     def draw_cordinate_system(self, size=5):
-        self.draw_vector([0, 0, 0, size, 0, 0], [1, 0, 0])
-        self.draw_vector([0, 0, 0, 0, size, 0], [0, 1, 0])
-        self.draw_vector([0, 0, 0, 0, 0, size], [0, 0, 1])
+        self.draw_vector([0, 0, 0, size, 0, 0], [1, 0, 0]) #x
+        self.draw_vector([0, 0, 0, 0, size, 0], [0, 1, 0]) #y
+        self.draw_vector([0, 0, 0, 0, 0, size], [0, 0, 1]) #z
 
     #redundant function
     def create_vector(self, df):
@@ -95,7 +96,6 @@ class Window(pyglet.window.Window):
             self.draw_vector(vector, color=color)
         # Pop Matrix off stack
         glPopMatrix()
-        #print(self.position, self.rotation)
 
     def on_resize(self, width, height):
         # set the Viewport
@@ -151,20 +151,15 @@ class Window(pyglet.window.Window):
             self.list_guard()
             self.change_frame()
     '''
-    
+
     def next_frame(self):
         self.i+=1
         self.change_frame()
 
     def change_frame(self):
-        #print("Frame {}, Len {}".format(self.i, len(tbase_data)))
-        #print(self.FREE_RUN)
         self.list_guard()
-        self.base_data = self.tbase_data[self.i]
-        self.count = self.tcount[self.i]
+        base_data = tbase_data[self.i]
         width, height = self.get_size()
-        #print("Mean of colors {}".format(np.mean(colors)))
-        #print("Mean of data in change frame: {}".format(np.mean(data[self.i]['x'])))
         self.on_resize(width, height)
 
     #DO NOT REMOVE DF FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
@@ -182,11 +177,41 @@ class Window(pyglet.window.Window):
         else:
             pass
 
+def getAllFiles(directory, extension, filetype = 'binary'):
+    tFileList = os.listdir(directory)
+    fileList = []
+    j = 0
+    for file in tFileList:
+        j += 1
+        if j > control:
+            break
+        if file.find(extension) != -1:
+            fileList.append(directory + file)
+
+    base_data = []
+    count = []
+    data = []
+    print("Reading data... {}, fileformat: {}".format(len(fileList), filetype))
+    fileList.sort()
+    if filetype == 'binary':
+        for filename in fileList:
+            tbase_data, tdf = binary_read(filename)
+            base_data.append(tbase_data)
+            data.append(tdf)
+    elif filetype == 'text':
+        for filename in fileList:
+            tbase_data, tcount = extract_base_data(filename)
+            base_data.append(tbase_data)
+            count.append(tcount)
+            to_skip = [x for x in range(tcount)]
+            df = form_dataframe(filename, to_skip)
+            data.append(df)
+
+    return data, base_data, count
+
 if __name__ == '__main__':
-    tdata, tbase_data, tcount = getAllFiles("../data/", ".omf")
-    header = read_header_file("../data/voltage-spin-diode.odt")
-    #tdata, tbase_data, tcount = getAllFiles("../data/", ".omf")
-    angle_list = []
+    #tdata, tbase_data, tcount = getAllFiles("./data/", ".omf")
+    tdata, tbase_data, tcount = getAllFiles("./0200nm/", ".omf")
     vectors_list = []
     color_list = []
 
@@ -195,17 +220,17 @@ if __name__ == '__main__':
     pool = Pool()
     multiple_results = [pool.apply_async(process_batch, (tdata[i], tbase_data[i])) for i in range(len(tdata))]
     for result in multiple_results:
-        angle, vectors, colors = result.get(timeout=7)
-        angle_list.append(angle)
+        vectors, colors = result.get(timeout=20)
         vectors_list.append(vectors)
         color_list.append(colors)
 
     end = time.time()
     print("It has taken {}".format(end-start))
 
-    #header = read_header_file("../data/voltage-spin-diode.odt")
+    #header = read_header_file("./data/voltage-spin-diode.odt")
+    #header = read_header_file("./0200nm/proba1.odt")
     data = tdata
     base_data = tbase_data[0]
-    count = tcount[0]
-    x = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
+    #count = tcount[0]
+    Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
     pyglet.app.run()

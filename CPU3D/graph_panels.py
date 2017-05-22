@@ -45,7 +45,7 @@ def layer_splitter(data, base_data):
     '''
     (x, y, z) = (int(base_data['xnodes']), int(base_data['ynodes']), int(base_data['znodes']))
     # print(x,y,z)
-    surface = x * y
+    surface = x*y
     layers = [data.iloc[surface * i:surface * i + surface, :] for i in range(z)]
     # ask about the true layer size, should be divisible by 5
     # TODO caveat, an artificial value is added to the last layer to make these equal
@@ -69,8 +69,8 @@ def populate_list(x_nodes, y_nodes):
     point_list_y = []
     for y_node in range(y_nodes):
         for x_node in range(x_nodes):
-            point_list_x.append(x_node)
             point_list_y.append(y_node)
+            point_list_x.append(x_node)
     return (point_list_x, point_list_y)
 
 
