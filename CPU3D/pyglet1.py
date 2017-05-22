@@ -15,7 +15,7 @@ from CPU3D.graph_panels import calculate_angle, generate_color_series
 
 WINDOW = 800
 INCREMENT = 5
-control = 30
+control = 10
 
 TIME_INTERVAL = 1/60.0
 
@@ -34,6 +34,7 @@ class Window(pyglet.window.Window):
         self.color_list = data[1]
         self.tbase_data = data[2]
         self.header = data[3]
+        self.iterations = data[4]
 
 
     def upload_uniforms(self):
@@ -154,7 +155,7 @@ class Window(pyglet.window.Window):
     def list_guard(self):
         if self.i >= control-1:
             self.i = 0
-        if self.i > self.header['Iteration'].count():
+        if self.i > self.iterations:
             self.i = 0
         else:
             pass
