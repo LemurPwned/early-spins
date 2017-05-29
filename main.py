@@ -94,11 +94,13 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         if self.worker.play:
             self.nextFrame_button.setEnabled(True)
             self.prevFrame_button.setEnabled(True)
+            self.animationMovement_horizontalSlider.setEnabled(True)
             self.playPause_button.setText("Play")
             self.worker.play = False
         else:
             self.nextFrame_button.setEnabled(False)
             self.prevFrame_button.setEnabled(False)
+            self.animationMovement_horizontalSlider.setEnabled(False)
             self.playPause_button.setText("Pause")
             self.worker.play = True
 
@@ -113,9 +115,9 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.worker.prevFrame = True
     
     def sliderChanged(self):
-        self.worker.setFrame = True
-        self.worker.frame = self.animationMovement_horizontalSlider.value()
-        self.animationMovement_horizontalSlider.setValue(self.worker.frame)
+        if self.worker.play==False:
+            self.worker.setFrame = True
+            self.worker.frame = self.animationMovement_horizontalSlider.value()
     
     @QtCore.pyqtSlot(str)
     def getAllSignals(self, msg):

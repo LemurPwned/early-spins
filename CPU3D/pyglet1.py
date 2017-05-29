@@ -135,7 +135,7 @@ class Window(pyglet.window.Window):
 
     #DO NOT REMOVE DF FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
     def update(self, df):
-        self.i += 1
+        #self.i += 1
         self.change_frame()
         print(self.i)
 

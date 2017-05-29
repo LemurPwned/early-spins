@@ -51,23 +51,20 @@ class PygletRunner(QtCore.QObject):
         sleep(2)
         while(True):
             
-            if animation3d.i%10==0:
-                self.signalStatus.emit(str(animation3d.i))
-            sleep(0.1)
             if self.play:
-                #animation3d.i+=1
+                animation3d.i+=1
                 animation3d.list_guard()
-                continue
+                #continue
             
             if self.nextFrame:
                 animation3d.i+=1
                 animation3d.list_guard()
-                self.nextFrame = not self.nextFrame
+                self.nextFrame = False
             
             if self.prevFrame:
                 animation3d.i-=1
                 animation3d.list_guard()
-                self.prevFrame = not self.prevFrame
+                self.prevFrame = False
             
             if self.stop:
                 animation3d.i = 0
@@ -76,12 +73,15 @@ class PygletRunner(QtCore.QObject):
                 self.stop = False
             
             if self.setFrame:
-                animation3d.i = self.frame
-                animation3d.list_guard()
+                #animation3d.i = self.frame
+                #animation3d.list_guard()
                 self.setFrame = False
             
             
-            
+            #animation3d.update(1)
+            sleep(self.TIME_INTERVAL*10)
+            if animation3d.i%10:
+                self.signalStatus.emit(str(animation3d.i))
             
             
 
