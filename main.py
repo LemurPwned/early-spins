@@ -29,7 +29,7 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.headerFile = ""
         self.directory = ""
         self.fformat = ""
-        self.filetype = "text"
+        self.worker.filetype = "text"
 
         #SIGNALS
         self.worker.signalStatus.connect(self.getAllSignals)
@@ -40,6 +40,7 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.nextFrame_button.clicked.connect(self.nextFrame)
         self.prevFrame_button.clicked.connect(self.prevFrame)
         self.animationMovement_horizontalSlider.valueChanged.connect(self.sliderChanged)
+        self.binaryFiles_checkBox.clicked.connect(self.filetypeCheckBox)
         
 
         #MENU
@@ -50,9 +51,11 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
 
     def filetypeCheckBox(self):
         if(self.binaryFiles_checkBox.isChecked()):
-            self.filetype = "binary"
+            self.worker.filetype = "binary"
+            #print("bin")
         else:
-            self.filetype = "text"
+            self.worker.filetype = "text"
+            #print("text")
 
     def loadSingleFile(self):
         w = QtGui.QWidget()
@@ -69,7 +72,7 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
 
         self.worker.directory = self.directory
         self.worker.fformat = self.fformat
-        self.worker.filetype = self.filetype
+        #self.worker.filetype = self.filetype
 
         #prawokultury/kurs
 

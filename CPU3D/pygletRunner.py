@@ -73,8 +73,8 @@ class PygletRunner(QtCore.QObject):
                 self.stop = False
             
             if self.setFrame:
-                #animation3d.i = self.frame
-                #animation3d.list_guard()
+                animation3d.i = self.frame
+                animation3d.list_guard()
                 self.setFrame = False
             
             
@@ -121,7 +121,7 @@ class PygletRunner(QtCore.QObject):
         print("Maximum number of iterations : {}".format(self.iterations))
         self.vectors_list = []
         self.color_list = []
-
+        
         pool = Pool()
         multiple_results = [pool.apply_async(process_batch, (self.tdata[i], self.tbase_data[i])) for i in range(len(self.tdata))]
         for result in multiple_results:
