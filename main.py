@@ -9,6 +9,9 @@ from GUI.warning import WarningScreen
 from CPU3D import pygletRunner
 
 class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
+    
+    #signalStatus = QtCore.pyqtSignal(str)
+    
     def __init__(self, parent=None):
         super(MainScreen, self).__init__(parent)
         self.setupUi(self)
@@ -111,8 +114,9 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.worker.frame = self.animationMovement_horizontalSlider.value()
         self.animationMovement_horizontalSlider.setValue(self.worker.frame)
     
-        
-    
+    @QtCore.pyqtSlot(str)
+    def getAllSignals(self, msg):
+        print(msg)
     
 def main():
     app = QtGui.QApplication(sys.argv)

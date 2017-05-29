@@ -4,6 +4,9 @@ from time import *
 from GUI.warning import WarningScreen
 
 class PygletRunner(QtCore.QObject):
+    
+    signalStatus = QtCore.pyqtSignal(str)
+    
     def __init__(self, parent = None):
         super(self.__class__, self).__init__(parent)
         self.play = False
@@ -19,20 +22,15 @@ class PygletRunner(QtCore.QObject):
         self.TIME_INTERVAL = 1/60
         self.control = 100 #TODO: parametrize it
         
-
+        
+    @QtCore.pyqtSlot()
     def playAnimation(self):
         if self.directory=="":
-            #add warning msg
-            pass
+            self.signalStatus.emit("no_dir")
+            sleep(10)
             
-        
         elif self.headerFile == "":
-            #will do signal here
-            pass
-        
-        #self.w.showMsg()
-        #self.w.exec()
-        #sleep(10)
+            self.signalStatus.emit("no_header")
         
         self.simulateDirectory(self.directory, self.fformat, self.headerFile, self.filetype)
         print("Generating 3d structure...")
@@ -60,7 +58,7 @@ class PygletRunner(QtCore.QObject):
             
             if self.stop:
                 animation3d.i = 0
-                animation3d.list_guard() #not necessary?
+                animation3d.list_guard()
                 self.play = False
                 self.stop = False
             
@@ -69,7 +67,7 @@ class PygletRunner(QtCore.QObject):
                 animation3d.list_guard()
                 self.setFrame = False
             
-            self.frame = animation3d.i
+            self.signalStatus.emit('test')
             sleep(0.1)
             
             
