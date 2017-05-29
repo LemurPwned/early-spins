@@ -1,8 +1,5 @@
 from PyQt4 import QtGui, QtCore
-try:
-    from WarningWindow import Ui_Window
-except:
-    from GUI.WarningWindow import Ui_Window
+from GUI.WarningWindow import Ui_Window
 
 
 class WarningScreen(QtGui.QWidget, Ui_Window):
@@ -22,8 +19,6 @@ class WarningScreen(QtGui.QWidget, Ui_Window):
         
     def showMsg(self):
         self.warning_Label.setText(str(self._message))
-    
-    
 
 if __name__ == "__main__":
     import sys
