@@ -1,21 +1,39 @@
 from CPU3D.pyglet1 import *
 from time import *
+#from GUI.WarningWindow import Ui_Window
+from GUI.warning import WarningScreen
 
 class PygletRunner(QtCore.QObject):
     def __init__(self, parent = None):
         super(self.__class__, self).__init__(parent)
         self.play = False
+        self.stop = False
+        self.nextFrame = False
+        self.prevFrame = False
         self.directory = ""
         self.fformat = ""
         self.headerFile = ""
         self.filetype = ""
         self.TIME_INTERVAL = 1/60
         self.control = 100 #TODO: parametrize it
+        
 
     def playAnimation(self):
+        if self.directory=="":
+            pass
+            
+        
+        elif self.headerFile == "":
+            #will do signal here
+            pass
+        
+        #self.w.showMsg()
+        #self.w.exec()
+        #sleep(10)
+        
         self.simulateDirectory(self.directory, self.fformat, self.headerFile, self.filetype)
         print("Generating 3d structure...")
-        animation3d = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
+        animation3d = Window(WINDOW, WINDOW, '3D simulation')
         animation3d.getDataFromRunner([self.vectors_list, self.color_list, self.tbase_data, self.header, self.iterations])
         t1 = threading.Thread(target = pyglet.app.run)
         pyglet.clock.schedule_interval(animation3d.update, self.TIME_INTERVAL)
@@ -26,7 +44,31 @@ class PygletRunner(QtCore.QObject):
             if self.play:
                 animation3d.i+=1
                 animation3d.list_guard()
+                #continue
+            
+            if self.nextFrame:
+                animation3d.i+=1
+                animation3d.list_guard()
+                self.nextFrame = not self.nextFrame
+                #continue
+            
+            if self.prevFrame:
+                animation3d.i-=1
+                animation3d.list_guard()
+                self.prevFrame = not self.prevFrame
+                #continue
+            
+            if self.stop:
+                animation3d.i = 0
+                animation3d.list_guard() #not necessary?
+                self.play = False
+                self.stop = False
+                #continue
+            
             sleep(0.1)
+            
+            
+
 
     def getAllFiles(self, directory, extension, filetype = 'binary'):
         tFileList = os.listdir(directory)

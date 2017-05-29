@@ -4,6 +4,7 @@ import os
 
 from GUI.MainWindow import Ui_MainWindow
 #from GUI.WarningWindow import Ui_Window
+from GUI.warning import WarningScreen
 
 from CPU3D import pygletRunner
 
@@ -16,6 +17,8 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.worker_thread = QtCore.QThread()
         self.worker.moveToThread(self.worker_thread)
         self.worker_thread.start()
+        
+
 
         self.window()
 
@@ -77,26 +80,32 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.headerFile = filename
         self.header_file_lineEdit.setText(self.headerFile)
         self.worker.headerFile = self.headerFile
-
-    #INSTEAD OF THESE WE WILL GIVE OUR FUNCTIONS!
+    
     def playPause(self):
         if self.worker.play:
+            self.nextFrame_button.setEnabled(True)
+            self.prevFrame_button.setEnabled(True)
             self.playPause_button.setText("Play")
             self.worker.play = False
         else:
+            self.nextFrame_button.setEnabled(False)
+            self.prevFrame_button.setEnabled(False)
             self.playPause_button.setText("Pause")
             self.worker.play = True
 
     def stop(self):
-        print("Stop")
+        self.worker.stop = True
 
     def nextFrame(self):
-        print("next frame")
+        self.worker.nextFrame = True
 
     def prevFrame(self):
-        print("prev frame")
-    #INSTEAD OF THESE WE WILL GIVE OUR FUNCTIONS!
-
+        self.worker.prevFrame = True
+    
+    
+        
+    
+    
 def main():
     app = QtGui.QApplication(sys.argv)
     window = MainScreen()
