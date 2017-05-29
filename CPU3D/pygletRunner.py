@@ -10,6 +10,8 @@ class PygletRunner(QtCore.QObject):
         self.stop = False
         self.nextFrame = False
         self.prevFrame = False
+        self.setFrame = False
+        self.frame = 0
         self.directory = ""
         self.fformat = ""
         self.headerFile = ""
@@ -20,6 +22,7 @@ class PygletRunner(QtCore.QObject):
 
     def playAnimation(self):
         if self.directory=="":
+            #add warning msg
             pass
             
         
@@ -44,27 +47,29 @@ class PygletRunner(QtCore.QObject):
             if self.play:
                 animation3d.i+=1
                 animation3d.list_guard()
-                #continue
             
             if self.nextFrame:
                 animation3d.i+=1
                 animation3d.list_guard()
                 self.nextFrame = not self.nextFrame
-                #continue
             
             if self.prevFrame:
                 animation3d.i-=1
                 animation3d.list_guard()
                 self.prevFrame = not self.prevFrame
-                #continue
             
             if self.stop:
                 animation3d.i = 0
                 animation3d.list_guard() #not necessary?
                 self.play = False
                 self.stop = False
-                #continue
             
+            if self.setFrame:
+                animation3d.i = self.frame
+                animation3d.list_guard()
+                self.setFrame = False
+            
+            self.frame = animation3d.i
             sleep(0.1)
             
             

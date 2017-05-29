@@ -33,6 +33,8 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.stop_button.clicked.connect(self.stop)
         self.nextFrame_button.clicked.connect(self.nextFrame)
         self.prevFrame_button.clicked.connect(self.prevFrame)
+        self.animationMovement_horizontalSlider.valueChanged.connect(self.sliderChanged)
+        
 
         #MENU
         self.actionLoad_File.triggered.connect(self.loadSingleFile)
@@ -73,6 +75,7 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
                 c+=1
 
         self.number_of_files_value_label.setText(str(c))
+        self.animationMovement_horizontalSlider.setMaximum(c)
 
     def loadHeader(self):
         w = QtGui.QWidget()
@@ -95,6 +98,7 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
 
     def stop(self):
         self.worker.stop = True
+        self.playPause_button.setText("Play")
 
     def nextFrame(self):
         self.worker.nextFrame = True
@@ -102,6 +106,10 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
     def prevFrame(self):
         self.worker.prevFrame = True
     
+    def sliderChanged(self):
+        self.worker.setFrame = True
+        self.worker.frame = self.animationMovement_horizontalSlider.value()
+        self.animationMovement_horizontalSlider.setValue(self.worker.frame)
     
         
     
