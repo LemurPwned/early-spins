@@ -27,10 +27,12 @@ class PygletRunner(QtCore.QObject):
     def playAnimation(self):
         if self.directory=="":
             self.signalStatus.emit("no_dir")
-            sleep(10)
+            return 0
             
         elif self.headerFile == "":
             self.signalStatus.emit("no_header")
+            return 0
+            
         
         self.simulateDirectory(self.directory, self.fformat, self.headerFile, self.filetype)
         print("Generating 3d structure...")
@@ -42,9 +44,14 @@ class PygletRunner(QtCore.QObject):
         print("done!")
         sleep(2)
         while(True):
+            
+            if animation3d.i%10==0:
+                self.signalStatus.emit(str(animation3d.i))
+            sleep(0.1)
             if self.play:
                 animation3d.i+=1
                 animation3d.list_guard()
+                continue
             
             if self.nextFrame:
                 animation3d.i+=1
@@ -67,8 +74,8 @@ class PygletRunner(QtCore.QObject):
                 animation3d.list_guard()
                 self.setFrame = False
             
-            self.signalStatus.emit('test')
-            sleep(0.1)
+            
+            
             
             
 

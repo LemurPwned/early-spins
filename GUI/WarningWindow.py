@@ -38,6 +38,7 @@ class Ui_Window(object):
         self.gridLayout.addWidget(self.warning_pushButton, 1, 0, 1, 1)
         self.warning_Label = QtGui.QLabel(self.horizontalLayoutWidget)
         self.warning_Label.setText(_fromUtf8(""))
+        self.warning_Label.setWordWrap(True)
         self.warning_Label.setObjectName(_fromUtf8("warning_Label"))
         self.gridLayout.addWidget(self.warning_Label, 0, 0, 1, 1)
         self.horizontalLayout.addLayout(self.gridLayout)

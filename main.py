@@ -10,7 +10,7 @@ from CPU3D import pygletRunner
 
 class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
     
-    #signalStatus = QtCore.pyqtSignal(str)
+    signalStatus = QtCore.pyqtSignal(str)
     
     def __init__(self, parent=None):
         super(MainScreen, self).__init__(parent)
@@ -30,6 +30,9 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.directory = ""
         self.fformat = ""
         self.filetype = "text"
+
+        #SIGNALS
+        self.worker.signalStatus.connect(self.getAllSignals)
 
         #LAYOUT
         self.playPause_button.clicked.connect(self.playPause)
@@ -116,7 +119,19 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
     
     @QtCore.pyqtSlot(str)
     def getAllSignals(self, msg):
-        print(msg)
+        if msg.isnumeric():
+            self.animationMovement_horizontalSlider.setValue(int(msg))
+        else:
+            self.w = WarningScreen()
+            if msg == "no_dir":
+                self.w.message = "Directory not set properly! Choose directory from Menu>File>Load Directory"
+                
+            if msg == "no_header":
+                #print("header not specified")
+                self.w.message = "Header not specified properly! Choose header file from Menu > File > Load Header"
+                
+            self.w.showMsg()
+            self.w.show()
     
 def main():
     app = QtGui.QApplication(sys.argv)
