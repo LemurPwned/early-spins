@@ -214,18 +214,20 @@ def binary_read(filename, cols = ['x', 'y', 'z']):
     c = 0
     base_data = {}
     validity = False
-    iterator = 2
+    iterator = -10
     validation = 123456789012345.0 #this is IEEE validation value
     with open(filename, 'rb') as f:
-        while validity == False and iterator < 12:
+        while validity == False and iterator < 50:
             headers = f.read(24*38 + iterator) #idk xD
             #print("Header \n",headers)
             headers = str(headers)
             check_value = struct.unpack('d', f.read(8))[0]
             #print(base_data)
-            #print("Check value for 8-binary {}".format(check_value))
+            print("Check value for 8-binary {}".format(check_value))
             if check_value == validation:
-                #print("Proper reading commences ...")
+                print("Proper reading commences ...")
+                print("Detected value for 8-binary {}".format(check_value))
+
                 validity = True
                 break
             else:
@@ -233,13 +235,13 @@ def binary_read(filename, cols = ['x', 'y', 'z']):
                 #print("Adjusting binary size read")
                 f.seek(0)
                 iterator += 1
-        if iterator == 12  : raise TypeError
+        if iterator == 24  : raise TypeError
         base_data = process_header(headers)
+        #print(headers)
         #print(base_data)
         b = f.read(8)
         #TODO quantize below
-        k = (51200)*3 - 1
-        # = x_nodes*y_nodes*z_nodes*3 - 1
+        k = 3*base_data['xnodes']*base_data['ynodes']*base_data['znodes'] -1
         counter = 0
         while b and counter < k:
             try:
@@ -254,7 +256,7 @@ def binary_read(filename, cols = ['x', 'y', 'z']):
                 else:
                     a_tuple.append(p)
             except struct.error:
-                #print(b)
+                print(b)
                 pass
             b = f.read(8)
         b = f.read(36 + 8) #pro debug process

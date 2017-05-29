@@ -10,11 +10,12 @@ if(str(sys.argv[1]) == "pyglet"):
     x.play = True
 
     #example of usage
-    x.directory = "data/"
-    #x.directory = "0200nm/"
+    #x.directory = "data/"
+    x.directory = "0520nm/"
     x.fformat = ".omf"
-    x.filetype = 'text'
-    x.headerFile = "data/voltage-spin-diode.odt"
+    x.filetype = 'binary'
+    x.headerFile = '0520nm/proba1.odt'
+    #x.headerFile = "data/voltage-spin-diode.odt"
     x.playAnimation()
 
 # u can create your own simulations and then add it to makefile
