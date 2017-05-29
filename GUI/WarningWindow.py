@@ -47,5 +47,5 @@ class Ui_Window(object):
 
     def retranslateUi(self, Window):
         Window.setWindowTitle(_translate("Window", "Warning", None))
-        self.warning_pushButton.setText(_translate("Window", "Close", None))
+        self.warning_pushButton.setText(_translate("Window", "Ok", None))
 

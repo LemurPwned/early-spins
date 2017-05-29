@@ -17,18 +17,16 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.worker.moveToThread(self.worker_thread)
         self.worker_thread.start()
 
-        #self.WarningDialog = WarningScreen(self)
-
         self.window()
 
     def window(self):
         self.headerFile = ""
         self.directory = ""
         self.fformat = ""
+        self.filetype = "text"
 
         #LAYOUT
         self.playPause_button.clicked.connect(self.playPause)
-        #self.playPause_button.clicked.connect(self.worker.startWork)
         self.stop_button.clicked.connect(self.stop)
         self.nextFrame_button.clicked.connect(self.nextFrame)
         self.prevFrame_button.clicked.connect(self.prevFrame)
@@ -39,11 +37,18 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.actionLoad_Header_File.triggered.connect(self.loadHeader)
         self.actionShow_3D_Model.triggered.connect(self.worker.playAnimation)
 
+    def filetypeCheckBox(self):
+        if(self.binaryFiles_checkBox.isChecked()):
+            self.filetype = "binary"
+        else:
+            self.filetype = "text"
+
     def loadSingleFile(self):
         w = QtGui.QWidget()
         filename = QtGui.QFileDialog.getOpenFileName(w, 'Open File', '.')
 
     def loadDirectory(self):
+        self.filetypeCheckBox()
         w = QtGui.QWidget()
         filename = QtGui.QFileDialog.getOpenFileName(w, 'Open File', '.')
         self.directory = filename[:filename.rfind("/")+1]
@@ -53,9 +58,7 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
 
         self.worker.directory = self.directory
         self.worker.fformat = self.fformat
-
-        #TODO we have to detect it or make checkbox
-        self.worker.filetype = "text"
+        self.worker.filetype = self.filetype
 
         #prawokultury/kurs
 
@@ -75,25 +78,13 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.header_file_lineEdit.setText(self.headerFile)
         self.worker.headerFile = self.headerFile
 
-    def load3Dsim(self):
-        if self.headerFile == "":
-            pass
-            #self.WarningDialog.exec_()
-            #self.WarningDialog.message = "Header file not specified!"
-            #self.WarningDialog.showMsg()
-            #pass
-
-        if self.directory == "":
-            #TODO error
-            pass
-
-        #self.worker.
-
     #INSTEAD OF THESE WE WILL GIVE OUR FUNCTIONS!
     def playPause(self):
         if self.worker.play:
+            self.playPause_button.setText("Play")
             self.worker.play = False
         else:
+            self.playPause_button.setText("Pause")
             self.worker.play = True
 
     def stop(self):
@@ -114,4 +105,4 @@ def main():
 
 
 if __name__ == '__main__':
-	main()
+    main()
