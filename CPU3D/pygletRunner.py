@@ -1,12 +1,13 @@
 from CPU3D.pyglet1 import *
-from time import *
+import time
 #from GUI.WarningWindow import Ui_Window
 from GUI.warning import WarningScreen
 
+
 class PygletRunner(QtCore.QObject):
-    
+
     signalStatus = QtCore.pyqtSignal(str)
-    
+
     def __init__(self, parent = None):
         super(self.__class__, self).__init__(parent)
         self.play = False
@@ -21,19 +22,19 @@ class PygletRunner(QtCore.QObject):
         self.filetype = ""
         self.TIME_INTERVAL = 1/200
         self.control = 100 #TODO: parametrize it
-        
-        
+
+
     @QtCore.pyqtSlot()
     def playAnimation(self):
         if self.directory=="":
             self.signalStatus.emit("no_dir")
             return 0
-            
+
         elif self.headerFile == "":
             self.signalStatus.emit("no_header")
             return 0
-            
-        
+
+
         self.simulateDirectory(self.directory, self.fformat, self.headerFile, self.filetype)
         print("Generating 3d structure...")
         animation3d = Window(WINDOW, WINDOW, '3D simulation')
@@ -50,40 +51,40 @@ class PygletRunner(QtCore.QObject):
         print("done!")
         sleep(2)
         while(True):
-            
+
             if self.play:
                 animation3d.i+=1
                 animation3d.list_guard()
                 #continue
-            
+
             if self.nextFrame:
                 animation3d.i+=1
                 animation3d.list_guard()
                 self.nextFrame = False
-            
+
             if self.prevFrame:
                 animation3d.i-=1
                 animation3d.list_guard()
                 self.prevFrame = False
-            
+
             if self.stop:
                 animation3d.i = 0
                 animation3d.list_guard()
                 self.play = False
                 self.stop = False
-            
+
             if self.setFrame:
                 animation3d.i = self.frame
                 animation3d.list_guard()
                 self.setFrame = False
-            
-            
+
+
             #animation3d.update(1)
             sleep(self.TIME_INTERVAL*10)
             if animation3d.i%10:
                 self.signalStatus.emit(str(animation3d.i))
-            
-            
+
+
 
 
     def getAllFiles(self, directory, extension, filetype = 'binary'):
@@ -121,13 +122,16 @@ class PygletRunner(QtCore.QObject):
         print("Maximum number of iterations : {}".format(self.iterations))
         self.vectors_list = []
         self.color_list = []
-        
+
         pool = Pool()
+        print("measurement start")
+        t1 = time.time()
         multiple_results = [pool.apply_async(process_batch, (self.tdata[i], self.tbase_data[i])) for i in range(len(self.tdata))]
+        print("measurement time: ", time.time()-t1)
         for result in multiple_results:
             vectors, colors = result.get(timeout=500)
             self.vectors_list.append(vectors)
             self.color_list.append(colors)
-
+        print("measurement time2: ", time.time()-t1)
         self.data = self.tdata
         self.base_data = self.tbase_data[0]
