@@ -14,7 +14,6 @@ from CPU3D.graph_panels import calculate_angle, generate_color_series
 
 WINDOW = 800
 INCREMENT = 5
-control = 100
 
 class Window(pyglet.window.Window):
 
