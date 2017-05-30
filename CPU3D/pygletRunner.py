@@ -16,7 +16,7 @@ class PygletRunner(QtCore.QObject):
         self.headerFile = ""
         self.filetype = ""
         self.TIME_INTERVAL = 1/200
-        self.control = 10
+        self.control = 544
 
     @QtCore.pyqtSlot()
     def playAnimation(self):
@@ -100,11 +100,9 @@ class PygletRunner(QtCore.QObject):
             for filename in fileList:
                 tbase_data, tcount = extract_base_data(filename)
                 base_data.append(tbase_data)
-                #count.append(tcount)
                 to_skip = [x for x in range(tcount)]
                 df = form_dataframe(filename, to_skip)
                 data.append(df)
-
         return data, base_data
 
     def simulateDirectory(self, path_to_folder, extension, path_to_header_file, filetype):
@@ -120,7 +118,7 @@ class PygletRunner(QtCore.QObject):
         multiple_results = [pool.apply_async(process_batch, (self.tdata[i], self.tbase_data[i])) for i in range(len(self.tdata))]
         print("measurement time: ", time.time()-t1)
         for result in multiple_results:
-            vectors, colors = result.get(timeout=500)
+            vectors, colors = result.get(timeout=12)
             self.vectors_list.append(vectors)
             self.color_list.append(colors)
         print("measurement time2: ", time.time()-t1)

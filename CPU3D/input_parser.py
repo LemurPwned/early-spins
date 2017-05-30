@@ -79,7 +79,6 @@ def process_batch(df, base_data):
     xpos = 0
     ypos = 0
     zpos = 0
-    t1 = time.time()
     xc = int(base_data['xnodes'])
     yc = int(base_data['ynodes'])
     zc = int(base_data['znodes'])
@@ -89,7 +88,6 @@ def process_batch(df, base_data):
     xv = df['x'].tolist()
     yv = df['y'].tolist()
     zv = df['z'].tolist()
-    t2 = time.time()
     for x, y, z in zip(xv,yv,zv):
         xpos += 1
         if xpos >= xc:
@@ -102,16 +100,11 @@ def process_batch(df, base_data):
         xtemp = xpos * xb
         ytemp = ypos * yb
         ztemp = zpos * zb
-        c = Vector(x, y, z)
-        if np.abs(c.x + c.y + c.z) > 0:
-            k = c.norm
-            vectors.append([xtemp, ytemp, ztemp, xtemp + (c.x / k),
-                            ytemp + (c.y / k), ztemp + (c.z/k)])
-            temp_color.append((c.x/k, c.y/k, c.z/k))
-        else:
-            continue
-    t3 = time.time()
-    #print("Parsing time: {}, Iteration time: {}".format(t2-t1, t3-t2))
+        if np.abs(x + y + z) > 0:
+            k = np.sqrt(x ** 2 + y ** 2 + z ** 2)
+            vectors.append([xtemp, ytemp, ztemp, xtemp + (x / k),
+                            ytemp + (y / k), ztemp + (z / k)])
+            temp_color.append((x/k, y/k, z/k))
     return vectors, temp_color
 
 def process_batch_sensitive(df, base_data):
