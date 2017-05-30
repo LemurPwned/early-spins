@@ -21,8 +21,6 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.worker.moveToThread(self.worker_thread)
         self.worker_thread.start()
         
-
-
         self.window()
 
     def window(self):
