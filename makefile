@@ -5,4 +5,4 @@ pyglet:
 	python3 -m test pyglet
 
 profiler:
-	python3 -m cProfile test.py pyglet >> profiler.txt
+	python3 -m cProfile -o profiler_output test.py pyglet >> profiler.txt

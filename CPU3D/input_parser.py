@@ -79,6 +79,7 @@ def process_batch(df, base_data):
     xpos = 0
     ypos = 0
     zpos = 0
+    t1 = time.time()
     xc = int(base_data['xnodes'])
     yc = int(base_data['ynodes'])
     zc = int(base_data['znodes'])
@@ -88,6 +89,7 @@ def process_batch(df, base_data):
     xv = df['x'].tolist()
     yv = df['y'].tolist()
     zv = df['z'].tolist()
+    t2 = time.time()
     for x, y, z in zip(xv,yv,zv):
         xpos += 1
         if xpos >= xc:
@@ -108,6 +110,8 @@ def process_batch(df, base_data):
             temp_color.append((c.x/k, c.y/k, c.z/k))
         else:
             continue
+    t3 = time.time()
+    #print("Parsing time: {}, Iteration time: {}".format(t2-t1, t3-t2))
     return vectors, temp_color
 
 def process_batch_sensitive(df, base_data):
@@ -223,10 +227,10 @@ def binary_read(filename, cols = ['x', 'y', 'z']):
             headers = str(headers)
             check_value = struct.unpack('d', f.read(8))[0]
             #print(base_data)
-            print("Check value for 8-binary {}".format(check_value))
+            #print("Check value for 8-binary {}".format(check_value))
             if check_value == validation:
-                print("Proper reading commences ...")
-                print("Detected value for 8-binary {}".format(check_value))
+                #print("Proper reading commences ...")
+                #print("Detected value for 8-binary {}".format(check_value))
 
                 validity = True
                 break
