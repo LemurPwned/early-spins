@@ -11,6 +11,11 @@ class PygletRunner(QtCore.QObject):
     def __init__(self, parent = None):
         super(self.__class__, self).__init__(parent)
         self.play = False
+        self.nextFrame = False
+        self.prevFrame = False
+        self.stop = False
+        self.setFrame = False
+        self.frame = 0
         self.directory = ""
         self.fformat = ""
         self.headerFile = ""
@@ -41,10 +46,11 @@ class PygletRunner(QtCore.QObject):
         #IT CANNOT BE INCREASED at the same time by another function, because the
         #overflow will occur. Thus, either use clock or schdeule the change of
         #frame with the chunk of code below, but never both
-        print("done!")
-        time.sleep(2)
+        print("done!")  
         while(True):
+            #print("testw")
             if self.play:
+                #print("test")
                 animation3d.i+=1
                 animation3d.list_guard()
                 #continue
@@ -70,9 +76,10 @@ class PygletRunner(QtCore.QObject):
                 animation3d.list_guard()
                 self.setFrame = False
 
+            #time.sleep(0.1)
 
             #animation3d.update(1)
-            sleep(self.TIME_INTERVAL*10)
+            time.sleep(self.TIME_INTERVAL*20)
             if animation3d.i%10:
                 self.signalStatus.emit(str(animation3d.i))
 
