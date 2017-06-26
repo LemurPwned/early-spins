@@ -3,6 +3,7 @@ from CPU3D.tiny_vectors import *
 from CPU3D.graph_panels import *
 import struct
 
+
 def extract_base_data(filename):
     '''
     .omf format reader
@@ -29,6 +30,52 @@ def extract_base_data(filename):
     f.close()
     return base_data, count
 
+def fortran_list(filename):
+    vectors = []
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+    f.close()
+    vectors = [g.strip().split(' ') for g in lines if '#' not in g]
+    vectors = [[float(row[0]), float(row[1]), float(row[2])] for row in vectors]
+    return np.array(vectors)
+
+def process_fortran_list(fortran_list, base_data):
+    xc = int(base_data['xnodes'])
+    yc = int(base_data['ynodes'])
+    zc = int(base_data['znodes'])
+    xb = float(base_data['xbase']) * 1e9
+    yb = float(base_data['ybase']) * 1e9
+    zb = float(base_data['zbase']) * 1e9
+    #fortran_list = np.apply_along_axis(np.linalg.norm, 1, fortran_list)
+    fortran_list = np.array([x*100/np.linalg.norm(x)
+        for x in np.nditer(fortran_list, flags=['external_loop'])]).reshape(35*35*5,3)
+    vectors = [[xb * x%xc, yb * y%yc, zb * z%zc,
+                xb * x%xc, yb * y%yc, zb * z%zc]
+                for z in range(zc) for y in range(yc) for x in range(xc)]
+    return vectors, fortran_list
+
+def listy(fortran_list):
+        #temp_color = [(x[0]/np.sqrt(x[0]**2 + x[1]**2 + x[2]**2),x[2]/np.sqrt(x[0]**2 + x[1]**2 + x[2]**2),
+        #               x[1]/np.sqrt(x[0]**2 + x[1]**2 + x[2]**2)) for z in fortran_list for y in z for x in y
+        #               if np.sqrt(x[0]**2 + x[1]**2 + x[2]**2)]
+    for z in fortran_list:
+        for y in z:
+            for x in y:
+                xtemp = xb * xp
+                ytemp = yb * yp
+                ztemp = zb * zp
+                k = np.sqrt(x[0]**2 + x[1]**2 + x[2]**2)
+                if k>0:
+                    c+=1
+                    vectors.append([xtemp, ytemp, ztemp, xtemp + (x[0] / k),
+                                   ytemp + (x[1] / k), ztemp + (x[2] / k)])
+                    temp_color.append((x[0]/k, x[1]/k, x[2]/k))
+                xp += 1
+            yp += 1
+            xp = 0
+        zp += 1
+        yp = 0
+    return vectors, temp_color
 
 def read_header_file(filename):
     '''
@@ -73,6 +120,7 @@ def form_dataframe(filename, to_skip, cols=['Whitespace', 'x', 'y', 'z']):
         data[['x', 'y', 'z']] = data[['x', 'y', 'z']].astype(float)
     return data
 
+
 def process_batch(df, base_data):
     vectors = []
     temp_color = []
@@ -85,9 +133,11 @@ def process_batch(df, base_data):
     xb = float(base_data['xbase']) * 1e9
     yb = float(base_data['ybase']) * 1e9
     zb = float(base_data['zbase']) * 1e9
+
     xv = df['x'].tolist()
     yv = df['y'].tolist()
     zv = df['z'].tolist()
+    c = 1
     for x, y, z in zip(xv,yv,zv):
         xpos += 1
         if xpos >= xc:
@@ -100,8 +150,9 @@ def process_batch(df, base_data):
         xtemp = xpos * xb
         ytemp = ypos * yb
         ztemp = zpos * zb
-        if np.abs(x + y + z) > 0:
-            k = np.sqrt(x ** 2 + y ** 2 + z ** 2)
+        k = np.sqrt(x ** 2 + y ** 2 + z ** 2)
+        if k > 0:
+            c+=1
             vectors.append([xtemp, ytemp, ztemp, xtemp + (x / k),
                             ytemp + (y / k), ztemp + (z / k)])
             temp_color.append((x/k, y/k, z/k))

@@ -9,3 +9,6 @@ profiler:
 
 parser:
 	python3 -m test input_parser
+	#for profiling custom function
+tester:
+	python3 -m test tester

@@ -4,7 +4,7 @@ pyglet.options['debug_gl'] = False
 from pyglet.gl import *
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
-import time
+import time as tm
 from multiprocessing import Pool
 import threading
 from CPU3D.input_parser import *
@@ -46,7 +46,7 @@ class Window(pyglet.window.Window):
         width, height = self.get_size()
         uni.proj = perspective(60.0, width / height, 0.1, 256.0)
 
-    def draw_vector(self, vec, color=(1, 1, 1)):
+    def draw_vector(self, vec, color=[1, 1, 1]):
         # arr in format [[x1,x2,x3, y1,y2,y3], [], [], [], []...]
         # TODO create coloring algorithm
         # maybe multithreading?
@@ -54,7 +54,9 @@ class Window(pyglet.window.Window):
         glColor3f(color[0], color[1], color[2])
         glBegin(GL_LINES)
         glVertex3f(vec[0], vec[1], vec[2])
-        glVertex3f(vec[3], vec[4], vec[5])
+        #glVertex3f(vec[3], vec[4], vec[5])
+        glVertex3f(vec[3]+color[0], vec[4]+color[1], vec[5]+color[2])
+        #this would be used for new fortran style funciton
         glEnd()
         glPointSize(6)
         glBegin(GL_POINTS)

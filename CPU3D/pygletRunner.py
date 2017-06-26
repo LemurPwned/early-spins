@@ -46,7 +46,7 @@ class PygletRunner(QtCore.QObject):
         #IT CANNOT BE INCREASED at the same time by another function, because the
         #overflow will occur. Thus, either use clock or schdeule the change of
         #frame with the chunk of code below, but never both
-        print("done!")  
+        print("done!")
         while(True):
             #print("testw")
             if self.play:
@@ -108,7 +108,8 @@ class PygletRunner(QtCore.QObject):
                 tbase_data, tcount = extract_base_data(filename)
                 base_data.append(tbase_data)
                 to_skip = [x for x in range(tcount)]
-                df = form_dataframe(filename, to_skip)
+                #df = form_dataframe(filename, to_skip)
+                df = fortran_list(filename)
                 data.append(df)
         return data, base_data
 
@@ -122,7 +123,8 @@ class PygletRunner(QtCore.QObject):
         pool = Pool()
         print("measurement start")
         t1 = time.time()
-        multiple_results = [pool.apply_async(process_batch, (self.tdata[i], self.tbase_data[i])) for i in range(len(self.tdata))]
+        #multiple_results = [pool.apply_async(process_batch, (self.tdata[i], self.tbase_data[i])) for i in range(len(self.tdata))]
+        multiple_results = [pool.apply_async(process_fortran_list, (self.tdata[i], self.tbase_data[i])) for i in range(len(self.tdata))]
         print("measurement time: ", time.time()-t1)
         for result in multiple_results:
             vectors, colors = result.get(timeout=12)
