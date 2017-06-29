@@ -12,3 +12,6 @@ parser:
 	#for profiling custom function
 tester:
 	python3 -m test tester
+
+binary:
+	python3 -m test binary_parser

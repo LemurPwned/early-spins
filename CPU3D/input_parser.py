@@ -46,8 +46,10 @@ def construct_layer_outline(base_data):
     xb = float(base_data['xbase']) * 1e9
     yb = float(base_data['ybase']) * 1e9
     zb = float(base_data['zbase']) * 1e9
-    base_vectors = [[xb * x%xc, yb * y%yc, zb * z%zc,
-            xb * x%xc, yb * y%yc, zb * z%zc]
+    print("Ybase is :", yb)
+    print("Params: xc {}, yc {}, zc {}, xb {}, yb {}, zb {}".format(xc,yc,zc,xb,yb,zb))
+    base_vectors = [[xb * (x%xc), yb * (y%yc), zb * (z%zc),
+            xb * (x%xc), yb * (y%yc), zb * (z%zc)]
             for z in range(zc) for y in range(yc) for x in range(xc)]
     return base_vectors
 
@@ -132,7 +134,6 @@ def binary_read(filename, cols = ['x', 'y', 'z']):
             if check_value == validation:
                 #print("Proper reading commences ...")
                 #print("Detected value for 8-binary {}".format(check_value))
-
                 validity = True
                 break
             else:
@@ -146,7 +147,7 @@ def binary_read(filename, cols = ['x', 'y', 'z']):
         #print(base_data)
         b = f.read(8)
         #TODO quantize below
-        k = 3*base_data['xnodes']*base_data['ynodes']*base_data['znodes'] -1
+        k = 3*base_data['xnodes']*base_data['ynodes']*base_data['znodes']
         counter = 0
         while b and counter < k:
             try:
@@ -167,5 +168,4 @@ def binary_read(filename, cols = ['x', 'y', 'z']):
         b = f.read(36 + 8) #pro debug process
         #print("last line {}".format(b))
     f.close()
-    df = pd.DataFrame.from_records(lists, columns=cols)
-    return base_data, df
+    return base_data, np.array(lists)

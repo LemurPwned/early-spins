@@ -55,9 +55,9 @@ class Window(pyglet.window.Window):
         glVertex3f(vec[0], vec[1], vec[2])
         glVertex3f(vec[3]+color[0], vec[4]+color[1], vec[5]+color[2])
         glEnd()
-        glPointSize(6)
+        glPointSize(5)
         glBegin(GL_POINTS)
-        glVertex3f(vec[3], vec[4], vec[5])
+        glVertex3f(vec[3]+color[0], vec[4]+color[1], vec[5]+color[2])
         glEnd()
 
     def draw_cordinate_system(self, size=5):
