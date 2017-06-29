@@ -4,11 +4,9 @@ if(len(sys.argv)>2):
     exit("Error expecting 1 argument")
 
 if(str(sys.argv[1]) == "pyglet"):
-
     from CPU3D.pygletRunner import PygletRunner
     x = PygletRunner()
     x.play = True
-
     #example of usage
     x.directory = "data/firstData/"
     #x.directory = "0200nm/"

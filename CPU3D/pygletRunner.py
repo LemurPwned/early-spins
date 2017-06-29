@@ -36,7 +36,8 @@ class PygletRunner(QtCore.QObject):
         self.simulateDirectory(self.directory, self.fformat, self.headerFile, self.filetype)
         print("Generating 3d structure...")
         animation3d = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
-        animation3d.getDataFromRunner([self.vectors_list, self.color_list, self.tbase_data, self.header, self.iterations, self.control])
+        animation3d.getDataFromRunner([self.vectors_list, self.color_list,
+                    self.tbase_data, self.header, self.iterations, self.control])
         t1 = threading.Thread(target = pyglet.app.run)
         pyglet.clock.schedule_interval(animation3d.update, self.TIME_INTERVAL)
         t1.start()
@@ -48,12 +49,9 @@ class PygletRunner(QtCore.QObject):
         #frame with the chunk of code below, but never both
         print("done!")
         while(True):
-            #print("testw")
             if self.play:
-                #print("test")
                 animation3d.i+=1
                 animation3d.list_guard()
-                #continue
 
             if self.nextFrame:
                 animation3d.i+=1
@@ -77,16 +75,14 @@ class PygletRunner(QtCore.QObject):
                 self.setFrame = False
 
             #time.sleep(0.1)
-
             #animation3d.update(1)
-            time.sleep(self.TIME_INTERVAL*20)
+            time.sleep(self.TIME_INTERVAL*70)
             if animation3d.i%10:
                 self.signalStatus.emit(str(animation3d.i))
 
     def getAllFiles(self, directory, extension, filetype = 'binary'):
         tFileList = os.listdir(directory)
         fileList = []
-        j = 0
         for file in tFileList:
             if file.find(extension) != -1:
                 fileList.append(directory + file)
@@ -96,7 +92,6 @@ class PygletRunner(QtCore.QObject):
         data = []
         print("Reading data... {}, fileformat: {}".format(len(fileList), filetype))
         fileList.sort()
-        #fileList = fileList[:self.control]
         self.iterations = len(fileList)
         if filetype == 'binary':
             for filename in fileList:
@@ -105,31 +100,31 @@ class PygletRunner(QtCore.QObject):
                 data.append(tdf)
         elif filetype == 'text':
             for filename in fileList:
-                tbase_data, tcount = extract_base_data(filename)
+                tbase_data, _ = extract_base_data(filename)
                 base_data.append(tbase_data)
-                to_skip = [x for x in range(tcount)]
-                #df = form_dataframe(filename, to_skip)
                 df = fortran_list(filename)
                 data.append(df)
         return data, base_data
 
     def simulateDirectory(self, path_to_folder, extension, path_to_header_file, filetype):
-        self.tdata, self.tbase_data= self.getAllFiles(path_to_folder, extension, filetype)
+        self.tdata, self.tbase_data = self.getAllFiles(path_to_folder, extension, filetype)
         self.header, self.stages = odt_reader(path_to_header_file) #new odt format reader, more universal
         print("Maximum number of iterations : {}".format(self.iterations))
-        self.vectors_list = []
-        self.color_list = []
 
-        pool = Pool()
-        print("measurement start")
-        t1 = time.time()
-        #multiple_results = [pool.apply_async(process_batch, (self.tdata[i], self.tbase_data[i])) for i in range(len(self.tdata))]
-        multiple_results = [pool.apply_async(process_fortran_list, (self.tdata[i], self.tbase_data[i])) for i in range(len(self.tdata))]
-        print("measurement time: ", time.time()-t1)
-        for result in multiple_results:
-            vectors, colors = result.get(timeout=12)
-            self.vectors_list.append(vectors)
-            self.color_list.append(colors)
-        print("measurement time2: ", time.time()-t1)
-        self.data = self.tdata
+        start = time.time()
         self.base_data = self.tbase_data[0]
+        self.data = self.tdata
+        self.vectors_list = construct_layer_outline(self.base_data)
+        self.color_list = []
+        print("Elaped on constructing layer outline: {}".format(time.time()-start))
+        xc = int(self.base_data['xnodes'])
+        yc = int(self.base_data['ynodes'])
+        zc = int(self.base_data['znodes'])
+        pool = Pool()
+        multiple_results = [pool.apply_async(process_fortran_list, (self.tdata[i], xc, yc, zc))
+                            for i in range(len(self.tdata))]
+
+        for result in multiple_results:
+            colors = result.get(timeout=12)
+            self.color_list.append(colors)
+        print("Elaped on getting all vectors: {}".format(time.time()-start))

@@ -33,11 +33,10 @@ class Window(pyglet.window.Window):
         self.iterations = data[4]
         self.control = data[5]
 
-
     def upload_uniforms(self):
         uni = self.shader.uniforms
 
-        uni.view = translate(None, tuple(self.position))
+        uni.view = translate(None, tuplqe(self.position))
 
         mod_mat = rotate(None, self.rotation[0], (1.0, 0.0, 0.0))
         mod_mat = rotate(mod_mat, self.rotation[1], (0.0, 1.0, 0.0))
@@ -54,9 +53,7 @@ class Window(pyglet.window.Window):
         glColor3f(color[0], color[1], color[2])
         glBegin(GL_LINES)
         glVertex3f(vec[0], vec[1], vec[2])
-        #glVertex3f(vec[3], vec[4], vec[5])
         glVertex3f(vec[3]+color[0], vec[4]+color[1], vec[5]+color[2])
-        #this would be used for new fortran style funciton
         glEnd()
         glPointSize(6)
         glBegin(GL_POINTS)
@@ -86,7 +83,7 @@ class Window(pyglet.window.Window):
         glPushMatrix()
         self.transformate()
         self.draw_cordinate_system()
-        for vector, color in zip(self.vec, self.colors):
+        for vector, color in zip(self.vectors_list, self.colors):
             self.draw_vector(vector, color=color)
         # Pop Matrix off stack
         glPopMatrix()
@@ -103,8 +100,7 @@ class Window(pyglet.window.Window):
         glLoadIdentity()
         glTranslatef(0, 0, 0)
         # TODO Replace create_vector with dataframe ops.
-        #self.create_vector(data[self.i])
-        self.vec = self.vectors_list[self.i]
+        #self.vec = self.vectors_list[self.i]
         self.colors = self.color_list[self.i]
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
@@ -137,7 +133,6 @@ class Window(pyglet.window.Window):
 
     #DO NOT REMOVE DF FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
     def update(self, df):
-        #self.i += 1
         self.change_frame()
         print(self.i)
 

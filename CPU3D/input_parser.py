@@ -39,166 +39,23 @@ def fortran_list(filename):
     vectors = [[float(row[0]), float(row[1]), float(row[2])] for row in vectors]
     return np.array(vectors)
 
-def process_fortran_list(fortran_list, base_data):
+def construct_layer_outline(base_data):
     xc = int(base_data['xnodes'])
     yc = int(base_data['ynodes'])
     zc = int(base_data['znodes'])
     xb = float(base_data['xbase']) * 1e9
     yb = float(base_data['ybase']) * 1e9
     zb = float(base_data['zbase']) * 1e9
+    base_vectors = [[xb * x%xc, yb * y%yc, zb * z%zc,
+            xb * x%xc, yb * y%yc, zb * z%zc]
+            for z in range(zc) for y in range(yc) for x in range(xc)]
+    return base_vectors
+
+def process_fortran_list(fortran_list, xc, yc, zc):
     #fortran_list = np.apply_along_axis(np.linalg.norm, 1, fortran_list)
     fortran_list = np.array([x*100/np.linalg.norm(x)
-        for x in np.nditer(fortran_list, flags=['external_loop'])]).reshape(35*35*5,3)
-    vectors = [[xb * x%xc, yb * y%yc, zb * z%zc,
-                xb * x%xc, yb * y%yc, zb * z%zc]
-                for z in range(zc) for y in range(yc) for x in range(xc)]
-    return vectors, fortran_list
-
-def listy(fortran_list):
-        #temp_color = [(x[0]/np.sqrt(x[0]**2 + x[1]**2 + x[2]**2),x[2]/np.sqrt(x[0]**2 + x[1]**2 + x[2]**2),
-        #               x[1]/np.sqrt(x[0]**2 + x[1]**2 + x[2]**2)) for z in fortran_list for y in z for x in y
-        #               if np.sqrt(x[0]**2 + x[1]**2 + x[2]**2)]
-    for z in fortran_list:
-        for y in z:
-            for x in y:
-                xtemp = xb * xp
-                ytemp = yb * yp
-                ztemp = zb * zp
-                k = np.sqrt(x[0]**2 + x[1]**2 + x[2]**2)
-                if k>0:
-                    c+=1
-                    vectors.append([xtemp, ytemp, ztemp, xtemp + (x[0] / k),
-                                   ytemp + (x[1] / k), ztemp + (x[2] / k)])
-                    temp_color.append((x[0]/k, x[1]/k, x[2]/k))
-                xp += 1
-            yp += 1
-            xp = 0
-        zp += 1
-        yp = 0
-    return vectors, temp_color
-
-def read_header_file(filename):
-    '''
-    .odt format reader
-    '''
-    with open(filename, 'r') as f:
-        lines = f.readlines()
-    f.close()
-    lines = [x.strip() for x in lines]
-    print("{} lines have been read ".format(len(lines)))
-    lines = [x.split(' ') for x in lines]
-    new_cont = []
-    lines = lines[5:-1]
-    for line in lines:
-        temp_line = []
-        for el in line:
-            try:
-                new_el = float(el)
-                temp_line.append(new_el)
-            except:
-                pass
-        new_cont.append(temp_line)
-    col = ['Total energy', 'Energy calc count', 'Max dm/dt', 'dE/dt',
-           'Delta E', '_MRmagnetoresistance', 'Energy ', 'Max Spin Ang',
-           'Stage Max Spin Ang', 'Run Max Spin Ang', '_DemagEnergy',
-           '_MREnergy', '_TwoSurfaceExchangeFFEnergy',
-           '_UniaxialAnisotropystatEnergy', '_UniaxialAnisotropyipEnergy ',
-           '_UniaxialAnisotropydynEnergy', '_UZeemanEnergy', '_UZeemanB',
-           '_UZeemanBx', '_UZeemanBy', '_UZeemanBz', 'Iteration', 'Stage iteration',
-           'Stage ', 'mx', 'my', 'mz', 'Last time step', 'Simulation time']
-
-    df = pd.DataFrame.from_records(new_cont, columns=col)
-    return df
-
-
-def form_dataframe(filename, to_skip, cols=['Whitespace', 'x', 'y', 'z']):
-    data = pd.read_csv(filename, delimiter=' ', skiprows=to_skip)
-    if cols != None:
-        data.columns = cols
-        data.drop('Whitespace', axis=1, inplace=True)
-        data.drop([data.shape[0] - 2, data.shape[0] - 1], axis=0, inplace=True)
-        data[['x', 'y', 'z']] = data[['x', 'y', 'z']].astype(float)
-    return data
-
-
-def process_batch(df, base_data):
-    vectors = []
-    temp_color = []
-    xpos = 0
-    ypos = 0
-    zpos = 0
-    xc = int(base_data['xnodes'])
-    yc = int(base_data['ynodes'])
-    zc = int(base_data['znodes'])
-    xb = float(base_data['xbase']) * 1e9
-    yb = float(base_data['ybase']) * 1e9
-    zb = float(base_data['zbase']) * 1e9
-
-    xv = df['x'].tolist()
-    yv = df['y'].tolist()
-    zv = df['z'].tolist()
-    c = 1
-    for x, y, z in zip(xv,yv,zv):
-        xpos += 1
-        if xpos >= xc:
-            ypos += 1 + (xpos % xc)
-            xpos = 0
-        if ypos >= yc:
-            zpos += 1 + (ypos % yc)
-            ypos = 0
-            xpos = 0
-        xtemp = xpos * xb
-        ytemp = ypos * yb
-        ztemp = zpos * zb
-        k = np.sqrt(x ** 2 + y ** 2 + z ** 2)
-        if k > 0:
-            c+=1
-            vectors.append([xtemp, ytemp, ztemp, xtemp + (x / k),
-                            ytemp + (y / k), ztemp + (z / k)])
-            temp_color.append((x/k, y/k, z/k))
-    return vectors, temp_color
-
-def process_batch_sensitive(df, base_data):
-    '''
-    increases the displayed sensitivity of data
-    '''
-    b1 = Vector(1, 0, 0)
-    angles = []
-    vectors = []
-    xpos = 0
-    ypos = 0
-    zpos = 0
-    power = 5
-    xc = int(base_data['xnodes'])
-    yc = int(base_data['ynodes'])
-    xb = float(base_data['xbase']) * 1e9
-    yb = float(base_data['ybase']) * 1e9
-    zb = float(base_data['zbase']) * 1e9
-    for index, row in df.iterrows():
-        xpos += 1
-        if xpos >= xc:
-            ypos += 1 + (xpos % xc)
-            xpos = 0
-        if ypos >= yc:
-            zpos += 1 + (ypos % yc)
-            ypos = 0
-            xpos = 0
-
-        xtemp = xpos * xb
-        ytemp = ypos * yb
-        ztemp = zpos * zb
-        c =  Vector(row[0], row[1], row[2])
-        if np.abs(c.x + c.y + c.z) > 0:
-            k = c.norm
-            vectors.append([xtemp, ytemp, ztemp, xtemp + c.x / k,
-                            ytemp + c.y / k, ztemp + c.z / k])
-            angle = np.power(relative_direction(c, b1), power)
-            angles.append(angle)
-        else:
-            continue
-    series = generate_color_series(len(angles))
-    temp_color = [x for (y, x) in sorted(zip(angles, series))]
-    return vectors, temp_color
+        for x in np.nditer(fortran_list, flags=['external_loop'])]).reshape(xc*yc*zc,3)
+    return fortran_list
 
 def process_header(headers):
     base_data = {}
