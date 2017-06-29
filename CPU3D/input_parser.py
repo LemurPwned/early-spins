@@ -46,6 +46,7 @@ def construct_layer_outline(base_data):
     xb = float(base_data['xbase']) * 1e9
     yb = float(base_data['ybase']) * 1e9
     zb = float(base_data['zbase']) * 1e9
+
     print("Ybase is :", yb)
     print("Params: xc {}, yc {}, zc {}, xb {}, yb {}, zb {}".format(xc,yc,zc,xb,yb,zb))
     base_vectors = [[xb * (x%xc), yb * (y%yc), zb * (z%zc),
@@ -141,12 +142,9 @@ def binary_read(filename, cols = ['x', 'y', 'z']):
                 #print("Adjusting binary size read")
                 f.seek(0)
                 iterator += 1
-        if iterator == 24  : raise TypeError
+        if iterator > 49  : raise TypeError
         base_data = process_header(headers)
-        #print(headers)
-        #print(base_data)
         b = f.read(8)
-        #TODO quantize below
         k = 3*base_data['xnodes']*base_data['ynodes']*base_data['znodes']
         counter = 0
         while b and counter < k:

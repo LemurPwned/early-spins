@@ -9,11 +9,11 @@ if(str(sys.argv[1]) == "pyglet"):
     x.play = True
     #example of usage
     #x.directory = "data/firstData/"
-    x.directory = "data/0520nm/"
+    x.directory = "data/0200nm/"
     x.fformat = ".omf"
     x.filetype = 'binary'
     #x.filetype = 'text'
-    x.headerFile = 'data/0520nm/proba1.odt'
+    x.headerFile = 'data/0200nm/proba1.odt'
     #x.headerFile = "data/firstData/voltage-spin-diode.odt"
     x.playAnimation()
 
@@ -26,7 +26,7 @@ if(str(sys.argv[1]) == "input_parser"):
 
 if(str(sys.argv[1]) == "binary_parser"):
     from CPU3D.input_parser import *
-    filename ='data/0200nm/proba1-Oxs_MinDriver-Magnetization-00-0021617.omf'
+    filename ='data/0520nm/proba1-Oxs_TimeDriver-Magnetization-00-0001296.omf'
     base_data, vectors = binary_read(filename)
     print(base_data)
 

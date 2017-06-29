@@ -9,7 +9,6 @@ from multiprocessing import Pool
 import threading
 from CPU3D.input_parser import *
 from CPU3D.camera_calculations import *
-from CPU3D.tiny_vectors import *
 from CPU3D.graph_panels import calculate_angle, generate_color_series
 
 WINDOW = 800

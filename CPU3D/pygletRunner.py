@@ -22,6 +22,7 @@ class PygletRunner(QtCore.QObject):
         self.filetype = ""
         self.TIME_INTERVAL = 1/200
         self.control = 544
+        self.average = 2 # one is no averaging
 
     @QtCore.pyqtSlot()
     def playAnimation(self):
@@ -115,6 +116,7 @@ class PygletRunner(QtCore.QObject):
         self.base_data = self.tbase_data[0]
         self.data = self.tdata
         self.vectors_list = construct_layer_outline(self.base_data)
+        self.vectors_list = self.vectors_list[0::self.average]
         self.color_list = []
         print("Elaped on constructing layer outline: {}".format(time.time()-start))
         xc = int(self.base_data['xnodes'])
@@ -126,5 +128,5 @@ class PygletRunner(QtCore.QObject):
 
         for result in multiple_results:
             colors = result.get(timeout=12)
-            self.color_list.append(colors)
+            self.color_list.append(colors[0::self.average])
         print("Elaped on getting all vectors: {}".format(time.time()-start))
