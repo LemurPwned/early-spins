@@ -116,7 +116,8 @@ def odt_reader(filename):
     iterations = len(lines) -1
     return df, iterations
 
-def binary_read(filename, cols = ['x', 'y', 'z']):
+def binary_read(filename):
+    #TODO: improve the speed of filling arrays
     lists = []
     a_tuple = []
     c = 0

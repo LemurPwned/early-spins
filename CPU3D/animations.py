@@ -34,19 +34,12 @@ def process_batch(filename):
     df = form_dataframe(filename, to_skip)
     # split layers
     layers = layer_splitter(df, base_data)
-    '''
-    v1 = Vector(1,0,0)
-    v2 = Vector(0,1,0)
-    v3 = Vector(0,0,1)
-    figs = color2d(layers[4], [v1, v2, v3], base_data)
-    callback_plotter(figs[0])
-    '''
+
     relate = Vector(1, 0, 0)
     # testing, just one layer for now
     layer = calculate_angle(layers[0], relate)
     layer = increase_variance(layer, 25)
     return layer
-
 
 def batch_load(directory, iterations, function):
     '''
@@ -59,7 +52,7 @@ def batch_load(directory, iterations, function):
         if iterations <= 0:
             break
         if filename.endswith(".omf"):
-            # handler = function(directory+'/'+filename)
+            # d.handler = function(directory+'/'+filename)
             handler = directory + '/' + filename
             handling_list.append(handler)
             iterations -= 1
@@ -68,16 +61,12 @@ def batch_load(directory, iterations, function):
     handling_list.sort()
     return handling_list
 
-
-
 if __name__ == "__main__":
-    
-    N = 100
 
+    N = 100
     file_list = batch_load('../data', N, process_batch)
     batches_to_animate = []
     for filename in file_list:
         batches_to_animate.append(process_batch(filename))
     print(len(batches_to_animate))
     init_anim(batches_to_animate, 'Magnetization direction', N, 35, 35)
-

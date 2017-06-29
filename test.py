@@ -35,7 +35,6 @@ if(str(sys.argv[1]) == "tester"):
     filename ='data/firstData/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
     base_data, count = extract_base_data(filename)
     lists = fortran_list(filename)
-    #lists  = lists.reshape((5,35,35,3))
     import cProfile
     pr = cProfile.Profile()
     pr.enable()

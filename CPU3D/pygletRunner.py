@@ -22,7 +22,7 @@ class PygletRunner(QtCore.QObject):
         self.filetype = ""
         self.TIME_INTERVAL = 1/200
         self.control = 544
-        self.average = 2 # one is no averaging
+        self.average = 1 # one is no averaging
 
     @QtCore.pyqtSlot()
     def playAnimation(self):
