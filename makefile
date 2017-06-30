@@ -15,3 +15,6 @@ tester:
 
 binary:
 	python3 -m test binary_parser
+
+anim:
+	python3 -m test anims
