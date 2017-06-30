@@ -18,3 +18,6 @@ binary:
 
 anim:
 	python3 -m test anims
+
+runner:
+	python3 -m test runner

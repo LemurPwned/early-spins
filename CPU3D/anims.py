@@ -44,7 +44,8 @@ def update(i, current_single_layer, scat):
                             dtype=float))
     return scat
 
-def calculate_angles(x, relate = [1,0,0], scale=25):
+def calculate_angles(x, relate = [0,1,0], scale=25):
+    #TODO: make relate object variable
     norm = np.apply_along_axis(np.linalg.norm, 1, x)
     dot = np.divide(np.array([np.inner(i, relate) for i in x]), norm)
     angle = np.arccos(dot)**scale

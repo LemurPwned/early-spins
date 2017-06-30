@@ -46,6 +46,20 @@ if(str(sys.argv[1]) == "tester"):
     print(len(colors))
     print(colors[1:100])
 
+if(str(sys.argv[1])== 'runner'):
+    from CPU3D.animationsRunner import *
+    x = AnimationsRunner()
+    x.play = True
+    #example of usage
+    #x.directory = "data/firstData/"
+    x.directory = "data/0200nm/"
+    x.fformat = ".omf"
+    x.filetype = 'binary'
+    #x.filetype = 'text'
+    x.headerFile = 'data/0200nm/proba1.odt'
+    #x.headerFile = "data/firstData/voltage-spin-diode.odt"
+    x.playAnimation()
+
 if(str(sys.argv[1]) == "anims"):
     from CPU3D.anims import *
     from CPU3D.input_parser import *
