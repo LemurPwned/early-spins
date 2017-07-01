@@ -10,11 +10,10 @@ import threading
 from CPU3D.input_parser import *
 from CPU3D.camera_calculations import *
 
-WINDOW = 800
+WINDOW = 600
 INCREMENT = 5
 
 class Window(pyglet.window.Window):
-
     def __init__(self, width, height, title=''):
         super(Window, self).__init__(width, height, title)
         glClearColor(0, 0, 0, 1)
@@ -23,6 +22,7 @@ class Window(pyglet.window.Window):
         self.FREE_RUN = False
         self.i = 0
 
+
     def getDataFromRunner(self, data):
         self.vectors_list = data[0]
         self.color_list = data[1]
@@ -30,7 +30,7 @@ class Window(pyglet.window.Window):
         self.header = data[3]
         self.iterations = data[4]
         self.control = data[5]
-
+        self.fps_display = data[6]
     def upload_uniforms(self):
         uni = self.shader.uniforms
 
@@ -81,6 +81,11 @@ class Window(pyglet.window.Window):
         glPushMatrix()
         self.transformate()
         self.draw_cordinate_system()
+        self.fps_display.draw()
+        label = pyglet.text.Label(str(self.i), font_name='Comic Sans',
+                    font_size=11, x=20, y=-10,
+                    anchor_x='left', anchor_y='top', color=(100,100,100,255))
+        label.draw()
         for vector, color in zip(self.vectors_list, self.colors):
             self.draw_vector(vector, color=color)
         # Pop Matrix off stack
@@ -132,7 +137,7 @@ class Window(pyglet.window.Window):
     #DO NOT REMOVE DF FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
     def update(self, df):
         self.change_frame()
-        print(self.i)
+        #print(self.i)
 
     def list_guard(self):
         if self.i >= self.control-1:

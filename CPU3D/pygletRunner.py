@@ -37,8 +37,10 @@ class PygletRunner(QtCore.QObject):
         self.simulateDirectory(self.directory, self.fformat, self.headerFile, self.filetype)
         print("Generating 3d structure...")
         animation3d = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
+        fps_display = pyglet.window.FPSDisplay(animation3d)
         animation3d.getDataFromRunner([self.vectors_list, self.color_list,
-                    self.tbase_data, self.header, self.iterations, self.control])
+                    self.tbase_data, self.header, self.iterations, self.control,
+                    fps_display])
         t1 = threading.Thread(target = pyglet.app.run)
         pyglet.clock.schedule_interval(animation3d.update, self.TIME_INTERVAL)
         t1.start()
