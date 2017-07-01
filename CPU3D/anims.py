@@ -17,16 +17,12 @@ class Animation():
         self.TIME_INTERVAL = 200
 
     def onClick(self, event):
-        self.ani.new_frame_seq()
-        '''
         if self.anim_running:
             self.ani.event_source.stop()
             self.anim_running = False
         else:
             self.ani.event_source.start()
             self.anim_running = True
-
-        '''
 
     def reshape_data(self):
         xc = int(self.base_data['xnodes'])
@@ -51,7 +47,6 @@ class Animation():
                     frames=range(self.iterations),
                     fargs=(self.current_single_layer, scat),
                     interval=self.TIME_INTERVAL)
-        self.ani.event_source.stop()
         plt.show()
 
 def update(i, current_single_layer, scat):
