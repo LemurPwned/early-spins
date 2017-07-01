@@ -13,6 +13,15 @@ class Animation():
         self.dx = []
         self.dy = []
         self.iterations = 0
+        self.anim_running = True
+
+    def onClick(self, event):
+        if self.anim_running:
+            self.ani.event_source.stop()
+            self.anim_running = False
+        else:
+            self.ani.event_source.start()
+            self.anim_running = True
 
     def reshape_data(self):
         xc = int(self.base_data['xnodes'])
@@ -32,6 +41,7 @@ class Animation():
                             c=tuple(c), cmap=cm.jet)
         fig.suptitle(title)
         fig.colorbar(scat)
+        fig.canvas.mpl_connect('button_press_event', self.onClick)
         self.ani = animation.FuncAnimation(fig, update,
                     frames=range(self.iterations),
                     fargs=(self.current_single_layer, scat))
