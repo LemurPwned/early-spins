@@ -46,9 +46,6 @@ def construct_layer_outline(base_data):
     xb = float(base_data['xbase']) * 1e9
     yb = float(base_data['ybase']) * 1e9
     zb = float(base_data['zbase']) * 1e9
-
-    print("Ybase is :", yb)
-    print("Params: xc {}, yc {}, zc {}, xb {}, yb {}, zb {}".format(xc,yc,zc,xb,yb,zb))
     base_vectors = [[xb * (x%xc), yb * (y%yc), zb * (z%zc),
             xb * (x%xc), yb * (y%yc), zb * (z%zc)]
             for z in range(zc) for y in range(yc) for x in range(xc)]

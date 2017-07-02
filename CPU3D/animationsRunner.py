@@ -39,6 +39,7 @@ class AnimationsRunner(QtCore.QObject):
         myanim.init_anim()
 
 
+
     def getAllFiles(self, directory, extension, filetype = 'binary'):
         tFileList = os.listdir(directory)
         fileList = []

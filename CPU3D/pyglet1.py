@@ -10,7 +10,7 @@ import threading
 from CPU3D.input_parser import *
 from CPU3D.camera_calculations import *
 
-WINDOW = 600
+WINDOW = 700
 INCREMENT = 5
 
 class Window(pyglet.window.Window):
@@ -21,7 +21,6 @@ class Window(pyglet.window.Window):
         self.initial_transformation()
         self.FREE_RUN = False
         self.i = 0
-
 
     def getDataFromRunner(self, data):
         self.vectors_list = data[0]
@@ -83,8 +82,7 @@ class Window(pyglet.window.Window):
         self.draw_cordinate_system()
         self.fps_display.draw()
         label = pyglet.text.Label(str(self.i), font_name='Comic Sans',
-                    font_size=11, x=20, y=-10,
-                    anchor_x='left', anchor_y='top', color=(100,100,100,255))
+                    font_size=11, x=10, y=-20, anchor_x='right', anchor_y='bottom', color=(100,100,100,255))
         label.draw()
         for vector, color in zip(self.vectors_list, self.colors):
             self.draw_vector(vector, color=color)

@@ -23,6 +23,7 @@ class PygletRunner(QtCore.QObject):
         self.TIME_INTERVAL = 1/200
         self.control = 544
         self.average = 1 # one is no averaging
+        self.layer = 4
 
     @QtCore.pyqtSlot()
     def playAnimation(self):
@@ -116,7 +117,7 @@ class PygletRunner(QtCore.QObject):
 
         start = time.time()
         self.base_data = self.tbase_data[0]
-        self.data = self.tdata
+        self.data = self.tdata ###????
         self.vectors_list = construct_layer_outline(self.base_data)
         self.vectors_list = self.vectors_list[0::self.average]
         self.color_list = []
@@ -124,6 +125,9 @@ class PygletRunner(QtCore.QObject):
         xc = int(self.base_data['xnodes'])
         yc = int(self.base_data['ynodes'])
         zc = int(self.base_data['znodes'])
+        if self.layer:
+            self.tdata = [self.tdata[i].reshape(zc, xc*yc,3)[self.layer-1] for i in range(self.iterations)]
+            zc = 1
         pool = Pool()
         multiple_results = [pool.apply_async(process_fortran_list, (self.tdata[i], xc, yc, zc))
                             for i in range(len(self.tdata))]
