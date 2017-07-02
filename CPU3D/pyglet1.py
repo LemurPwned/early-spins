@@ -4,11 +4,10 @@ pyglet.options['debug_gl'] = False
 from pyglet.gl import *
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
-import time as tm
-from multiprocessing import Pool
-import threading
 from CPU3D.input_parser import *
 from CPU3D.camera_calculations import *
+from multiprocessing import Pool
+import threading
 
 WINDOW = 700
 INCREMENT = 5
@@ -20,6 +19,7 @@ class Window(pyglet.window.Window):
         glEnable(GL_DEPTH_TEST)
         self.initial_transformation()
         self.i = 0
+        self.cl = True
 
     def getDataFromRunner(self, data):
         self.vectors_list = data[0]
@@ -42,9 +42,6 @@ class Window(pyglet.window.Window):
         uni.proj = perspective(60.0, width / height, 0.1, 256.0)
 
     def draw_vector(self, vec, color=[1, 1, 1]):
-        # arr in format [[x1,x2,x3, y1,y2,y3], [], [], [], []...]
-        # TODO create coloring algorithm
-        # maybe multithreading?
         glLineWidth(3)
         glColor3f(color[0], color[1], color[2])
         glBegin(GL_LINES)
@@ -84,6 +81,8 @@ class Window(pyglet.window.Window):
                     font_size=11, x=10, y=-20, anchor_x='right', anchor_y='bottom',
                     color=(100,100,100,255)).draw()
         for vector, color in zip(self.vectors_list, self.colors):
+            if self.cl:
+                color = color[::-1]
             self.draw_vector(vector, color=color)
         # Pop Matrix off stack
         glPopMatrix()
@@ -99,8 +98,6 @@ class Window(pyglet.window.Window):
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         glTranslatef(0, 0, 0)
-        # TODO Replace create_vector with dataframe ops.
-        #self.vec = self.vectors_list[self.i]
         self.colors = self.color_list[self.i]
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
@@ -126,7 +123,7 @@ class Window(pyglet.window.Window):
             self.position[1] += dy * 0.1
 
 
-    #DO NOT REMOVE DF FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
+    #DO NOT REMOVE dt FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
     def update(self, dt):
         self.list_guard()
         #width, height = self.get_size()

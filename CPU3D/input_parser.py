@@ -52,7 +52,6 @@ def construct_layer_outline(base_data):
     return base_vectors
 
 def process_fortran_list(fortran_list, xc, yc, zc):
-    #fortran_list = np.apply_along_axis(np.linalg.norm, 1, fortran_list)
     fortran_list = np.array([x*100/np.linalg.norm(x)
         for x in np.nditer(fortran_list, flags=['external_loop'])]).reshape(xc*yc*zc,3)
     return fortran_list
