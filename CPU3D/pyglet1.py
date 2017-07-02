@@ -19,17 +19,16 @@ class Window(pyglet.window.Window):
         glClearColor(0, 0, 0, 1)
         glEnable(GL_DEPTH_TEST)
         self.initial_transformation()
-        self.FREE_RUN = False
         self.i = 0
 
     def getDataFromRunner(self, data):
         self.vectors_list = data[0]
         self.color_list = data[1]
-        self.tbase_data = data[2]
-        self.header = data[3]
-        self.iterations = data[4]
-        self.control = data[5]
-        self.fps_display = data[6]
+        self.iterations = data[2]
+        self.control = data[3]
+        self.fps_display = data[4]
+
+
     def upload_uniforms(self):
         uni = self.shader.uniforms
 
@@ -81,9 +80,9 @@ class Window(pyglet.window.Window):
         self.transformate()
         self.draw_cordinate_system()
         self.fps_display.draw()
-        label = pyglet.text.Label(str(self.i), font_name='Comic Sans',
-                    font_size=11, x=10, y=-20, anchor_x='right', anchor_y='bottom', color=(100,100,100,255))
-        label.draw()
+        pyglet.text.Label(str(self.i), font_name='Comic Sans',
+                    font_size=11, x=10, y=-20, anchor_x='right', anchor_y='bottom',
+                    color=(100,100,100,255)).draw()
         for vector, color in zip(self.vectors_list, self.colors):
             self.draw_vector(vector, color=color)
         # Pop Matrix off stack
@@ -126,16 +125,12 @@ class Window(pyglet.window.Window):
             self.position[0] += dx * 0.1
             self.position[1] += dy * 0.1
 
-    def change_frame(self):
-        self.list_guard()
-        base_data = self.tbase_data[self.i]
-        width, height = self.get_size()
-        self.on_resize(width, height)
 
     #DO NOT REMOVE DF FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
-    def update(self, df):
-        self.change_frame()
-        #print(self.i)
+    def update(self, dt):
+        self.list_guard()
+        #width, height = self.get_size()
+        self.on_resize(self.width, self.height)
 
     def list_guard(self):
         if self.i >= self.control-1:
