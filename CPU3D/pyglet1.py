@@ -20,7 +20,8 @@ class Window(pyglet.window.Window):
         self.initial_transformation()
         self.i = 0
         self.cl = True
-        self.spacer = 1
+        self.cube = True
+        self.spacer = 0.72
 
     def getDataFromRunner(self, data):
         self.vectors_list = data[0]
@@ -28,7 +29,6 @@ class Window(pyglet.window.Window):
         self.iterations = data[2]
         self.control = data[3]
         self.fps_display = data[4]
-
 
     def upload_uniforms(self):
         uni = self.shader.uniforms
@@ -53,7 +53,6 @@ class Window(pyglet.window.Window):
         glBegin(GL_POINTS)
         glVertex3f(vec[3]+color[0], vec[4]+color[1], vec[5]+color[2])
         glEnd()
-
 
     def draw_cube(self, vec, color=[1,0,1]):
         glBegin(GL_QUADS)
@@ -93,7 +92,6 @@ class Window(pyglet.window.Window):
         glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4], vec[5])
         glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
-
         glEnd()
 
     def draw_cordinate_system(self, size=5):
@@ -127,10 +125,9 @@ class Window(pyglet.window.Window):
         for vector, color in zip(self.vectors_list, self.colors):
             if self.cl:
                 color = color[::-1]
-            #self.draw_vector(vector, color=color)
-            self.draw_cube(vector, color=color)
+            if not self.cube: self.draw_vector(vector, color=color)
+            if self.cube: self.draw_cube(vector, color=color)
         # Pop Matrix off stack
-
         glPopMatrix()
 
     def on_resize(self, width, height):
@@ -168,11 +165,8 @@ class Window(pyglet.window.Window):
             self.position[0] += dx * 0.1
             self.position[1] += dy * 0.1
 
-
     #DO NOT REMOVE dt FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
     def update(self, dt):
-        self.list_guard()
-        #width, height = self.get_size()
         self.on_resize(self.width, self.height)
 
     def list_guard(self):
@@ -180,5 +174,3 @@ class Window(pyglet.window.Window):
             self.i = 0
         if self.i > self.iterations-1:
             self.i = 0
-        else:
-            pass
