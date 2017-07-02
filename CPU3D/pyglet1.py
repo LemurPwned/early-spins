@@ -20,6 +20,7 @@ class Window(pyglet.window.Window):
         self.initial_transformation()
         self.i = 0
         self.cl = True
+        self.spacer = 1
 
     def getDataFromRunner(self, data):
         self.vectors_list = data[0]
@@ -53,6 +54,48 @@ class Window(pyglet.window.Window):
         glVertex3f(vec[3]+color[0], vec[4]+color[1], vec[5]+color[2])
         glEnd()
 
+
+    def draw_cube(self, vec, color=[1,0,1]):
+        glBegin(GL_QUADS)
+        #TOP FACE
+        glColor3f(color[0], color[1],color[2])
+        glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
+        glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
+        #BOTTOM FACE
+        glColor3f(color[0], color[1],color[2])
+        glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
+        glVertex3f(vec[3], vec[4], vec[5])
+        glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
+        glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
+        #FRONT FACE
+        glColor3f(color[0], color[1],color[2])
+        glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
+        glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
+        #BACK FACE
+        glColor3f(color[0], color[1],color[2])
+        glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4], vec[5])
+        glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
+        #RIGHT FACE
+        glColor3f(color[0], color[1],color[2])
+        glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
+        glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
+        glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
+        glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
+        #LEFT FACE
+        glColor3f(color[0], color[1],color[2])
+        glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4], vec[5])
+        glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
+
+        glEnd()
+
     def draw_cordinate_system(self, size=5):
         self.draw_vector([0, 0, 0, size, 0, 0], [1, 0, 0]) #x
         self.draw_vector([0, 0, 0, 0, size, 0], [0, 1, 0]) #y
@@ -77,14 +120,17 @@ class Window(pyglet.window.Window):
         self.transformate()
         self.draw_cordinate_system()
         self.fps_display.draw()
+
         pyglet.text.Label(str(self.i), font_name='Comic Sans',
                     font_size=11, x=10, y=-20, anchor_x='right', anchor_y='bottom',
                     color=(100,100,100,255)).draw()
         for vector, color in zip(self.vectors_list, self.colors):
             if self.cl:
                 color = color[::-1]
-            self.draw_vector(vector, color=color)
+            #self.draw_vector(vector, color=color)
+            self.draw_cube(vector, color=color)
         # Pop Matrix off stack
+
         glPopMatrix()
 
     def on_resize(self, width, height):
