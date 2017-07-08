@@ -1,5 +1,6 @@
 from CPU3D.pyglet1 import *
 from CPU3D.anims import *
+import time
 
 class Runner(QtCore.QObject):
     signalStatus = QtCore.pyqtSignal(str)
@@ -19,7 +20,7 @@ class Runner(QtCore.QObject):
         self.control = 544
         self.average = 1 # one is no averaging
         self.layer = 4
-
+        self.wait_ended = False
     def prepare_run(self):
         if self.directory=="":
             self.signalStatus.emit("no_dir")
@@ -34,14 +35,15 @@ class Runner(QtCore.QObject):
 
     @QtCore.pyqtSlot()
     def play2DAnimation(self):
-        myanim = Animation()
-        myanim.base_data = self.tbase_data[0]
-        myanim.tdata = self.tdata
-        myanim.reshape_data()
-        myanim.iterations = self.iterations
-        myanim.current_layer = 0
-        myanim.create_canvas()
-        myanim.run_canvas()
+        self.myanim = Animation()
+        self.myanim.base_data = self.tbase_data[0]
+        self.myanim.tdata = self.tdata
+        self.myanim.reshape_data()
+        self.myanim.iterations = self.iterations
+        self.myanim.current_layer = 0
+        self.myanim.create_canvas()
+        self.wait_ended = True
+        self.myanim.run_canvas()
 
     @QtCore.pyqtSlot()
     def play3DAnimation(self):
@@ -72,28 +74,45 @@ class Runner(QtCore.QObject):
         animation3d.getDataFromRunner([self.vectors_list, self.color_list,
                     self.iterations, self.control, fps_display])
         t1 = threading.Thread(target = pyglet.app.run)
+        while not self.wait_ended:
+            time.sleep(0.01)
         pyglet.clock.schedule_interval(animation3d.update, self.TIME_INTERVAL)
         t1.start()
         while(True):
+            #TODO: make list_guard more effective
             if self.play:
-                animation3d.i+=1
-                animation3d.list_guard()
+                animation3d.i += 1
+                self.myanim.ax_pl.idat += 1
+                self.myanim.replot_data()
+                self.list_guard()
             if self.nextFrame:
-                animation3d.i+=1
-                animation3d.list_guard()
+                animation3d.i += 1
+                #animation3d.list_guard()
+                self.myanim.ax_pl.idat += 1
+                self.list_guard()
+                self.myanim.replot_data()
                 self.nextFrame = False
             if self.prevFrame:
-                animation3d.i-=1
-                animation3d.list_guard()
+                animation3d.i -= 1
+                #animation3d.list_guard()
+                self.myanim.ax_pl.idat -= 1
+                self.list_guard()
+                self.myanim.replot_data()
                 self.prevFrame = False
             if self.stop:
                 animation3d.i = 0
-                animation3d.list_guard()
+                #animation3d.list_guard()
+                self.myanim.ax_pl.idat = 0
+                self.list_guard()
+                self.myanim.replot_data()
                 self.play = False
                 self.stop = False
             if self.setFrame:
                 animation3d.i = self.frame
-                animation3d.list_guard()
+                #animation3d.list_guard()
+                self.myanim.ax_pl.idat = self.frame
+                self.list_guard()
+                self.myanim.replot_data()
                 self.setFrame = False
             time.sleep(self.TIME_INTERVAL*70)
             if animation3d.i%10:
@@ -129,3 +148,9 @@ class Runner(QtCore.QObject):
                 df = fortran_list(filename)
                 data.append(df)
         return data, base_data
+
+    def list_guard(self):
+        if self.i >= self.control-1:
+            self.i = 0
+        if self.i > self.iterations-1:
+            self.i = 0

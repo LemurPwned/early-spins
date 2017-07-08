@@ -21,6 +21,7 @@ class Animation():
         self.i = 0
         self.play = True
 
+    def get_it
     #WIDGETS
     def create_canvas(self, title='Magnetization'):
         self.fig = plt.figure()
@@ -66,7 +67,7 @@ class Animation():
         self.butt_l.on_clicked(self.left_cl)
         self.butt_r.on_clicked(self.right_cl)
         plt.show()
-        
+
     #ANIMATIONS
     def onPress(self, event):
         if self.anim_running:

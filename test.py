@@ -7,6 +7,7 @@ if(len(sys.argv)>2):
 if (str(sys.argv[1]) == "run"):
     from CPU3D.runner import Runner
     x = Runner()
+    x.play = True
     x.directory = "data/0200nm/"
     x.fformat = ".omf"
     x.filetype = 'binary'
@@ -14,7 +15,7 @@ if (str(sys.argv[1]) == "run"):
     x.prepare_run()
     Thread(target = x.play2DAnimation).start()
     Thread(target = x.play3DAnimation).start()
-    
+
 if(str(sys.argv[1]) == "pyglet"):
     from CPU3D.pygletRunner import PygletRunner
     x = PygletRunner()
