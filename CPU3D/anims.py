@@ -20,6 +20,38 @@ class Animation():
         self.backwards_counter = 0
         self.i = 0
         self.play = True
+        self.graph_data = []
+        self.null_data = []
+
+    def reshape_data(self):
+        xc = int(self.base_data['xnodes'])
+        yc = int(self.base_data['ynodes'])
+        zc = int(self.base_data['znodes'])
+        self.layers_data = np.array([x.reshape(zc,yc*xc,3)[self.current_layer] for x in self.tdata])
+        self.current_single_layer = np.array([calculate_angles(x)
+                                for x in self.layers_data])
+        x = np.linspace(0, xc, xc)
+        y = np.linspace(0, yc, yc)
+        self.dx, self.dy = np.meshgrid(x,y)
+
+    #INDEPENDENT graph_panels
+    def create_plot_canvas(self, title='Magnetization'):
+        self.fig = plt.figure
+        self.ax_pl = plt.subplot(111)
+        self.ax_pl.idat = self.i
+        self.null_data = [x for x in range(self.iterations)]
+        a_handler = self.ax_pl.plot(self.null_data,
+            self.graph_data[0:self.ax_pl.idat]+self.null_data[self.ax_pl.idat:], 'ro')[0]
+        self.ax_pl.hpl = a_handler
+        #self.ax_pl.axis('scaled')
+        self.ax_pl.axis([0, self.iterations, np.min(self.graph_data), np.max(self.graph_data)])
+        self.ax_pl.set_autoscale_on(False)
+        #self.ax_pl.set_title('{}/{}'.format(self.ax_pl.idat,self.iterations))
+
+    def replot(self):
+        self.ax_pl.hpl.set_ydata(self.graph_data[0:self.ax_pl.idat]+self.null_data[self.ax_pl.idat:])
+        self.ax_pl.set_title('{}/{}'.format(self.ax_pl.idat, self.iterations))
+        self.ax_pl.get_figure().canvas.draw()
 
     #WIDGETS
     def create_button_canvas(self, title='Magnetization'):
@@ -29,8 +61,8 @@ class Animation():
         self.ax_pl = plt.subplot2grid((5,5),(0,0),colspan=5,rowspan=3)  # axes_plot
         self.ax_bl = plt.subplot2grid((5,5),(4,0),colspan=2,rowspan=1)  # axes_button_left
         self.ax_br = plt.subplot2grid((5,5),(4,3),colspan=2,rowspan=1)  # axes_button_right
-        self.butt_l = Button(self.ax_bl, '\N{leftwards arrow}') # or u'' on python 2
-        self.butt_r = Button(self.ax_br, '\N{rightwards arrow}') # or u'' on python 2
+        self.butt_l = Button(self.ax_bl, '\N{leftwards arrow}')
+        self.butt_r = Button(self.ax_br, '\N{rightwards arrow}')
         self.ax_pl.idat = self.i
         scat = self.ax_pl.scatter(self.dx, self.dy,
                             c=tuple(self.current_single_layer[self.ax_pl.idat]), cmap=cm.jet)
@@ -93,17 +125,6 @@ class Animation():
         else:
             self.ani.event_source.start()
             self.anim_running = True
-
-    def reshape_data(self):
-        xc = int(self.base_data['xnodes'])
-        yc = int(self.base_data['ynodes'])
-        zc = int(self.base_data['znodes'])
-        self.layers_data = np.array([x.reshape(zc,yc*xc,3)[self.current_layer] for x in self.tdata])
-        self.current_single_layer = np.array([calculate_angles(x)
-                                for x in self.layers_data])
-        x = np.linspace(0, xc, xc)
-        y = np.linspace(0, yc, yc)
-        self.dx, self.dy = np.meshgrid(x,y)
 
     def init_anim(self, title='Animation'):
         fig = plt.figure()

@@ -48,6 +48,19 @@ class Runner(QtCore.QObject):
         self.myanim.run_canvas()
 
     @QtCore.pyqtSlot()
+    def play2DGraph(self):
+        self.myanim = Animation()
+        self.myanim.base_data = self.tbase_data[0]
+        self.myanim.tdata = self.tdata
+        self.myanim.reshape_data()
+        self.myanim.iterations = self.iterations
+        self.myanim.current_layer = 0
+        self.myanim.graph_data = self.header['UZeeman::Energy'].tolist()[0:self.iterations]
+        self.myanim.create_plot_canvas()
+        self.wait_ended = True
+        self.myanim.run_canvas()
+
+    @QtCore.pyqtSlot()
     def play3DAnimation(self):
         start = time.time()
         self.base_data = self.tbase_data[0]
@@ -80,19 +93,20 @@ class Runner(QtCore.QObject):
         pyglet.clock.schedule_interval(animation3d.update, self.TIME_INTERVAL)
         t1.start()
         while(True):
-            #TODO: make list_guard more effective
             if self.play:
                 self.i += 1
                 self.list_guard()
                 animation3d.i = self.i
                 self.myanim.ax_pl.idat = self.i
-                self.myanim.replot_data()
+                #self.myanim.replot_data()
+                self.myanim.replot()
             if self.nextFrame:
                 self.i += 1
                 self.list_guard()
                 animation3d.i = self.i
                 self.myanim.ax_pl.idat = self.i
-                self.myanim.replot_data()
+                #self.myanim.replot_data()
+                self.myanim.replot()
                 self.nextFrame = False
             if self.prevFrame:
                 self.i -= 1
@@ -124,6 +138,8 @@ class Runner(QtCore.QObject):
         self.tdata, self.tbase_data = self.getAllFiles(path_to_folder, extension, filetype)
         self.header, self.stages = odt_reader(path_to_header_file) #new odt format reader, more universal
         print("Maximum number of iterations : {}".format(self.iterations))
+        print(self.stages)
+        print(self.header.columns)
 
     def getAllFiles(self, directory, extension, filetype = 'binary'):
         tFileList = os.listdir(directory)

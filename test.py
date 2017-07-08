@@ -5,7 +5,7 @@ from threading import Thread
 
 if(len(sys.argv)>2):
     exit("Error expecting 1 argument")
-    
+
 if (str(sys.argv[1]) == "run"):
     from CPU3D.runner import Runner
     x = Runner()
@@ -15,7 +15,7 @@ if (str(sys.argv[1]) == "run"):
     x.filetype = 'binary'
     x.headerFile = 'data/0200nm/proba1.odt'
     x.prepare_run()
-    Thread(target = x.play2DAnimation).start()
+    Thread(target = x.play2DGraph).start()
     Thread(target = x.play3DAnimation).start()
 
 if(str(sys.argv[1]) == "pyglet"):

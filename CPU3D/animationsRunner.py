@@ -15,8 +15,7 @@ class AnimationsRunner(QtCore.QObject):
         self.filetype = ""
         self.control = 544
         self.average = 1 # one is no averaging
-
-
+        
     @QtCore.pyqtSlot()
     def playAnimation(self):
         if self.directory=="":
