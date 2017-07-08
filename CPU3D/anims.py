@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from matplotlib.widgets import Button
 from matplotlib import cm
 import time as tm
 
@@ -20,6 +21,52 @@ class Animation():
         self.i = 0
         self.play = True
 
+    #WIDGETS
+    def create_canvas(self, title='Magnetization'):
+        self.fig = plt.figure()
+        self.fig.suptitle(title)
+        self.ax_pl = plt.subplot2grid((5,5),(0,0),colspan=5,rowspan=3)  # axes_plot
+        self.ax_bl = plt.subplot2grid((5,5),(4,0),colspan=2,rowspan=1)  # axes_button_left
+        self.ax_br = plt.subplot2grid((5,5),(4,3),colspan=2,rowspan=1)  # axes_button_right
+        self.butt_l = Button(self.ax_bl, '\N{leftwards arrow}') # or u'' on python 2
+        self.butt_r = Button(self.ax_br, '\N{rightwards arrow}') # or u'' on python 2
+        self.ax_pl.idat = self.i
+        scat = self.ax_pl.scatter(self.dx, self.dy,
+                            c=tuple(self.current_single_layer[self.ax_pl.idat]), cmap=cm.jet)
+        self.ax_pl.hpl = scat
+        self.fig.colorbar(self.ax_pl.hpl)
+        self.ax_pl.axis('scaled')
+        self.ax_pl.axis([0, len(self.dx), 0, len(self.dy)])
+        self.ax_pl.set_autoscale_on(False)
+        self.ax_pl.set_title('{}/{}'.format(self.ax_pl.idat,self.current_single_layer.shape[0]-1))
+
+    def replot_data(self):
+        self.ax_pl.hpl.set_array(self.current_single_layer[self.ax_pl.idat])
+        self.ax_pl.set_title('{}/{}'.format(self.ax_pl.idat,
+                self.current_single_layer.shape[0]-1))
+        self.ax_pl.get_figure().canvas.draw()
+
+    def left_cl(self, event):
+        if self.ax_pl.idat > 0:
+            self.ax_pl.idat -= 1
+            self.replot_data()
+        if self.ax_pl.idat == 0:
+            self.ax_pl.idat = self.current_single_layer.shape[0]-1
+            self.replot_data()
+
+    def right_cl(self, event):
+        if self.ax_pl.idat < self.current_single_layer.shape[0]-1:
+            self.ax_pl.idat += 1
+            self.replot_data()
+        if self.ax_pl.idat == self.current_single_layer.shape[0]-1:
+            self.ax_pl.idat = 0
+            self.replot_data()
+
+    def run_canvas(self):
+        self.butt_l.on_clicked(self.left_cl)
+        self.butt_r.on_clicked(self.right_cl)
+        plt.show()
+    #ANIMATIONS
     def onPress(self, event):
         if self.anim_running:
             self.ani.event_source.stop()

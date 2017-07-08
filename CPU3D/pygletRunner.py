@@ -124,6 +124,7 @@ class PygletRunner(QtCore.QObject):
         xc = int(self.base_data['xnodes'])
         yc = int(self.base_data['ynodes'])
         zc = int(self.base_data['znodes'])
+        print("{} layers detected, {} layer was selected".format(zc, self.layer))
         if self.layer:
             self.tdata = [self.tdata[i].reshape(zc, xc*yc,3)[self.layer-1] for i in range(self.iterations)]
             zc = 1

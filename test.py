@@ -9,13 +9,13 @@ if(str(sys.argv[1]) == "pyglet"):
     x = PygletRunner()
     x.play = True
     #example of usage
-    x.directory = "data/firstData/"
-    #x.directory = "data/0200nm/"
+    #x.directory = "data/firstData/"
+    x.directory = "data/0200nm/"
     x.fformat = ".omf"
-    #x.filetype = 'binary'
-    x.filetype = 'text'
-    #x.headerFile = 'data/0200nm/proba1.odt'
-    x.headerFile = "data/firstData/voltage-spin-diode.odt"
+    x.filetype = 'binary'
+    #x.filetype = 'text'
+    x.headerFile = 'data/0200nm/proba1.odt'
+    #x.headerFile = "data/firstData/voltage-spin-diode.odt"
     x.playAnimation()
 
 if(str(sys.argv[1]) == "tester"):
@@ -46,3 +46,7 @@ if(str(sys.argv[1])== 'runner'):
     x.headerFile = 'data/0200nm/proba1.odt'
     #x.headerFile = "data/firstData/voltage-spin-diode.odt"
     x.playAnimation()
+
+if (str(sys.argv[1]=='parser')):
+    from CPU3D.input_parser import *
+    print("Hello")

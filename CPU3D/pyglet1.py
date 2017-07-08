@@ -21,7 +21,7 @@ class Window(pyglet.window.Window):
         self.i = 0
         self.cl = True
         self.cube = True
-        self.spacer = 0.72
+        self.spacer = 0.92
 
     def getDataFromRunner(self, data):
         self.vectors_list = data[0]
@@ -118,7 +118,6 @@ class Window(pyglet.window.Window):
         self.transformate()
         self.draw_cordinate_system()
         self.fps_display.draw()
-
         pyglet.text.Label(str(self.i), font_name='Comic Sans',
                     font_size=11, x=10, y=-20, anchor_x='right', anchor_y='bottom',
                     color=(100,100,100,255)).draw()
