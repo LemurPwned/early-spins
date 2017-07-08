@@ -9,3 +9,6 @@ tester:
 
 runner:
 	python3 -m test runner
+
+merge:
+	python3 -m test run

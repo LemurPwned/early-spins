@@ -1,12 +1,37 @@
 import sys
 import os
-
+import threading
+from threading import Thread
 if(len(sys.argv)>2):
     exit("Error expecting 1 argument")
-
+if (str(sys.argv[1]) == "run"):
+    from CPU3D.runner import Runner
+    x = Runner()
+    x.directory = "data/0200nm/"
+    x.fformat = ".omf"
+    x.filetype = 'binary'
+    x.headerFile = 'data/0200nm/proba1.odt'
+    x.prepare_run()
+    Thread(target = x.play2DAnimation).start()
+    Thread(target = x.play3DAnimation).start()
+    
 if(str(sys.argv[1]) == "pyglet"):
     from CPU3D.pygletRunner import PygletRunner
     x = PygletRunner()
+    x.play = True
+    #example of usage
+    #x.directory = "data/firstData/"
+    x.directory = "data/0200nm/"
+    x.fformat = ".omf"
+    x.filetype = 'binary'
+    #x.filetype = 'text'
+    x.headerFile = 'data/0200nm/proba1.odt'
+    #x.headerFile = "data/firstData/voltage-spin-diode.odt"
+    x.playAnimation()
+
+if(str(sys.argv[1])== 'runner'):
+    from CPU3D.animationsRunner import *
+    x = AnimationsRunner()
     x.play = True
     #example of usage
     #x.directory = "data/firstData/"
@@ -32,21 +57,3 @@ if(str(sys.argv[1]) == "tester"):
     pr.print_stats(sort='time')
     print(len(colors))
     print(colors[1:100])
-
-if(str(sys.argv[1])== 'runner'):
-    from CPU3D.animationsRunner import *
-    x = AnimationsRunner()
-    x.play = True
-    #example of usage
-    #x.directory = "data/firstData/"
-    x.directory = "data/0200nm/"
-    x.fformat = ".omf"
-    x.filetype = 'binary'
-    #x.filetype = 'text'
-    x.headerFile = 'data/0200nm/proba1.odt'
-    #x.headerFile = "data/firstData/voltage-spin-diode.odt"
-    x.playAnimation()
-
-if (str(sys.argv[1]=='parser')):
-    from CPU3D.input_parser import *
-    print("Hello")
