@@ -36,7 +36,6 @@ class AnimationsRunner(QtCore.QObject):
         myanim.reshape_data()
         myanim.iterations = self.iterations
         myanim.current_layer = 0
-        #myanim.init_anim()
         myanim.create_canvas()
         myanim.run_canvas()
 

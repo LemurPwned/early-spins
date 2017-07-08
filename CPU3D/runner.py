@@ -21,6 +21,8 @@ class Runner(QtCore.QObject):
         self.average = 1 # one is no averaging
         self.layer = 4
         self.wait_ended = False
+        self.i = 0
+
     def prepare_run(self):
         if self.directory=="":
             self.signalStatus.emit("no_dir")
@@ -49,7 +51,6 @@ class Runner(QtCore.QObject):
     def play3DAnimation(self):
         start = time.time()
         self.base_data = self.tbase_data[0]
-        self.data = self.tdata ###????
         self.vectors_list = construct_layer_outline(self.base_data)
         self.vectors_list = self.vectors_list[0::self.average]
         self.color_list = []
@@ -81,37 +82,38 @@ class Runner(QtCore.QObject):
         while(True):
             #TODO: make list_guard more effective
             if self.play:
-                animation3d.i += 1
-                self.myanim.ax_pl.idat += 1
+                self.i += 1
+                self.list_guard()
+                animation3d.i = self.i
+                self.myanim.ax_pl.idat = self.i
                 self.myanim.replot_data()
-                self.list_guard()
             if self.nextFrame:
-                animation3d.i += 1
-                #animation3d.list_guard()
-                self.myanim.ax_pl.idat += 1
+                self.i += 1
                 self.list_guard()
+                animation3d.i = self.i
+                self.myanim.ax_pl.idat = self.i
                 self.myanim.replot_data()
                 self.nextFrame = False
             if self.prevFrame:
-                animation3d.i -= 1
-                #animation3d.list_guard()
-                self.myanim.ax_pl.idat -= 1
+                self.i -= 1
                 self.list_guard()
+                animation3d.i = self.i
+                self.myanim.ax_pl.idat = self.i
                 self.myanim.replot_data()
                 self.prevFrame = False
             if self.stop:
-                animation3d.i = 0
-                #animation3d.list_guard()
-                self.myanim.ax_pl.idat = 0
+                self.i = 0
                 self.list_guard()
+                animation3d.i = self.i
+                self.myanim.ax_pl.idat = self.i
                 self.myanim.replot_data()
                 self.play = False
                 self.stop = False
             if self.setFrame:
-                animation3d.i = self.frame
-                #animation3d.list_guard()
-                self.myanim.ax_pl.idat = self.frame
+                self.i = self.frame
                 self.list_guard()
+                animation3d.i = self.i
+                self.myanim.ax_pl.idat = self.i
                 self.myanim.replot_data()
                 self.setFrame = False
             time.sleep(self.TIME_INTERVAL*70)

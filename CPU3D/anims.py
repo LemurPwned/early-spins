@@ -21,16 +21,30 @@ class Animation():
         self.i = 0
         self.play = True
 
-    def get_it
     #WIDGETS
-    def create_canvas(self, title='Magnetization'):
+    def create_button_canvas(self, title='Magnetization'):
         self.fig = plt.figure()
         self.fig.suptitle(title)
+        self.ax_pl = plt.subplot(111)
         self.ax_pl = plt.subplot2grid((5,5),(0,0),colspan=5,rowspan=3)  # axes_plot
         self.ax_bl = plt.subplot2grid((5,5),(4,0),colspan=2,rowspan=1)  # axes_button_left
         self.ax_br = plt.subplot2grid((5,5),(4,3),colspan=2,rowspan=1)  # axes_button_right
         self.butt_l = Button(self.ax_bl, '\N{leftwards arrow}') # or u'' on python 2
         self.butt_r = Button(self.ax_br, '\N{rightwards arrow}') # or u'' on python 2
+        self.ax_pl.idat = self.i
+        scat = self.ax_pl.scatter(self.dx, self.dy,
+                            c=tuple(self.current_single_layer[self.ax_pl.idat]), cmap=cm.jet)
+        self.ax_pl.hpl = scat
+        self.fig.colorbar(self.ax_pl.hpl)
+        self.ax_pl.axis('scaled')
+        self.ax_pl.axis([0, len(self.dx), 0, len(self.dy)])
+        self.ax_pl.set_autoscale_on(False)
+        self.ax_pl.set_title('{}/{}'.format(self.ax_pl.idat,self.current_single_layer.shape[0]-1))
+
+    def create_canvas(self, title='Magnetization'):
+        self.fig = plt.figure()
+        self.fig.suptitle(title)
+        self.ax_pl = plt.subplot(111)
         self.ax_pl.idat = self.i
         scat = self.ax_pl.scatter(self.dx, self.dy,
                             c=tuple(self.current_single_layer[self.ax_pl.idat]), cmap=cm.jet)
@@ -64,6 +78,9 @@ class Animation():
             self.replot_data()
 
     def run_canvas(self):
+        plt.show()
+
+    def run_button_canvas(self):
         self.butt_l.on_clicked(self.left_cl)
         self.butt_r.on_clicked(self.right_cl)
         plt.show()
@@ -109,7 +126,7 @@ def update(i, current_single_layer, scat):
     return scat
 
 def calculate_angles(x, relate = [0,1,0], scale=1):
-    #TODO: make relate object variable
+    #TODO: make relate object a variable
     norm = np.apply_along_axis(np.linalg.norm, 1, x)
     dot = np.divide(np.array([np.inner(i, relate) for i in x]), norm)
     angle = np.arccos(dot)**scale

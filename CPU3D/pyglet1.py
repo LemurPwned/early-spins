@@ -166,10 +166,4 @@ class Window(pyglet.window.Window):
 
     #DO NOT REMOVE dt FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
     def update(self, dt):
-        self.on_resize(self.width, self.height)
-
-    def list_guard(self):
-        if self.i >= self.control-1:
-            self.i = 0
-        if self.i > self.iterations-1:
-            self.i = 0
+        self.on_resize(self.width, self.height) 

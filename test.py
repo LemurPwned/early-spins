@@ -2,8 +2,10 @@ import sys
 import os
 import threading
 from threading import Thread
+
 if(len(sys.argv)>2):
     exit("Error expecting 1 argument")
+    
 if (str(sys.argv[1]) == "run"):
     from CPU3D.runner import Runner
     x = Runner()
