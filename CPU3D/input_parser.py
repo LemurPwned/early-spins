@@ -90,7 +90,6 @@ def odt_reader(filename):
     cols = [x.strip() for x in cols]
 
     units = units.split(" ")
-    units
     units = [x.strip() for x in units]
 
     dataset = []
@@ -161,5 +160,32 @@ def binary_read(filename):
             b = f.read(8)
         b = f.read(36 + 8) #pro debug process
         #print("last line {}".format(b))
+    f.close()
+    return base_data, np.array(lists)
+
+def binary_read2(filename):
+    lists = []
+    base_data = {}
+    validity = False
+    iterator = -10
+    validation = 123456789012345.0 #this is IEEE validation value
+    with open(filename, 'rb') as f:
+        while validity == False and iterator < 50:
+            headers = f.read(24*38 + iterator)
+            headers = str(headers)
+            check_value = struct.unpack('d', f.read(8))[0]
+            if check_value == validation:
+                validity = True
+                break
+            else:
+                f.seek(0)
+                iterator += 1
+        if iterator > 49  : raise TypeError
+        base_data = process_header(headers)
+        k = base_data['xnodes']*base_data['ynodes']*base_data['znodes']
+        lists = [(struct.unpack('d', f.read(8))[0],
+                struct.unpack('d', f.read(8))[0],
+                struct.unpack('d', f.read(8))[0]) for i in range(int(k))]
+        #print(lists[1:100])
     f.close()
     return base_data, np.array(lists)

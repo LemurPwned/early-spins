@@ -48,15 +48,14 @@ if(str(sys.argv[1])== 'runner'):
 
 if(str(sys.argv[1]) == "tester"):
     from CPU3D.input_parser import *
-    filename ='data/firstData/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000000.omf'
-    base_data, count = extract_base_data(filename)
-    lists = fortran_list(filename)
+    filename ='data/0520nm/proba1-Oxs_TimeDriver-Magnetization-01-0002265.omf'
     import cProfile
     pr = cProfile.Profile()
     pr.enable()
-    for i in range(100):
-        vectors, colors = process_fortran_list(lists, base_data)
+    for i in range(1):
+        base_data, vectors = binary_read2(filename)
+        #vectors, colors = process_fortran_list(lists, base_data)
     pr.disable()
     pr.print_stats(sort='time')
-    print(len(colors))
-    print(colors[1:100])
+    #print(len(colors))
+    #print(colors[1:100])

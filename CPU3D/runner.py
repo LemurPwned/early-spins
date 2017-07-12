@@ -37,6 +37,10 @@ class Runner(QtCore.QObject):
 
     @QtCore.pyqtSlot()
     def play2DAnimation(self):
+        """
+        this instance allows for creating dynamic 2D aniamtion of the layer
+        surface that synchronizes with 3D animation
+        """
         self.myanim = Animation()
         self.myanim.base_data = self.tbase_data[0]
         self.myanim.tdata = self.tdata
@@ -49,6 +53,10 @@ class Runner(QtCore.QObject):
 
     @QtCore.pyqtSlot()
     def play2DGraph(self):
+        """
+        this instance allows for creating dynamic graphs that follow an
+        animation
+        """
         self.myanim = Animation()
         self.myanim.base_data = self.tbase_data[0]
         self.myanim.tdata = self.tdata
@@ -162,7 +170,7 @@ class Runner(QtCore.QObject):
         self.iterations = len(fileList)
         if filetype == 'binary':
             for filename in fileList:
-                tbase_data, tdf = binary_read(filename)
+                tbase_data, tdf = binary_read2(filename)
                 if len(base_data) == 0:
                     base_data.append(tbase_data)
                 data.append(tdf)
