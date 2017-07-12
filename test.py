@@ -10,10 +10,10 @@ if (str(sys.argv[1]) == "run"):
     from CPU3D.runner import Runner
     x = Runner()
     x.play = True
-    x.directory = "data/0200nm/"
+    x.directory = "data/0520nm/"
     x.fformat = ".omf"
     x.filetype = 'binary'
-    x.headerFile = 'data/0200nm/proba1.odt'
+    x.headerFile = 'data/0520nm/proba1.odt'
     x.prepare_run()
     Thread(target = x.play2DGraph).start()
     Thread(target = x.play3DAnimation).start()
@@ -49,6 +49,10 @@ if(str(sys.argv[1])== 'runner'):
 if(str(sys.argv[1]) == "tester"):
     from CPU3D.input_parser import *
     filename ='data/0520nm/proba1-Oxs_TimeDriver-Magnetization-01-0002265.omf'
+    _, vectors1 = binary_read3(filename)
+    _, vectors2 = binary_read2(filename)
+    #for i in range(100):
+    #    print(vectors1[i], vectors2[i])
     import cProfile
     pr = cProfile.Profile()
     pr.enable()

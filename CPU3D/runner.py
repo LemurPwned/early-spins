@@ -149,11 +149,11 @@ class Runner(QtCore.QObject):
                 self.signalStatus.emit(str(animation3d.i))
 
     def simulateDirectory(self, path_to_folder, extension, path_to_header_file, filetype):
+        t1 = time.time()
         self.tdata, self.tbase_data = self.getAllFiles(path_to_folder, extension, filetype)
+        print("Reading files took: {}".format(time.time()-t1))
         self.header, self.stages = odt_reader(path_to_header_file) #new odt format reader, more universal
         print("Maximum number of iterations : {}".format(self.iterations))
-        print(self.stages)
-        print(self.header.columns)
 
     def getAllFiles(self, directory, extension, filetype = 'binary'):
         tFileList = os.listdir(directory)
@@ -170,7 +170,7 @@ class Runner(QtCore.QObject):
         self.iterations = len(fileList)
         if filetype == 'binary':
             for filename in fileList:
-                tbase_data, tdf = binary_read2(filename)
+                tbase_data, tdf = binary_read3(filename)
                 if len(base_data) == 0:
                     base_data.append(tbase_data)
                 data.append(tdf)

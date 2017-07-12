@@ -51,7 +51,7 @@ def construct_layer_outline(base_data):
     return base_vectors
 
 def process_fortran_list(fortran_list, xc, yc, zc):
-    fortran_list = np.array([x*100/np.linalg.norm(x)
+    fortran_list = np.array([x*len(fortran_list)/np.linalg.norm(x)
         for x in np.nditer(fortran_list, flags=['external_loop'])]).reshape(xc*yc*zc,3)
     return fortran_list
 
@@ -186,6 +186,30 @@ def binary_read2(filename):
         lists = [(struct.unpack('d', f.read(8))[0],
                 struct.unpack('d', f.read(8))[0],
                 struct.unpack('d', f.read(8))[0]) for i in range(int(k))]
-        #print(lists[1:100])
     f.close()
     return base_data, np.array(lists)
+
+def binary_read3(filename):
+    lists = []
+    base_data = {}
+    validation = 123456789012345.0  # this is IEEE validation value
+    guard = 0
+    constant = 900
+    with open(filename, 'rb') as f:
+        last = f.read(constant)
+        while last != validation:
+            guard += 1
+            f.seek(constant+guard)
+            last = struct.unpack('d', f.read(8))[0]
+            f.seek(0)
+            if guard > 250:
+                raise struct.error
+        headers = str(f.read(constant+guard))
+        base_data = process_header(headers)
+        k = base_data['xnodes']*base_data['ynodes']*base_data['znodes']
+        f.read(8)
+        lists = np.array([(struct.unpack('d', f.read(8))[0],
+                struct.unpack('d', f.read(8))[0],
+                struct.unpack('d', f.read(8))[0]) for i in range(int(k))])
+    f.close()
+    return base_data, lists
