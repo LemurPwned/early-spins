@@ -1,8 +1,7 @@
 import time
-from CPU3D.tiny_vectors import *
-from CPU3D.graph_panels import *
 import struct
-
+import numpy as np
+import pandas as pd
 
 def extract_base_data(filename):
     '''

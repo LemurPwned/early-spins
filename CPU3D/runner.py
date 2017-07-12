@@ -18,10 +18,10 @@ class Runner(QtCore.QObject):
         self.filetype = ""
         self.TIME_INTERVAL = 1/200
         self.control = 544
-        self.average = 1 # one is no averaging
-        self.layer = 4
-        self.wait_ended = False
-        self.i = 0
+        self.average = 3 # one is no averaging
+        self.layer = 4 # indexing starts from 1 to reduce redundancy
+        self.wait_ended = False # control variable, orders one animation to wait for the other
+        self.i = 0 # multiclass iterator to which all clases should synchronize
 
     def prepare_run(self):
         if self.directory=="":
@@ -56,6 +56,8 @@ class Runner(QtCore.QObject):
         self.myanim.iterations = self.iterations
         self.myanim.current_layer = 0
         self.myanim.graph_data = self.header['UZeeman::Energy'].tolist()[0:self.iterations]
+        #TODO: ask about the above, it seems that header contains more data
+        # than available in iterations
         self.myanim.create_plot_canvas()
         self.wait_ended = True
         self.myanim.run_canvas()
@@ -65,7 +67,7 @@ class Runner(QtCore.QObject):
         start = time.time()
         self.base_data = self.tbase_data[0]
         self.vectors_list = construct_layer_outline(self.base_data)
-        self.vectors_list = self.vectors_list[0::self.average]
+        #self.vectors_list = self.vectors_list[0::self.average] # moved to pyglet class
         self.color_list = []
         print("Elaped on constructing layer outline: {}".format(time.time()-start))
         xc = int(self.base_data['xnodes'])
@@ -81,12 +83,13 @@ class Runner(QtCore.QObject):
 
         for result in multiple_results:
             colors = result.get(timeout=12)
-            self.color_list.append(colors[0::self.average])
+            #self.color_list.append(colors[0::self.average]) # moved to pyglet class
+            self.color_list.append(colors)
         print("Elaped on getting all vectors: {}".format(time.time()-start))
         animation3d = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
         fps_display = pyglet.window.FPSDisplay(animation3d)
         animation3d.getDataFromRunner([self.vectors_list, self.color_list,
-                    self.iterations, self.control, fps_display])
+                    self.iterations, self.control, fps_display, self.average])
         t1 = threading.Thread(target = pyglet.app.run)
         while not self.wait_ended:
             time.sleep(0.01)
@@ -97,14 +100,14 @@ class Runner(QtCore.QObject):
                 self.i += 1
                 self.list_guard()
                 animation3d.i = self.i
-                self.myanim.ax_pl.idat = self.i
+                self.myanim.i = self.i
                 #self.myanim.replot_data()
                 self.myanim.replot()
             if self.nextFrame:
                 self.i += 1
                 self.list_guard()
                 animation3d.i = self.i
-                self.myanim.ax_pl.idat = self.i
+                self.myanim.i = self.i
                 #self.myanim.replot_data()
                 self.myanim.replot()
                 self.nextFrame = False
@@ -112,23 +115,26 @@ class Runner(QtCore.QObject):
                 self.i -= 1
                 self.list_guard()
                 animation3d.i = self.i
-                self.myanim.ax_pl.idat = self.i
-                self.myanim.replot_data()
+                self.myanim.i = self.i
+                #self.myanim.replot_data()
+                self.myanim.replot()
                 self.prevFrame = False
             if self.stop:
                 self.i = 0
                 self.list_guard()
                 animation3d.i = self.i
-                self.myanim.ax_pl.idat = self.i
-                self.myanim.replot_data()
+                self.myanim.i = self.i
+                #self.myanim.replot_data()
+                self.myanim.replot()
                 self.play = False
                 self.stop = False
             if self.setFrame:
                 self.i = self.frame
                 self.list_guard()
                 animation3d.i = self.i
-                self.myanim.ax_pl.idat = self.i
-                self.myanim.replot_data()
+                self.myanim.i = self.i
+                self.myanim.replot()
+                #self.myanim.replot_data()
                 self.setFrame = False
             time.sleep(self.TIME_INTERVAL*70)
             if animation3d.i%10:
@@ -157,12 +163,14 @@ class Runner(QtCore.QObject):
         if filetype == 'binary':
             for filename in fileList:
                 tbase_data, tdf = binary_read(filename)
-                base_data.append(tbase_data)
+                if len(base_data) == 0:
+                    base_data.append(tbase_data)
                 data.append(tdf)
         elif filetype == 'text':
             for filename in fileList:
                 tbase_data, _ = extract_base_data(filename)
-                base_data.append(tbase_data)
+                if len(base_data) == 0:
+                    base_data.append(tbase_data)
                 df = fortran_list(filename)
                 data.append(df)
         return data, base_data

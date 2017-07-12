@@ -38,19 +38,18 @@ class Animation():
     def create_plot_canvas(self, title='Magnetization'):
         self.fig = plt.figure
         self.ax_pl = plt.subplot(111)
-        self.ax_pl.idat = self.i
+        self.i = self.i
         self.null_data = [x for x in range(self.iterations)]
         a_handler = self.ax_pl.plot(self.null_data,
-            self.graph_data[0:self.ax_pl.idat]+self.null_data[self.ax_pl.idat:], 'ro')[0]
+            self.graph_data[0:self.i]+self.null_data[self.i:], 'ro')[0]
         self.ax_pl.hpl = a_handler
-        #self.ax_pl.axis('scaled')
         self.ax_pl.axis([0, self.iterations, np.min(self.graph_data), np.max(self.graph_data)])
         self.ax_pl.set_autoscale_on(False)
-        #self.ax_pl.set_title('{}/{}'.format(self.ax_pl.idat,self.iterations))
+        self.ax_pl.set_title('{}/{}'.format(self.i,self.iterations))
 
     def replot(self):
-        self.ax_pl.hpl.set_ydata(self.graph_data[0:self.ax_pl.idat]+self.null_data[self.ax_pl.idat:])
-        self.ax_pl.set_title('{}/{}'.format(self.ax_pl.idat, self.iterations))
+        self.ax_pl.hpl.set_ydata(self.graph_data[0:self.i]+self.null_data[self.i:])
+        self.ax_pl.set_title('{}/{}'.format(self.i, self.iterations))
         self.ax_pl.get_figure().canvas.draw()
 
     #WIDGETS
@@ -63,50 +62,50 @@ class Animation():
         self.ax_br = plt.subplot2grid((5,5),(4,3),colspan=2,rowspan=1)  # axes_button_right
         self.butt_l = Button(self.ax_bl, '\N{leftwards arrow}')
         self.butt_r = Button(self.ax_br, '\N{rightwards arrow}')
-        self.ax_pl.idat = self.i
+        self.i = self.i
         scat = self.ax_pl.scatter(self.dx, self.dy,
-                            c=tuple(self.current_single_layer[self.ax_pl.idat]), cmap=cm.jet)
+                            c=tuple(self.current_single_layer[self.i]), cmap=cm.jet)
         self.ax_pl.hpl = scat
         self.fig.colorbar(self.ax_pl.hpl)
         self.ax_pl.axis('scaled')
         self.ax_pl.axis([0, len(self.dx), 0, len(self.dy)])
         self.ax_pl.set_autoscale_on(False)
-        self.ax_pl.set_title('{}/{}'.format(self.ax_pl.idat,self.current_single_layer.shape[0]-1))
+        self.ax_pl.set_title('{}/{}'.format(self.i,self.current_single_layer.shape[0]-1))
 
     def create_canvas(self, title='Magnetization'):
         self.fig = plt.figure()
         self.fig.suptitle(title)
         self.ax_pl = plt.subplot(111)
-        self.ax_pl.idat = self.i
+        self.i = self.i
         scat = self.ax_pl.scatter(self.dx, self.dy,
-                            c=tuple(self.current_single_layer[self.ax_pl.idat]), cmap=cm.jet)
+                            c=tuple(self.current_single_layer[self.i]), cmap=cm.jet)
         self.ax_pl.hpl = scat
         self.fig.colorbar(self.ax_pl.hpl)
         self.ax_pl.axis('scaled')
         self.ax_pl.axis([0, len(self.dx), 0, len(self.dy)])
         self.ax_pl.set_autoscale_on(False)
-        self.ax_pl.set_title('{}/{}'.format(self.ax_pl.idat,self.current_single_layer.shape[0]-1))
+        self.ax_pl.set_title('{}/{}'.format(self.i,self.current_single_layer.shape[0]-1))
 
     def replot_data(self):
-        self.ax_pl.hpl.set_array(self.current_single_layer[self.ax_pl.idat])
-        self.ax_pl.set_title('{}/{}'.format(self.ax_pl.idat,
+        self.ax_pl.hpl.set_array(self.current_single_layer[self.i])
+        self.ax_pl.set_title('{}/{}'.format(self.i,
                 self.current_single_layer.shape[0]-1))
         self.ax_pl.get_figure().canvas.draw()
 
     def left_cl(self, event):
-        if self.ax_pl.idat > 0:
-            self.ax_pl.idat -= 1
+        if self.i > 0:
+            self.i -= 1
             self.replot_data()
-        if self.ax_pl.idat == 0:
-            self.ax_pl.idat = self.current_single_layer.shape[0]-1
+        if self.i == 0:
+            self.i = self.current_single_layer.shape[0]-1
             self.replot_data()
 
     def right_cl(self, event):
-        if self.ax_pl.idat < self.current_single_layer.shape[0]-1:
-            self.ax_pl.idat += 1
+        if self.i < self.current_single_layer.shape[0]-1:
+            self.i += 1
             self.replot_data()
-        if self.ax_pl.idat == self.current_single_layer.shape[0]-1:
-            self.ax_pl.idat = 0
+        if self.i == self.current_single_layer.shape[0]-1:
+            self.i = 0
             self.replot_data()
 
     def run_canvas(self):
@@ -141,7 +140,6 @@ class Animation():
         plt.show()
 
 def update(i, current_single_layer, scat):
-    print(i) #idk why works
     scat.set_array(np.array(current_single_layer[i],
                             dtype=float))
     return scat

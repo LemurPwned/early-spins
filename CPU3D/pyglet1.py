@@ -29,6 +29,7 @@ class Window(pyglet.window.Window):
         self.iterations = data[2]
         self.control = data[3]
         self.fps_display = data[4]
+        self.av = data[5]
 
     def upload_uniforms(self):
         uni = self.shader.uniforms
@@ -121,7 +122,7 @@ class Window(pyglet.window.Window):
         pyglet.text.Label(str(self.i), font_name='Comic Sans',
                     font_size=11, x=10, y=-20, anchor_x='right', anchor_y='bottom',
                     color=(100,100,100,255)).draw()
-        for vector, color in zip(self.vectors_list, self.colors):
+        for vector, color in zip(self.vectors_list[0::self.av], self.colors[0::self.av]):
             if self.cl:
                 color = color[::-1]
             if not self.cube: self.draw_vector(vector, color=color)
@@ -166,4 +167,4 @@ class Window(pyglet.window.Window):
 
     #DO NOT REMOVE dt FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
     def update(self, dt):
-        self.on_resize(self.width, self.height) 
+        self.on_resize(self.width, self.height)
