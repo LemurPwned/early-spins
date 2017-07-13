@@ -40,6 +40,8 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         self.animationMovement_horizontalSlider.valueChanged.connect(self.sliderChanged)
         self.binaryFiles_checkBox.clicked.connect(self.filetypeCheckBox)
         
+        self.averaging_spinBox.valueChanged.connect(self.spinBoxAveraging)
+        
 
         #MENU
         self.actionLoad_File.triggered.connect(self.loadSingleFile)
@@ -119,6 +121,9 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         if self.worker.play==False:
             self.worker.setFrame = True
             self.worker.frame = self.animationMovement_horizontalSlider.value()
+    
+    def spinBoxAveraging(self):
+        self.worker.average = int(self.averaging_spinBox.value())
     
     @QtCore.pyqtSlot(str)
     def getAllSignals(self, msg):

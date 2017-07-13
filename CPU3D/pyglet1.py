@@ -9,7 +9,7 @@ from CPU3D.camera_calculations import *
 from multiprocessing import Pool
 import threading
 
-WINDOW = 700
+WINDOW = 600
 INCREMENT = 5
 
 class Window(pyglet.window.Window):
@@ -29,6 +29,17 @@ class Window(pyglet.window.Window):
         self.iterations = data[2]
         self.control = data[3]
         self.fps_display = data[4]
+
+    def formText(self):
+        #print(self.fps_display)
+        fSize = 16
+        text = "test"#str(self.fps_display)
+        self.label = pyglet.text.Label(text,
+                          font_name='Times New Roman',
+                          font_size=fSize,
+                          x=-40, y=-40,
+                          anchor_x='left', anchor_y='bottom')
+        #self.label = pyglet.text.Label(, x = 400, y = 550)
 
     def upload_uniforms(self):
         uni = self.shader.uniforms
@@ -117,11 +128,10 @@ class Window(pyglet.window.Window):
         glPushMatrix()
         self.transformate()
         self.draw_cordinate_system()
-        self.fps_display.draw()
+        #self.formText()
+        #self.label.draw()
+        #self.fps_display.draw() #something is broken i think this is connected with 3d view.
 
-        pyglet.text.Label(str(self.i), font_name='Comic Sans',
-                    font_size=11, x=10, y=-20, anchor_x='right', anchor_y='bottom',
-                    color=(100,100,100,255)).draw()
         for vector, color in zip(self.vectors_list, self.colors):
             if self.cl:
                 color = color[::-1]

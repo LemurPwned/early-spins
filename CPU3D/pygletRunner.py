@@ -21,7 +21,7 @@ class PygletRunner(QtCore.QObject):
         self.headerFile = ""
         self.filetype = ""
         self.TIME_INTERVAL = 1/200
-        self.control = 544
+        self.control = 50
         self.average = 1 # one is no averaging
         self.layer = 4
 
@@ -55,6 +55,7 @@ class PygletRunner(QtCore.QObject):
             if self.play:
                 animation3d.i+=1
                 animation3d.list_guard()
+                print(self.average)
 
             if self.nextFrame:
                 animation3d.i+=1
