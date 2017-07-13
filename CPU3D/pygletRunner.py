@@ -21,8 +21,8 @@ class PygletRunner(QtCore.QObject):
         self.headerFile = ""
         self.filetype = ""
         self.TIME_INTERVAL = 1/200
-        self.control = 520 #this should be set automaticly 
-        self.average = 1 # one is no averaging
+        self.control = 10 #this should be set automaticly 
+        self.average = 5 # one is no averaging
         self.layer = 4
 
     @QtCore.pyqtSlot()

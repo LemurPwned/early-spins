@@ -121,6 +121,8 @@ class MainScreen(QtGui.QMainWindow, Ui_MainWindow):
         if self.worker.play==False:
             self.worker.setFrame = True
             self.worker.frame = self.animationMovement_horizontalSlider.value()
+            
+        self.frameNumber_label.setText(str(self.worker.frame))
     
     def spinBoxAveraging(self):
         self.worker.average = int(self.averaging_spinBox.value())

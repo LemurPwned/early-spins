@@ -152,9 +152,10 @@ class Window(pyglet.window.Window):
         glLoadIdentity()
         glTranslatef(0, 0, 0)
         self.colors = self.color_list[self.i]
+        print(self.position[0], self.position[1], self.position[2], self.rotation[0], self.position[1])
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
-        # SMART SCROLL BETA
+        # SMART SCROLL™
         self.position[0] -= mt.sin(self.rotation[0] * mt.pi / 180) * mt.cos(self.rotation[1] * mt.pi / 180) * scroll_y
         self.position[1] += mt.cos(self.rotation[0] * mt.pi / 180) * mt.sin(self.rotation[1] * mt.pi / 180) * scroll_y
         self.position[2] += mt.cos(self.rotation[0] * mt.pi / 180) * mt.cos(self.rotation[1] * mt.pi / 180) * scroll_y
@@ -172,7 +173,11 @@ class Window(pyglet.window.Window):
             self.position[2] = zpos
 
         elif buttons & mouse.RIGHT != 0:
-            self.position[0] += dx * 0.1
+            print("dx: ", dx)
+            self.position[0] += mt.cos(mt.radians(self.rotation[0]))* dx * 0.1
+            self.position[2] += mt.sin(mt.radians(self.rotation[0]))* dx * 0.1
+            
+            
             self.position[1] += dy * 0.1
 
     #DO NOT REMOVE dt FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
