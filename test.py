@@ -10,10 +10,12 @@ if (str(sys.argv[1]) == "run"):
     from CPU3D.runner import Runner
     x = Runner()
     x.play = True
-    x.directory = "data/0520nm/"
+    #x.directory = "data/0520nm/"
+    x.directory = "data/firstData/"
     x.fformat = ".omf"
-    x.filetype = 'binary'
-    x.headerFile = 'data/0520nm/proba1.odt'
+    x.filetype = 'text'
+    #x.headerFile = 'data/0520nm/proba1.odt'
+    x.headerFile = "data/firstData/voltage-spin-diode.odt"
     x.prepare_run()
     Thread(target = x.play2DGraph).start()
     Thread(target = x.play3DAnimation).start()
@@ -29,7 +31,6 @@ if(str(sys.argv[1]) == "pyglet"):
     x.filetype = 'binary'
     #x.filetype = 'text'
     x.headerFile = 'data/0200nm/proba1.odt'
-    #x.headerFile = "data/firstData/voltage-spin-diode.odt"
     x.playAnimation()
 
 if(str(sys.argv[1])== 'runner'):

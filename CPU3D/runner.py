@@ -38,7 +38,7 @@ class Runner(QtCore.QObject):
     @QtCore.pyqtSlot()
     def play2DAnimation(self):
         """
-        this instance allows for creating dynamic 2D aniamtion of the layer
+        this instance allows for creating dynamic 2D animation of the layer
         surface that synchronizes with 3D animation
         """
         self.myanim = Animation()
@@ -88,11 +88,13 @@ class Runner(QtCore.QObject):
         pool = Pool()
         multiple_results = [pool.apply_async(process_fortran_list, (self.tdata[i], xc, yc, zc))
                             for i in range(len(self.tdata))]
-
+        self.color_list = [result.get(timeout=12) for result in multiple_results]
+        '''
         for result in multiple_results:
             colors = result.get(timeout=12)
             #self.color_list.append(colors[0::self.average]) # moved to pyglet class
             self.color_list.append(colors)
+        '''
         print("Elaped on getting all vectors: {}".format(time.time()-start))
         animation3d = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
         fps_display = pyglet.window.FPSDisplay(animation3d)
@@ -168,18 +170,22 @@ class Runner(QtCore.QObject):
         print("Reading data... {}, fileformat: {}".format(len(fileList), filetype))
         fileList.sort()
         self.iterations = len(fileList)
+        file_pool = Pool()
         if filetype == 'binary':
-            for filename in fileList:
-                tbase_data, tdf = binary_read3(filename)
-                if len(base_data) == 0:
-                    base_data.append(tbase_data)
+            multiple_results = [file_pool.apply_async(binary_read3, (filename,))
+                                    for filename in fileList]
+            for result in multiple_results:
+                tbd, tdf = result.get(timeout=12)
                 data.append(tdf)
-        elif filetype == 'text':
-            for filename in fileList:
-                tbase_data, _ = extract_base_data(filename)
                 if len(base_data) == 0:
-                    base_data.append(tbase_data)
-                df = fortran_list(filename)
+                    base_data.append(tbd)
+        elif filetype == 'text':
+            tbase_data, _ = extract_base_data(fileList[0])
+            base_data.append(tbase_data)
+            multiple_results = [file_pool.apply_async(fortran_list, (filename,))
+                                    for filename in fileList]
+            for result in multiple_results:
+                df = result.get(timeout=12)
                 data.append(df)
         return data, base_data
 

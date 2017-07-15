@@ -190,6 +190,10 @@ def binary_read2(filename):
     return base_data, np.array(lists)
 
 def binary_read3(filename):
+    '''
+    use this as it is the fastest way of reading binary files, however,
+    this has little error handling 
+    '''
     lists = []
     base_data = {}
     validation = 123456789012345.0  # this is IEEE validation value
