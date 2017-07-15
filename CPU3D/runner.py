@@ -177,7 +177,7 @@ class Runner(QtCore.QObject):
                 self.update_progress_bar(p)
                 tbd, tdf = result.get(timeout=12)
                 data.append(tdf)
-                p += 1
+                p+= 1
                 if len(base_data) == 0:
                     base_data.append(tbd)
         elif filetype == 'text':
@@ -204,10 +204,9 @@ class Runner(QtCore.QObject):
 
     def update_progress_bar(self, i):
         k = (i*100/self.iterations)
-        if k%1 == 0:
-            k = int(k)
-            stars = ""
-            for i in range(k+1):
-                stars+="*"
-            self.bar = stars + self.bar[k+1:]
-            print("[" + self.bar + "] {}%".format(i))
+        k = int(k)
+        stars = ""
+        for i in range(k+1):
+            stars+="*"
+        self.bar = stars + self.bar[k+1:]
+        print("[" + self.bar + "] {}%".format(i))
