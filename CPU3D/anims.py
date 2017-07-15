@@ -38,6 +38,8 @@ class Animation():
     #INDEPENDENT graph_panels
     def create_plot_canvas(self, title='Magnetization'):
         self.fig = plt.figure
+        self.title = title
+        self.fig.suptitle(self.title)
         self.ax_pl = plt.subplot(111)
         self.i = self.i
         self.null_data = [x for x in range(self.iterations)]

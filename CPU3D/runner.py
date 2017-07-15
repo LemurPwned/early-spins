@@ -65,6 +65,7 @@ class Runner(QtCore.QObject):
         self.myanim.iterations = self.iterations
         self.myanim.current_layer = 0
         self.myanim.graph_data = self.header['UZeeman::Energy'].tolist()[0:self.iterations]
+        self.myanim.title('Zeeman Energy')
         #TODO: ask about the above, it seems that header contains more data
         # than available in iterations
         self.myanim.create_plot_canvas()
