@@ -20,6 +20,7 @@ class Animation():
         self.i = 0
         self.graph_data = []
         self.null_data = []
+        self.title = 'Magnetization'
 
     def reshape_data(self):
         '''
@@ -36,9 +37,8 @@ class Animation():
         self.dx, self.dy = np.meshgrid(x,y)
 
     #INDEPENDENT graph_panels
-    def create_plot_canvas(self, title='Magnetization'):
-        self.fig = plt.figure
-        self.title = title
+    def create_plot_canvas(self):
+        self.fig = plt.figure()
         self.fig.suptitle(self.title)
         self.ax_pl = plt.subplot(111)
         self.i = self.i
@@ -58,7 +58,7 @@ class Animation():
     #WIDGETS
     def create_button_canvas(self, title='Magnetization'):
         self.fig = plt.figure()
-        self.fig.suptitle(title)
+        self.fig.suptitle(self.title)
         self.ax_pl = plt.subplot(111)
         self.ax_pl = plt.subplot2grid((5,5),(0,0),colspan=5,rowspan=3)  # axes_plot
         self.ax_bl = plt.subplot2grid((5,5),(4,0),colspan=2,rowspan=1)  # axes_button_left
@@ -77,7 +77,7 @@ class Animation():
 
     def create_canvas(self, title='Magnetization'):
         self.fig = plt.figure()
-        self.fig.suptitle(title)
+        self.fig.suptitle(self.title)
         self.ax_pl = plt.subplot(111)
         self.i = self.i
         scat = self.ax_pl.scatter(self.dx, self.dy,
@@ -133,7 +133,7 @@ class Animation():
         c = self.current_single_layer[0]
         scat = plt.scatter(self.dx, self.dy,
                             c=tuple(c), cmap=cm.jet)
-        fig.suptitle(title)
+        fig.suptitle(self.title)
         fig.colorbar(scat)
         fig.canvas.mpl_connect('button_press_event', self.onPress)
         self.ani = animation.FuncAnimation(fig, update,
