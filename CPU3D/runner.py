@@ -22,6 +22,7 @@ class Runner(QtCore.QObject):
         self.layer = 4 # indexing starts from 1 to reduce redundancy
         self.wait_ended = False # control variable, orders one animation to wait for the other
         self.i = 0 # multiclass iterator to which all clases should synchronize
+        self.bar = ""
 
     def prepare_run(self):
         if self.directory=="":
@@ -167,12 +168,16 @@ class Runner(QtCore.QObject):
         fileList.sort()
         self.iterations = len(fileList)
         file_pool = Pool()
+        self.init_progress_bar()
+        p = 0
         if filetype == 'binary':
             multiple_results = [file_pool.apply_async(binary_read, (filename,))
                                     for filename in fileList]
             for result in multiple_results:
+                self.update_progress_bar(p)
                 tbd, tdf = result.get(timeout=12)
                 data.append(tdf)
+                p += 1
                 if len(base_data) == 0:
                     base_data.append(tbd)
         elif filetype == 'text':
@@ -181,8 +186,10 @@ class Runner(QtCore.QObject):
             multiple_results = [file_pool.apply_async(fortran_list, (filename,))
                                     for filename in fileList]
             for result in multiple_results:
+                self.update_progress_bar(p)
                 df = result.get(timeout=12)
                 data.append(df)
+                p+=1
         return data, base_data
 
     def list_guard(self):
@@ -190,3 +197,17 @@ class Runner(QtCore.QObject):
             self.i = 0
         if self.i > self.iterations-1:
             self.i = 0
+
+    def init_progress_bar(self):
+        for i in range(100):
+            self.bar += "="
+
+    def update_progress_bar(self, i):
+        k = (i*100/self.iterations)
+        if k%1 == 0:
+            k = int(k)
+            stars = ""
+            for i in range(k+1):
+                stars+="*"
+            self.bar = stars + self.bar[k+1:]
+            print("[" + self.bar + "] {}%".format(i))

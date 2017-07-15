@@ -21,7 +21,7 @@ class Window(pyglet.window.Window):
         self.i = 0
         self.cl = True  # this variable provides the possiblity of color inversion
         self.cube = True
-        self.spacer = 0.92
+        self.spacer = 0.707
 
     def getDataFromRunner(self, data):
         self.vectors_list = data[0]
