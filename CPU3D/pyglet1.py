@@ -19,7 +19,7 @@ class Window(pyglet.window.Window):
         glEnable(GL_DEPTH_TEST)
         self.initial_transformation()
         self.i = 0
-        self.cl = True
+        self.cl = True  # this variable provides the possiblity of color inversion
         self.cube = True
         self.spacer = 0.92
 

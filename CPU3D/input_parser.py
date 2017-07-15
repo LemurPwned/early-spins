@@ -30,6 +30,9 @@ def extract_base_data(filename):
     return base_data, count
 
 def fortran_list(filename):
+    '''
+    this gathers all the vectors from each .omf file
+    '''
     vectors = []
     with open(filename, 'r') as f:
         lines = f.readlines()
@@ -39,6 +42,10 @@ def fortran_list(filename):
     return np.array(vectors)
 
 def construct_layer_outline(base_data):
+    '''
+    constructs the vector outline of each layer, this is a shell that
+    colors function operate on (masking)
+    '''
     xc = int(base_data['xnodes'])
     yc = int(base_data['ynodes'])
     zc = int(base_data['znodes'])
@@ -56,6 +63,9 @@ def process_fortran_list(fortran_list, xc, yc, zc):
     return fortran_list
 
 def process_header(headers):
+    '''
+    processes the header of each .omf file and return base_data dict
+    '''
     base_data = {}
     headers = headers.replace('\'', "")
     headers = headers.replace(' ', "")
@@ -71,6 +81,9 @@ def process_header(headers):
     return base_data
 
 def odt_reader(filename):
+    '''
+    this is an .odt file reader
+    '''
     header_lines = 4
     header = []
     i = 0
@@ -110,7 +123,10 @@ def odt_reader(filename):
     iterations = len(lines) -1
     return df, iterations
 
-def binary_read(filename):
+def binary_read_error_handling(filename):
+    '''
+    binary reader with error handling
+    '''
     #TODO: improve the speed of filling arrays
     lists = []
     a_tuple = []
@@ -163,36 +179,10 @@ def binary_read(filename):
     f.close()
     return base_data, np.array(lists)
 
-def binary_read2(filename):
-    lists = []
-    base_data = {}
-    validity = False
-    iterator = -10
-    validation = 123456789012345.0 #this is IEEE validation value
-    with open(filename, 'rb') as f:
-        while validity == False and iterator < 50:
-            headers = f.read(24*38 + iterator)
-            headers = str(headers)
-            check_value = struct.unpack('d', f.read(8))[0]
-            if check_value == validation:
-                validity = True
-                break
-            else:
-                f.seek(0)
-                iterator += 1
-        if iterator > 49  : raise TypeError
-        base_data = process_header(headers)
-        k = base_data['xnodes']*base_data['ynodes']*base_data['znodes']
-        lists = [(struct.unpack('d', f.read(8))[0],
-                struct.unpack('d', f.read(8))[0],
-                struct.unpack('d', f.read(8))[0]) for i in range(int(k))]
-    f.close()
-    return base_data, np.array(lists)
-
-def binary_read3(filename):
+def binary_read(filename):
     '''
     use this as it is the fastest way of reading binary files, however,
-    this has little error handling 
+    this has little error handling
     '''
     lists = []
     base_data = {}

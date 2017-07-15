@@ -17,13 +17,14 @@ class Animation():
         self.iterations = 0
         self.anim_running = True
         self.TIME_INTERVAL = 200
-        self.backwards_counter = 0
         self.i = 0
-        self.play = True
         self.graph_data = []
         self.null_data = []
 
     def reshape_data(self):
+        '''
+        reshaping the data so that plotting might happen faster
+        '''
         xc = int(self.base_data['xnodes'])
         yc = int(self.base_data['ynodes'])
         zc = int(self.base_data['znodes'])

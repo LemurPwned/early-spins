@@ -84,17 +84,13 @@ class Runner(QtCore.QObject):
         print("{} layers detected, {} layer was selected".format(zc, self.layer))
         if self.layer:
             self.tdata = [self.tdata[i].reshape(zc, xc*yc,3)[self.layer-1] for i in range(self.iterations)]
-            zc = 1
+            zc = 1  # this is to keep reshape function operational, and preserve
+                    # layer outline structure, see below
         pool = Pool()
         multiple_results = [pool.apply_async(process_fortran_list, (self.tdata[i], xc, yc, zc))
                             for i in range(len(self.tdata))]
         self.color_list = [result.get(timeout=12) for result in multiple_results]
-        '''
-        for result in multiple_results:
-            colors = result.get(timeout=12)
-            #self.color_list.append(colors[0::self.average]) # moved to pyglet class
-            self.color_list.append(colors)
-        '''
+
         print("Elaped on getting all vectors: {}".format(time.time()-start))
         animation3d = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
         fps_display = pyglet.window.FPSDisplay(animation3d)
@@ -172,7 +168,7 @@ class Runner(QtCore.QObject):
         self.iterations = len(fileList)
         file_pool = Pool()
         if filetype == 'binary':
-            multiple_results = [file_pool.apply_async(binary_read3, (filename,))
+            multiple_results = [file_pool.apply_async(binary_read, (filename,))
                                     for filename in fileList]
             for result in multiple_results:
                 tbd, tdf = result.get(timeout=12)
