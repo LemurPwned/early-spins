@@ -48,7 +48,7 @@ class Window(pyglet.window.Window):
         width, height = self.get_size()
         uni.proj = perspective(60.0, width / height, 0.1, 256.0)
 
-    def draw_vector(self, vec, color=[1, 1, 1]):
+    def draw_vector(self, vec, color=[0, 0, 0]):
         glLineWidth(3)
         glColor3f(color[0], color[1], color[2])
         glBegin(GL_LINES)
