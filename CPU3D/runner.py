@@ -1,6 +1,10 @@
 from CPU3D.pyglet1 import *
 from CPU3D.anims import *
+from CPU3D.input_parser import *
 import time
+from multiprocessing import Pool
+import threading
+
 
 class Runner(QtCore.QObject):
     signalStatus = QtCore.pyqtSignal(str)
@@ -17,7 +21,7 @@ class Runner(QtCore.QObject):
         self.headerFile = ""
         self.filetype = ""
         self.TIME_INTERVAL = 1/200
-        self.control = 544
+        self.control = 1000
         self.average = 3 # one is no averaging
         self.layer = 4 # indexing starts from 1 to reduce redundancy
         self.wait_ended = False # control variable, orders one animation to wait for the other

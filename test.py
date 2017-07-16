@@ -5,6 +5,14 @@ from threading import Thread
 
 if(len(sys.argv)>2):
     exit("Error expecting 1 argument")
+if (str(sys.argv[1]) == "video"):
+    from CPU3D.movie_format import Movie
+    movie = Movie()
+    movie.directory = "/home/lemurpwned/repos/dziala-niedziala/<Magnetization>"
+    movie.filename = "/home/lemurpwned/repos/dziala-niedziala/<Magnetization>/video_test"
+    movie.format = ".mp4"
+    movie.create_video()
+
 
 if (str(sys.argv[1]) == "run"):
     from CPU3D.runner import Runner

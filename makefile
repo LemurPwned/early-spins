@@ -12,3 +12,6 @@ runner:
 
 merge:
 	python3 -m test run
+
+video:
+	python3 -m test video

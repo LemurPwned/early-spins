@@ -4,10 +4,8 @@ pyglet.options['debug_gl'] = False
 from pyglet.gl import *
 from pyglet.window import key, mouse
 from OpenGL.GLUT import *
-from CPU3D.input_parser import *
 from CPU3D.camera_calculations import *
-from multiprocessing import Pool
-import threading
+import pathlib
 
 WINDOW = 700
 INCREMENT = 5
@@ -19,9 +17,16 @@ class Window(pyglet.window.Window):
         glEnable(GL_DEPTH_TEST)
         self.initial_transformation()
         self.i = 0
-        self.cl = True  # this variable provides the possiblity of color inversion
+        self.cl = True  # this variable provides color inversion
         self.cube = True
         self.spacer = 0.707
+        self.round = False
+        self.record = True
+        if self.record:
+            self.name = "./<Magnetization>/"
+            pathlib.Path(self.name).mkdir(parents=True, exist_ok=True)
+        self.last_i = 34
+        self.first_i = 21
 
     def getDataFromRunner(self, data):
         self.vectors_list = data[0]
@@ -120,9 +125,10 @@ class Window(pyglet.window.Window):
         self.draw_cordinate_system()
         self.fps_display.draw()
         pyglet.text.Label(str(self.i), font_name='Comic Sans',
-                    font_size=11, x=10, y=-20, anchor_x='right', anchor_y='bottom',
-                    color=(100,100,100,255)).draw()
-        for vector, color in zip(self.vectors_list[0::self.av], self.colors[0::self.av]):
+                    font_size=11, x=10, y=-20, anchor_x='right', \
+                    anchor_y='bottom', color=(100,100,100,255)).draw()
+        for vector, color in zip(self.vectors_list[0::self.av], \
+                                                self.colors[0::self.av]):
             if self.cl:
                 color = color[::-1]
             if not self.cube: self.draw_vector(vector, color=color)
@@ -145,18 +151,21 @@ class Window(pyglet.window.Window):
 
     def on_mouse_scroll(self, x, y, scroll_x, scroll_y):
         # SMART SCROLL BETA
-        self.position[0] -= mt.sin(self.rotation[0] * mt.pi / 180) * mt.cos(self.rotation[1] * mt.pi / 180) * scroll_y
-        self.position[1] += mt.cos(self.rotation[0] * mt.pi / 180) * mt.sin(self.rotation[1] * mt.pi / 180) * scroll_y
-        self.position[2] += mt.cos(self.rotation[0] * mt.pi / 180) * mt.cos(self.rotation[1] * mt.pi / 180) * scroll_y
+        self.position[0] -= mt.sin(self.rotation[0] * mt.pi / 180) * \
+                            mt.cos(self.rotation[1] * mt.pi / 180) * scroll_y
+        self.position[1] += mt.cos(self.rotation[0] * mt.pi / 180) * \
+                            mt.sin(self.rotation[1] * mt.pi / 180) * scroll_y
+        self.position[2] += mt.cos(self.rotation[0] * mt.pi / 180) * \
+                            mt.cos(self.rotation[1] * mt.pi / 180) * scroll_y
 
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
         if buttons & mouse.LEFT != 0:
             rotation_speed = 0.5
             self.rotation[0] += dx * rotation_speed
-            xpos = self.position[0] * mt.cos(dx * rotation_speed * mt.pi / 180) - self.position[2] * mt.sin(
-                dx * rotation_speed * mt.pi / 180)
-            zpos = self.position[0] * mt.sin(dx * rotation_speed * mt.pi / 180) + self.position[2] * mt.cos(
-                dx * rotation_speed * mt.pi / 180)
+            xpos = self.position[0] * mt.cos(dx * rotation_speed * mt.pi / 180)\
+                - self.position[2] * mt.sin(dx * rotation_speed * mt.pi / 180)
+            zpos = self.position[0] * mt.sin(dx * rotation_speed * mt.pi / 180)\
+                + self.position[2] * mt.cos(dx * rotation_speed * mt.pi / 180)
 
             self.position[0] = xpos
             self.position[2] = zpos
@@ -167,4 +176,13 @@ class Window(pyglet.window.Window):
 
     #DO NOT REMOVE dt FROM ARGUMENTS OTHERWISE IT WOULD NOT RUN
     def update(self, dt):
+        if self.record:
+            if not self.round: self.save_current_window()
+            if self.i == self.iterations-1: self.round = True
         self.on_resize(self.width, self.height)
+
+    def save_current_window(self):
+        if self.i <= self.last_i and self.i >= self.first_i:
+            print("Saved {}".format(self.i))
+            pyglet.image.get_buffer_manager().get_color_buffer().save(self.name +
+                                                "mag_py_" + str(self.i)+".jpg")
