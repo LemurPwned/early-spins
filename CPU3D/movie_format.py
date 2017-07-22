@@ -10,9 +10,10 @@ class Movie(Runner):
     def __init__(self):
         super(Runner).__init__()
         self.directory = ""
-        self.framerate = 5#regulate the framerate, not usual standard, see below
+        self.framerate = 5
+        #regulate the framerate, not usual standard, see below
         self.filename = ""
-        self.format = ""
+        self.format = ".avi"
 
     def create_video(self):
         '''
@@ -28,5 +29,4 @@ class Movie(Runner):
                 for i in range(self.framerate):
                     total_movie.append(img)
         total_movie = np.array(total_movie)
-        print(total_movie.shape)
         skv.vwrite(self.filename+self.format, total_movie)

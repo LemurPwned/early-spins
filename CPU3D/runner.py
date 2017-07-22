@@ -4,6 +4,7 @@ from CPU3D.input_parser import *
 import time
 from multiprocessing import Pool
 import threading
+import sys
 
 
 class Runner(QtCore.QObject):
@@ -173,7 +174,6 @@ class Runner(QtCore.QObject):
         fileList.sort()
         self.iterations = len(fileList)
         file_pool = Pool()
-        self.init_progress_bar()
         p = 0
         if filetype == 'binary':
             multiple_results = [file_pool.apply_async(binary_read, (filename,))
@@ -203,15 +203,10 @@ class Runner(QtCore.QObject):
         if self.i > self.iterations-1:
             self.i = 0
 
-    def init_progress_bar(self):
-        for i in range(100):
-            self.bar += "="
-
     def update_progress_bar(self, i):
         k = (i*100/self.iterations)
         k = int(k)
-        stars = ""
-        for i in range(k+1):
-            stars+="*"
-        self.bar = stars + self.bar[k+1:]
-        print("[" + self.bar + "] {}%".format(i))
+        sys.stdout.write('\r')
+        sys.stdout.write('[%-100s] %d%%'%('='*(k+1),k+2))
+        sys.stdout.flush()
+        time.sleep(0.02)
