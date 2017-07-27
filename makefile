@@ -15,3 +15,6 @@ merge:
 
 video:
 	python3 -m test video
+
+cli:
+	python3 -m test CLI

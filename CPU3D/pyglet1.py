@@ -27,6 +27,13 @@ class Window(pyglet.window.Window):
             pathlib.Path(self.name).mkdir(parents=True, exist_ok=True)
         self.last_i = 34
         self.first_i = 21
+        self.label = self.customText("Magnetoresistance")
+
+    def customText(self, text):
+        label = pyglet.text.Label(text, font_name='TimesNewRoman',
+                    font_size=11, x=10, y=-20, anchor_x='left', \
+                    anchor_y='top', color=(100,250,100,255))
+        return label
 
     def getDataFromRunner(self, data):
         self.vectors_list = data[0]
@@ -124,6 +131,7 @@ class Window(pyglet.window.Window):
         self.transformate()
         self.draw_cordinate_system()
         self.fps_display.draw()
+        self.label.draw()
         pyglet.text.Label(str(self.i), font_name='Comic Sans',
                     font_size=11, x=10, y=-20, anchor_x='right', \
                     anchor_y='bottom', color=(100,100,100,255)).draw()

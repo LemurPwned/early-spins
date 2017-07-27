@@ -22,7 +22,7 @@ class Runner(QtCore.QObject):
         self.headerFile = ""
         self.filetype = ""
         self.TIME_INTERVAL = 1/200
-        self.control = 1000
+        self.control = 544
         self.average = 3 # one is no averaging
         self.layer = 4 # indexing starts from 1 to reduce redundancy
         self.wait_ended = False # control variable, orders one animation to wait for the other
@@ -41,6 +41,13 @@ class Runner(QtCore.QObject):
         self.simulateDirectory(self.directory, self.fformat, self.headerFile, self.filetype)
         print("Preparing to generate animations...")
 
+    def spawn_instance(self, instance, function):
+        try:
+            Thread(target = instance).start()
+        except RuntimeError:
+            # TODO: handle it
+            pass
+
     @QtCore.pyqtSlot()
     def play2DAnimation(self):
         """
@@ -58,7 +65,7 @@ class Runner(QtCore.QObject):
         self.myanim.run_canvas()
 
     @QtCore.pyqtSlot()
-    def play2DGraph(self):
+    def play2DGraph(self, column='MR::magnetoresistance', synchronize=True):
         """
         this instance allows for creating dynamic graphs that follow an
         animation
@@ -69,13 +76,15 @@ class Runner(QtCore.QObject):
         self.myanim.reshape_data()
         self.myanim.iterations = self.iterations
         self.myanim.current_layer = 0
-        self.myanim.graph_data = self.header['UZeeman::Energy'].tolist()[0:self.iterations]
-        self.myanim.title = 'Zeeman Energy'
+        self.myanim.graph_data = self.header[column].tolist()[0:self.iterations]
+        self.myanim.title = 'magnetoresistance'
         #TODO: ask about the above, it seems that header contains more data
         # than available in iterations
         self.myanim.create_plot_canvas()
         self.wait_ended = True
         self.myanim.run_canvas()
+        if synchronize == False:
+            self.independent_iterator(self.myanim, self.myanim.replot_call)
 
     @QtCore.pyqtSlot()
     def play3DAnimation(self):
@@ -156,7 +165,7 @@ class Runner(QtCore.QObject):
     def simulateDirectory(self, path_to_folder, extension, path_to_header_file, filetype):
         t1 = time.time()
         self.tdata, self.tbase_data = self.getAllFiles(path_to_folder, extension, filetype)
-        print("Reading files took: {}".format(time.time()-t1))
+        print("\nReading files took: {}".format(time.time()-t1))
         self.header, self.stages = odt_reader(path_to_header_file) #new odt format reader, more universal
         print("Maximum number of iterations : {}".format(self.iterations))
 
@@ -203,10 +212,16 @@ class Runner(QtCore.QObject):
         if self.i > self.iterations-1:
             self.i = 0
 
+    def independent_iterator(self, instance, callback):
+        print("Iterating")
+        while(True):
+            self.list_guard()
+            instance.i += 1
+            instance.callback()
     def update_progress_bar(self, i):
         k = (i*100/self.iterations)
         k = int(k)
         sys.stdout.write('\r')
-        sys.stdout.write('[%-100s] %d%%'%('='*(k+1),k+2))
+        sys.stdout.write('[%-100s] %d%%'%('='*(k+2),k+2))
         sys.stdout.flush()
         time.sleep(0.02)

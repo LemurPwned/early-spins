@@ -21,6 +21,7 @@ class Animation():
         self.graph_data = []
         self.null_data = []
         self.title = 'Magnetization'
+        self.canvas_type = None
 
     def reshape_data(self):
         '''
@@ -38,6 +39,7 @@ class Animation():
 
     #INDEPENDENT graph_panels
     def create_plot_canvas(self):
+        self.canvas_type = 'panel'
         self.fig = plt.figure()
         self.fig.suptitle(self.title)
         self.ax_pl = plt.subplot(111)
@@ -57,6 +59,7 @@ class Animation():
 
     #WIDGETS
     def create_button_canvas(self, title='Magnetization'):
+        self.canvas = 'widget'
         self.fig = plt.figure()
         self.fig.suptitle(self.title)
         self.ax_pl = plt.subplot(111)
@@ -94,6 +97,15 @@ class Animation():
         self.ax_pl.set_title('{}/{}'.format(self.i,
                 self.current_single_layer.shape[0]-1))
         self.ax_pl.get_figure().canvas.draw()
+
+    def replot_call(self):
+        """
+        verifies the instance of canvas and calls correct replot
+        """
+        if self.canvas_type == 'widget':
+            self.replot_data()
+        elif self.canvas_type == 'panel':
+            self.replot()
 
     def left_cl(self, event):
         if self.i > 0:

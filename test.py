@@ -1,8 +1,36 @@
 import sys
 import os
 import threading
+import cProfile
 from threading import Thread
+from CPU3D.runner import Runner
 
+def create_new_instance_CLI():
+    x = Runner()
+    x.directory = "data/0200nm/"
+    x.fformat = ".omf"
+    x.filetype = 'binary'
+    x.headerFile = 'data/0200nm/proba1.odt'
+    x.prepare_run()
+    gen_options = ['1) 2D', '2) 3D', '3) both']
+    for option in gen_options:
+        print(option)
+    choice = input("Please select an option ...\n")
+    if choice == '1':
+        sec_opt = ['1) Graph, 2) Layers']
+        for opt in sec_opt:
+            print(opt)
+        schoice = input("Please select graph or layer animation\n")
+        if schoice == '2':
+            x.play2DAnimation()
+        elif schoice == '1':
+            print(x.header.columns)
+            column = input('Please select a graph to display\n')
+            x.play2DGraph(column, False)
+        else: print("Please repeat")
+
+if (str(sys.argv[1]) == 'CLI'):
+    create_new_instance_CLI()
 if(len(sys.argv)>2):
     exit("Error expecting 1 argument")
 if (str(sys.argv[1]) == "video"):
@@ -15,7 +43,6 @@ if (str(sys.argv[1]) == "video"):
 
 
 if (str(sys.argv[1]) == "run"):
-    from CPU3D.runner import Runner
     x = Runner()
     x.play = True
     x.directory = "data/0520nm/"
@@ -25,8 +52,12 @@ if (str(sys.argv[1]) == "run"):
     x.headerFile = 'data/0520nm/proba1.odt'
     #x.headerFile = "data/firstData/voltage-spin-diode.odt"
     x.prepare_run()
-    Thread(target = x.play2DGraph).start()
-    Thread(target = x.play3DAnimation).start()
+    try:
+        Thread(target = x.play2DGraph).start()
+        Thread(target = x.play3DAnimation).start()
+    except RuntimeError:
+        print("Finished....")
+        pass
 
 if(str(sys.argv[1]) == "pyglet"):
     from CPU3D.pygletRunner import PygletRunner
@@ -62,7 +93,6 @@ if(str(sys.argv[1]) == "tester"):
     _, vectors2 = binary_read2(filename)
     #for i in range(100):
     #    print(vectors1[i], vectors2[i])
-    import cProfile
     pr = cProfile.Profile()
     pr.enable()
     for i in range(1):
