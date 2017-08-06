@@ -62,6 +62,12 @@ def process_fortran_list(fortran_list, xc, yc, zc):
         for x in np.nditer(fortran_list, flags=['external_loop'])]).reshape(xc*yc*zc,3)
     return fortran_list
 
+def normalize_fortran_list(fortran_list, xc, yc, zc):
+    fortran_list = np.array([x/np.linalg.norm(x)
+        if x.any() else [0.0,0.0,0.0] for x in fortran_list])\
+        .reshape(xc*yc*zc, 3)
+    return fortran_list
+
 def process_header(headers):
     '''
     processes the header of each .omf file and return base_data dict

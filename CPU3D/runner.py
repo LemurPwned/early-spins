@@ -65,7 +65,7 @@ class Runner(QtCore.QObject):
         self.myanim.run_canvas()
 
     @QtCore.pyqtSlot()
-    def play2DGraph(self, column='MR::magnetoresistance', synchronize=True):
+    def play2DGraph(self, column='MR::magnetoresistance' ):
         """
         this instance allows for creating dynamic graphs that follow an
         animation
@@ -83,8 +83,6 @@ class Runner(QtCore.QObject):
         self.myanim.create_plot_canvas()
         self.wait_ended = True
         self.myanim.run_canvas()
-        if synchronize == False:
-            self.independent_iterator(self.myanim, self.myanim.replot_call)
 
     @QtCore.pyqtSlot()
     def play3DAnimation(self):
@@ -103,10 +101,11 @@ class Runner(QtCore.QObject):
             zc = 1  # this is to keep reshape function operational, and preserve
                     # layer outline structure, see below
         pool = Pool()
-        multiple_results = [pool.apply_async(process_fortran_list, (self.tdata[i], xc, yc, zc))
+        multiple_results = [pool.apply_async(normalize_fortran_list, (self.tdata[i], xc, yc, zc))
                             for i in range(len(self.tdata))]
         self.color_list = [result.get(timeout=12) for result in multiple_results]
-
+        for i in self.color_list[10]:
+            print(i)
         print("Elaped on getting all vectors: {}".format(time.time()-start))
         animation3d = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
         fps_display = pyglet.window.FPSDisplay(animation3d)
@@ -218,6 +217,7 @@ class Runner(QtCore.QObject):
             self.list_guard()
             instance.i += 1
             instance.callback()
+
     def update_progress_bar(self, i):
         k = (i*100/self.iterations)
         k = int(k)

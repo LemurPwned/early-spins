@@ -6,6 +6,7 @@ from pyglet.window import key, mouse
 from OpenGL.GLUT import *
 from CPU3D.camera_calculations import *
 import pathlib
+import numpy as np
 
 WINDOW = 700
 INCREMENT = 5
@@ -19,7 +20,7 @@ class Window(pyglet.window.Window):
         self.i = 0
         self.cl = True  # this variable provides color inversion
         self.cube = True
-        self.spacer = 0.707
+        self.spacer = 1.5
         self.round = False
         self.record = True
         if self.record:
@@ -55,9 +56,12 @@ class Window(pyglet.window.Window):
         width, height = self.get_size()
         uni.proj = perspective(60.0, width / height, 0.1, 256.0)
 
-    def draw_vector(self, vec, color=[0, 0, 0]):
+    def draw_vector(self, vec, color=[0, 0, 0], a=[1,1,0], b= [-1,-1,0]):
+        # [1,1,0] x, y ,z - red
+        # [-1,-1,0] x, y, z - blue
         glLineWidth(3)
-        glColor3f(color[0], color[1], color[2])
+        #glColor3f(color[0], color[1], color[2])
+        glColor3f(np.dot(a, color), np.dot(b, color), 0)
         glBegin(GL_LINES)
         glVertex3f(vec[0], vec[1], vec[2])
         glVertex3f(vec[3]+color[0], vec[4]+color[1], vec[5]+color[2])
@@ -67,40 +71,46 @@ class Window(pyglet.window.Window):
         glVertex3f(vec[3]+color[0], vec[4]+color[1], vec[5]+color[2])
         glEnd()
 
-    def draw_cube(self, vec, color=[1,0,1]):
+    def draw_cube(self, vec, color=[1,0,1], a=[1,1,0], b= [-1,-1,0]):
         glBegin(GL_QUADS)
         #TOP FACE
-        glColor3f(color[0], color[1],color[2])
+        #glColor3f(color[0], color[1],color[2])
+        glColor3f(np.dot(a, color), np.dot(b, color), 0)
         glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
         glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
         #BOTTOM FACE
-        glColor3f(color[0], color[1],color[2])
+        glColor3f(np.dot(a, color), np.dot(b, color), 0)
+        #glColor3f(color[0], color[1],color[2])
         glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
         glVertex3f(vec[3], vec[4], vec[5])
         glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
         glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
         #FRONT FACE
-        glColor3f(color[0], color[1],color[2])
+        glColor3f(np.dot(a, color), np.dot(b, color), 0)
+        #glColor3f(color[0], color[1],color[2])
         glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
         glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
         #BACK FACE
-        glColor3f(color[0], color[1],color[2])
+        glColor3f(np.dot(a, color), np.dot(b, color), 0)
+        #glColor3f(color[0], color[1],color[2])
         glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4], vec[5])
         glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
         #RIGHT FACE
-        glColor3f(color[0], color[1],color[2])
+        glColor3f(np.dot(a, color), np.dot(b, color), 0)
+        #glColor3f(color[0], color[1],color[2])
         glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
         glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
         glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
         glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
         #LEFT FACE
-        glColor3f(color[0], color[1],color[2])
+        glColor3f(np.dot(a, color), np.dot(b, color), 0)
+        #glColor3f(color[0], color[1],color[2])
         glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4], vec[5])
