@@ -1,6 +1,11 @@
 from CPU3D.pyglet1 import *
 from CPU3D.anims import *
+from CPU3D.input_parser import *
 import time
+from multiprocessing import Pool
+import threading
+import sys
+
 
 class Runner(QtCore.QObject):
     signalStatus = QtCore.pyqtSignal(str)
@@ -22,6 +27,7 @@ class Runner(QtCore.QObject):
         self.layer = 4 # indexing starts from 1 to reduce redundancy
         self.wait_ended = False # control variable, orders one animation to wait for the other
         self.i = 0 # multiclass iterator to which all clases should synchronize
+        self.bar = ""
 
     def prepare_run(self):
         if self.directory=="":
@@ -34,6 +40,13 @@ class Runner(QtCore.QObject):
 
         self.simulateDirectory(self.directory, self.fformat, self.headerFile, self.filetype)
         print("Preparing to generate animations...")
+
+    def spawn_instance(self, instance, function):
+        try:
+            Thread(target = instance).start()
+        except RuntimeError:
+            # TODO: handle it
+            pass
 
     @QtCore.pyqtSlot()
     def play2DAnimation(self):
@@ -52,7 +65,7 @@ class Runner(QtCore.QObject):
         self.myanim.run_canvas()
 
     @QtCore.pyqtSlot()
-    def play2DGraph(self):
+    def play2DGraph(self, column='MR::magnetoresistance' ):
         """
         this instance allows for creating dynamic graphs that follow an
         animation
@@ -63,7 +76,8 @@ class Runner(QtCore.QObject):
         self.myanim.reshape_data()
         self.myanim.iterations = self.iterations
         self.myanim.current_layer = 0
-        self.myanim.graph_data = self.header['UZeeman::Energy'].tolist()[0:self.iterations]
+        self.myanim.graph_data = self.header[column].tolist()[0:self.iterations]
+        self.myanim.title = 'magnetoresistance'
         #TODO: ask about the above, it seems that header contains more data
         # than available in iterations
         self.myanim.create_plot_canvas()
@@ -87,10 +101,11 @@ class Runner(QtCore.QObject):
             zc = 1  # this is to keep reshape function operational, and preserve
                     # layer outline structure, see below
         pool = Pool()
-        multiple_results = [pool.apply_async(process_fortran_list, (self.tdata[i], xc, yc, zc))
+        multiple_results = [pool.apply_async(normalize_fortran_list, (self.tdata[i], xc, yc, zc))
                             for i in range(len(self.tdata))]
         self.color_list = [result.get(timeout=12) for result in multiple_results]
-
+        for i in self.color_list[10]:
+            print(i)
         print("Elaped on getting all vectors: {}".format(time.time()-start))
         animation3d = Window(WINDOW, WINDOW, 'Pyglet Colored Cube')
         fps_display = pyglet.window.FPSDisplay(animation3d)
@@ -149,7 +164,7 @@ class Runner(QtCore.QObject):
     def simulateDirectory(self, path_to_folder, extension, path_to_header_file, filetype):
         t1 = time.time()
         self.tdata, self.tbase_data = self.getAllFiles(path_to_folder, extension, filetype)
-        print("Reading files took: {}".format(time.time()-t1))
+        print("\nReading files took: {}".format(time.time()-t1))
         self.header, self.stages = odt_reader(path_to_header_file) #new odt format reader, more universal
         print("Maximum number of iterations : {}".format(self.iterations))
 
@@ -167,12 +182,15 @@ class Runner(QtCore.QObject):
         fileList.sort()
         self.iterations = len(fileList)
         file_pool = Pool()
+        p = 0
         if filetype == 'binary':
             multiple_results = [file_pool.apply_async(binary_read, (filename,))
                                     for filename in fileList]
             for result in multiple_results:
+                self.update_progress_bar(p)
                 tbd, tdf = result.get(timeout=12)
                 data.append(tdf)
+                p+= 1
                 if len(base_data) == 0:
                     base_data.append(tbd)
         elif filetype == 'text':
@@ -181,8 +199,10 @@ class Runner(QtCore.QObject):
             multiple_results = [file_pool.apply_async(fortran_list, (filename,))
                                     for filename in fileList]
             for result in multiple_results:
+                self.update_progress_bar(p)
                 df = result.get(timeout=12)
                 data.append(df)
+                p+=1
         return data, base_data
 
     def list_guard(self):
@@ -190,3 +210,18 @@ class Runner(QtCore.QObject):
             self.i = 0
         if self.i > self.iterations-1:
             self.i = 0
+
+    def independent_iterator(self, instance, callback):
+        print("Iterating")
+        while(True):
+            self.list_guard()
+            instance.i += 1
+            instance.callback()
+
+    def update_progress_bar(self, i):
+        k = (i*100/self.iterations)
+        k = int(k)
+        sys.stdout.write('\r')
+        sys.stdout.write('[%-100s] %d%%'%('='*(k+2),k+2))
+        sys.stdout.flush()
+        time.sleep(0.02)

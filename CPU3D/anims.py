@@ -20,6 +20,8 @@ class Animation():
         self.i = 0
         self.graph_data = []
         self.null_data = []
+        self.title = 'Magnetization'
+        self.canvas_type = None
 
     def reshape_data(self):
         '''
@@ -36,8 +38,10 @@ class Animation():
         self.dx, self.dy = np.meshgrid(x,y)
 
     #INDEPENDENT graph_panels
-    def create_plot_canvas(self, title='Magnetization'):
-        self.fig = plt.figure
+    def create_plot_canvas(self):
+        self.canvas_type = 'panel'
+        self.fig = plt.figure()
+        self.fig.suptitle(self.title)
         self.ax_pl = plt.subplot(111)
         self.i = self.i
         self.null_data = [x for x in range(self.iterations)]
@@ -55,8 +59,9 @@ class Animation():
 
     #WIDGETS
     def create_button_canvas(self, title='Magnetization'):
+        self.canvas = 'widget'
         self.fig = plt.figure()
-        self.fig.suptitle(title)
+        self.fig.suptitle(self.title)
         self.ax_pl = plt.subplot(111)
         self.ax_pl = plt.subplot2grid((5,5),(0,0),colspan=5,rowspan=3)  # axes_plot
         self.ax_bl = plt.subplot2grid((5,5),(4,0),colspan=2,rowspan=1)  # axes_button_left
@@ -75,7 +80,7 @@ class Animation():
 
     def create_canvas(self, title='Magnetization'):
         self.fig = plt.figure()
-        self.fig.suptitle(title)
+        self.fig.suptitle(self.title)
         self.ax_pl = plt.subplot(111)
         self.i = self.i
         scat = self.ax_pl.scatter(self.dx, self.dy,
@@ -92,6 +97,15 @@ class Animation():
         self.ax_pl.set_title('{}/{}'.format(self.i,
                 self.current_single_layer.shape[0]-1))
         self.ax_pl.get_figure().canvas.draw()
+
+    def replot_call(self):
+        """
+        verifies the instance of canvas and calls correct replot
+        """
+        if self.canvas_type == 'widget':
+            self.replot_data()
+        elif self.canvas_type == 'panel':
+            self.replot()
 
     def left_cl(self, event):
         if self.i > 0:
@@ -131,7 +145,7 @@ class Animation():
         c = self.current_single_layer[0]
         scat = plt.scatter(self.dx, self.dy,
                             c=tuple(c), cmap=cm.jet)
-        fig.suptitle(title)
+        fig.suptitle(self.title)
         fig.colorbar(scat)
         fig.canvas.mpl_connect('button_press_event', self.onPress)
         self.ani = animation.FuncAnimation(fig, update,
