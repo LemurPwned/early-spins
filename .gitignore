@@ -1,4 +1,9 @@
 __pycache__
 *.pyc
 *.xml
-.idea/dziala-niedziala.iml
+
+#pawelkulig1 virtualenv:
+early_spins_vn
+
+.idea*
+.DS*
