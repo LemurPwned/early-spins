@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
 from MainWindowTemplate import Ui_MainWindow
 
 #from mainWindow import GLWidget, Helper
@@ -15,13 +15,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.openGLWidget.initializeGL()
         self.openGLWidget.resizeGL(800, 600)
-        canvas = DrawData()
+        self.canvas = DrawData()
+        self.canvas.initialSettings()
         #self.openGLWidget = canvas
-        self.openGLWidget.paintGL = canvas.paintGL #canvas.draw_cordinate_system()
+        self.openGLWidget.paintGL = self.canvas.paintGL #canvas.draw_cordinate_system()
 
-        #timer = QTimer(self)
-        #timer.timeout.connect(self.openGLWidget.update)
-        #timer.start(5000)
+        timer = QTimer(self)
+        timer.timeout.connect(self.openGLWidget.update)
+        timer.start(0)
+        self.addButtons()
+
+    def addButtons(self):
+        camLeft = QPushButton("Camera Left", self)
+        camRight = QPushButton("Camera Right", self)
+        camLeft.move(1000, 200)
+        camRight.move(1000, 250)
+        camLeft.clicked.connect(self.canvas.cameraLeft)
+        camRight.clicked.connect(self.canvas.cameraRight)
+        #self.openGLWidget.update()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

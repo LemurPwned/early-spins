@@ -5,7 +5,7 @@ import math
 window = 0												# glut window number
 
 # initial position of the rectangle
-rect_x = 0
+'''rect_x = 0
 rect_y = 200
 
 # constants
@@ -36,9 +36,10 @@ def refresh2d(width, height):
 	glOrtho(0.0, width, 0.0, height, 0.0, 1.0)
 	glMatrixMode (GL_MODELVIEW)
 	glLoadIdentity()
-
+'''
 def draw():												# ondraw is called all the time
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)	# clear the screen
+	pass
+	'''glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)	# clear the screen
 	glLoadIdentity()									# reset position
 
 	# ToDo draw rectangle
@@ -46,27 +47,29 @@ def draw():												# ondraw is called all the time
 	glColor3f(0.0, 0.0, 2.0)
 	draw_rect(rect_x, rect_y, RECT_WIDTH, RECT_HEIGHT)
 	glutSwapBuffers()									# important for double buffering
-
+'''
 
 
 def mouseControl( mx, my):
 
-	global rect_x, rect_y, dx, dy, s, mouse_x, mouse_y
+	#global rect_x, rect_y, dx, dy, s, mouse_x, mouse_y
 
-	my_new = height - my
-	mouse_x = mx
-	mouse_y = my_new
+	#my_new = height - my
+	#mouse_x = mx
+	#mouse_y = my_new
 
-	dif_x = mx - rect_x									# differnce between position of mouse cursor and rectangle to x
+	'''dif_x = mx - rect_x									# differnce between position of mouse cursor and rectangle to x
 	dif_y = my_new - rect_y								# differnce between position of mouse cursor and rectangle to y
 
 	s = math.sqrt(dif_x ** 2 + dif_y ** 2)
 	k = v / s
+	#k=0
 	dx = k * dif_x
-	dy = k * dif_y
+	dy = k * dif_y'''
+	print(mx, my)
 
 
-def movement(value):
+'''def movement(value):
 
 	global rect_x, rect_y, mouse_x, mouse_y
 
@@ -84,15 +87,20 @@ def movement(value):
 
 	glutTimerFunc(RECT_DELAY, movement, 0)
 
+	'''
 
-# initialization
-glutInit()												# initialize glut
-glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH)
-glutInitWindowSize(width, height)						# set window size
-glutInitWindowPosition(10, 0)							# set window position
-window = glutCreateWindow("Approaching rectangle")				# create window with title
-glutDisplayFunc(draw)									# set draw function callback
-glutIdleFunc(draw)										# draw all the time
-glutPassiveMotionFunc(mouseControl)
-glutTimerFunc(RECT_DELAY, movement, 0)
-glutMainLoop()
+def paintGL():
+	# initialization
+	glutInit()												# initialize glut
+	#glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH)
+	#glutInitWindowSize(800, 600)						# set window size
+	#glutInitWindowPosition(10, 0)							# set window position
+	window = glutCreateWindow("Approaching rectangle")				# create window with title
+	glutDisplayFunc(draw)									# set draw function callback
+	glutIdleFunc(draw)										# draw all the time
+	glutPassiveMotionFunc(mouseControl)
+	#glutTimerFunc(RECT_DELAY, movement, 0)
+	glutMainLoop()
+
+if __name__ == "__main__":
+	paintGL()

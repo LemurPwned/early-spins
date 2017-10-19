@@ -3,11 +3,13 @@ from OpenGL.GLUT import *
 from OpenGL.GLU import *
 import numpy as np
 
-from PyQt5.QtCore import QPoint
+from PyQt5.QtWidgets import QWidget, QLabel
 
 class DrawData():
     def __init__(self):
-        pass
+        self.rotation = [0,0,0]
+        self.position = [0,-1,-10]
+        self.initialRun = True
 
     def draw_vector(self, vec, color=[0, 0, 0], a=[1,1,0], b= [-1,-1,0]):
         # [1,1,0] x, y ,z - red
@@ -29,32 +31,31 @@ class DrawData():
         self.draw_vector([0, 0, 0, 0, size, 0], [0, 1, 0]) #y
         self.draw_vector([0, 0, 0, 0, 0, size], [0, 0, 1]) #z'''
 
-    def mouseMoveEvent(self, event):
-        dx = event.x() - self.lastPos.x()
-        dy = event.y() - self.lastPos.y()
+    def cameraLeft(self):
+        self.rotation[0] += 5
 
-        '''if event.buttons() & Qt.LeftButton:
-            self.setXRotation(self.xRot + 8 * dy)
-            self.setYRotation(self.yRot + 8 * dx)
-        elif event.buttons() & Qt.RightButton:
-            self.setXRotation(self.xRot + 8 * dy)
-            self.setZRotation(self.zRot + 8 * dx)
+    def cameraRight(self):
+        self.rotation[0] -= 5
 
-        self.lastPos = event.pos()    '''
+    def initialSettings(self):
+        self.position = [0, -1, -10]
 
-    #@staticmethod
     def paintGL(self):
         '''testing purposes'''
         glClear(GL_COLOR_BUFFER_BIT)
         self.draw_cordinate_system(5)
-        '''for i in range(3):
-            glColor3f(1,0,0);
-            glBegin(GL_TRIANGLES);
+        if self.initialRun:
+            self.initialSettings()
+            gluPerspective(90, 651/551, 0.1, 50.0)
+            self.initialRun = False
 
-            glVertex3f(-0.5,-0.5,i);
-            glVertex3f(0.5,-0.5,0);
-            glVertex3f(0.0,0.5,0);
-            glEnd()'''
 
-        gluPerspective(90, 651/551, 0.1, 50.0)
-        glTranslatef(0, -1, -10)
+        glTranslate(self.position[0], self.position[1], self.position[2])
+        glRotatef(self.rotation[0], 0, 1, 0)  # weird
+        glRotatef(self.rotation[1], 1, 0, 0)  # weird
+        glRotatef(self.rotation[2], 0, 0, 1)
+        self.position = [0,0,0]
+        self.rotation = [0,0,0]
+        #self.cameraLeft()
+
+        #glTranslatef(0, -1, -10)
