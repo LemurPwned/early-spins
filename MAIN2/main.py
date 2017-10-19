@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 from MainWindowTemplate import Ui_MainWindow
 
 #from mainWindow import GLWidget, Helper
-from structureDrawer import paintGL
+from structureDrawer import DrawData
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -15,11 +15,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.openGLWidget.initializeGL()
         self.openGLWidget.resizeGL(800, 600)
-        self.openGLWidget.paintGL = paintGL
+        canvas = DrawData()
+        #self.openGLWidget = canvas
+        self.openGLWidget.paintGL = canvas.paintGL #canvas.draw_cordinate_system()
 
-        timer = QTimer(self)
-        timer.timeout.connect(self.openGLWidget.update)
-        timer.start(1000)
+        #timer = QTimer(self)
+        #timer.timeout.connect(self.openGLWidget.update)
+        #timer.start(5000)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
