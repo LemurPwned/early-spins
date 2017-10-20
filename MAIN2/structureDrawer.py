@@ -43,6 +43,7 @@ class DrawData():
     def paintGL(self):
         '''testing purposes'''
         glClear(GL_COLOR_BUFFER_BIT)
+        print(glGetString(GL_VERSION))
         self.draw_cordinate_system(5)
         if self.initialRun:
             self.initialSettings()
