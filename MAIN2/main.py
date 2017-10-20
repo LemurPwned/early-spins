@@ -25,7 +25,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         timer.start(0)
         self.addButtons()
 
+    def events(self):
+        self.actionLoad_Directory.clicked.connect()
+
+
     def addButtons(self):
+        '''temp function unless mouse operation disabled'''
         camLeft = QPushButton("Camera Left", self)
         camRight = QPushButton("Camera Right", self)
         camLeft.move(1000, 200)
