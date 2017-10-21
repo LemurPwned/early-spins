@@ -1,12 +1,12 @@
 import sys
 
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, QPoint
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
 from MainWindowTemplate import Ui_MainWindow
 
 #from mainWindow import GLWidget, Helper
 from structureDrawer import DrawData
-from pyqtMatplotlib import PlotCanvas
+from plotCanvas import PlotCanvas
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -14,19 +14,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setWindowTitle("ESE - Early Spins Enviroment")
         self.setGeometry(10,10,1280, 768)
+        self.setupGL()
+
+        self.addButtons() #temp function
+        self.events()
+
+        self.gridSize = 1
+
+    def setupGL(self):
         self.openGLWidget.initializeGL()
-        self.openGLWidget.resizeGL(800, 600)
+
         self.canvas = DrawData()
         self.canvas.initialSettings()
-        #self.openGLWidget = canvas
-        self.openGLWidget.paintGL = self.canvas.paintGL #canvas.draw_cordinate_system()
+        self.openGLWidget.paintGL = self.canvas.paintGL
 
         timer = QTimer(self)
         timer.timeout.connect(self.openGLWidget.update)
         timer.start(0)
 
-        self.addButtons()
-        self.events()
+        self.make1WindowGrid()
 
     def events(self):
         #FILE SUBMENU
@@ -38,21 +44,91 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #self.actionAnimation.clicked.connect()
 
         #VIEW SUBMENU
-        self.action2_Window_Grid.triggered.connect(self.make2WindowsGrid)
-        #self.action4_Windows_Grid.clicked.connect()
+        self.action1_Window_Grid.triggered.connect(self.make1WindowGrid)
+        self.action2_Windows_Grid.triggered.connect(self.make2WindowsGrid)
+        self.action4_Windows_Grid.triggered.connect(self.make4WindowsGrid)
+
+    def resizeEvent(self, event):
+        if self.gridSize == 1:
+            self.make1WindowGrid()
+        elif self.gridSize == 2:
+            self.make2WindowsGrid()
+        elif self.gridSize == 4:
+            self.make4WindowsGrid
+        #print(event)
+
+
+    def make1WindowGrid(self):
+        self.gridSize = 1
+        try:
+            self.canvasPlot1.hide()
+        except:
+            pass
+
+        try:
+            self.canvasPlot2.hide()
+        except:
+            pass
+
+        try:
+            self.canvasPlot3.hide()
+        except:
+            pass
+
+        self.openGLWidget.setGeometry(50, 15, self.width()-100, self.height()-50)
 
 
     def make2WindowsGrid(self):
+        self.gridSize = 2
         middlePos = (self.width())/2
         self.openGLWidget.setGeometry(self.openGLWidget.pos().x(), self.openGLWidget.pos().y(), middlePos-50, self.height())
 
         #create matplotlib window
-        self.canvasPlot1 = PlotCanvas(self, width=5, height=5)
-        self.canvasPlot1.move(middlePos+50, self.openGLWidget.pos().y())
-        self.canvasPlot1.resize(100, 100)
+        try:
+            self.canvasPlot1.show()
+        except:
+            self.canvasPlot1 = PlotCanvas(self, width=5, height=4)
+        self.canvasPlot1.move(middlePos+50, 10)
+        self.canvasPlot1.resize((self.width()/2)-50, self.height()-25)
+        self.canvasPlot1.show()
 
-        #width of the other widget
+        try:
+            self.canvasPlot2.hide()
+            self.canvasPlot3.hide()
+        except:
+            pass
 
+
+    def make4WindowsGrid(self):
+        self.gridSize = 4
+        middleWidthPos = (self.width())/2
+        middleHeightPos = (self.height())/2
+
+        self.openGLWidget.setGeometry(self.openGLWidget.pos().x(), self.openGLWidget.pos().y(), middleWidthPos - 50, middleHeightPos - 25)
+
+        #create matplotlib window right top corner
+        try:
+            self.canvasPlot1.show()
+        except:
+            self.canvasPlot1 = PlotCanvas(self, width=5, height=4)
+        self.canvasPlot1.setGeometry(middleWidthPos+25, 15, (self.width()/2-25), (self.height()/2)-15)
+        self.canvasPlot1.show()
+
+        #create matplotlib window left bottom corner
+        try:
+            self.canvasPlot2.show()
+        except:
+            self.canvasPlot2 = PlotCanvas(self, width=5, height=4)
+        self.canvasPlot2.setGeometry(25, middleHeightPos + 15, (self.width()/2-25), (self.height()/2)-30)
+        self.canvasPlot2.show()
+
+        #create matplotlib window left bottom corner
+        try:
+            self.canvasPlot3.show()
+        except:
+            self.canvasPlot3 = PlotCanvas(self, width=5, height=4)
+        self.canvasPlot3.setGeometry(middleWidthPos + 25, middleHeightPos + 15, (self.width()/2-25), (self.height()/2)-30)
+        self.canvasPlot3.show()
 
     def addButtons(self):
         '''temp function unless mouse operation disabled'''
