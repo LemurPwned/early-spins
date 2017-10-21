@@ -2,11 +2,13 @@ import sys
 
 from PyQt5.QtCore import QTimer, QPoint
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
+
 from MainWindowTemplate import Ui_MainWindow
 
 #from mainWindow import GLWidget, Helper
 from structureDrawer import DrawData
 from plotCanvas import PlotCanvas
+from animationSettings import AnimationSettings
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -41,7 +43,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         #EDIT SUBMENU
         #self.actionPlot.clicked.connect()
-        #self.actionAnimation.clicked.connect()
+        self.actionAnimation.triggered.connect(self.showAnimationSettings)
 
         #VIEW SUBMENU
         self.action1_Window_Grid.triggered.connect(self.make1WindowGrid)
@@ -57,6 +59,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.make4WindowsGrid
         #print(event)
 
+
+    def showAnimationSettings(self):
+        self.animationSettingsWindow = AnimationSettings()
+        
 
     def make1WindowGrid(self):
         self.gridSize = 1
