@@ -17,11 +17,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle("ESE - Early Spins Enviroment")
         self.setGeometry(10,10,1280, 768)
         self.setupGL()
+        self.gridSize = 1
+
+        self.make1WindowGrid()
+        #self.resizeEvent()
 
         self.addButtons() #temp function
         self.events()
 
-        self.gridSize = 1
 
     def setupGL(self):
         self.openGLWidget.initializeGL()
@@ -33,8 +36,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         timer = QTimer(self)
         timer.timeout.connect(self.openGLWidget.update)
         timer.start(0)
-
-        self.make1WindowGrid()
 
     def events(self):
         #FILE SUBMENU
@@ -51,18 +52,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action4_Windows_Grid.triggered.connect(self.make4WindowsGrid)
 
     def resizeEvent(self, event):
+        print(event)
+        self.verticalLayoutWidget.setGeometry(0, 0, self.width()-5, self.height()-5)
+        self.progressBar.setGeometry(5, (self.height()-35), (self.width()-10), self.height()-25)
+        self.statusBar_label.setGeometry(5, self.height()-45, self.width()-10, self.height()-35)
+
         if self.gridSize == 1:
             self.make1WindowGrid()
         elif self.gridSize == 2:
             self.make2WindowsGrid()
         elif self.gridSize == 4:
-            self.make4WindowsGrid
+            self.make4WindowsGrid()
+
+
         #print(event)
 
 
     def showAnimationSettings(self):
         self.animationSettingsWindow = AnimationSettings()
-        
+
 
     def make1WindowGrid(self):
         self.gridSize = 1
@@ -81,21 +89,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         except:
             pass
 
-        self.openGLWidget.setGeometry(50, 15, self.width()-100, self.height()-50)
+        self.openGLWidget.setGeometry(0, 0, self.width()-100, self.height()-100)
 
 
     def make2WindowsGrid(self):
         self.gridSize = 2
         middlePos = (self.width())/2
-        self.openGLWidget.setGeometry(self.openGLWidget.pos().x(), self.openGLWidget.pos().y(), middlePos-50, self.height())
+        self.openGLWidget.setGeometry(0,0, middlePos-5, self.height()-20)
 
         #create matplotlib window
         try:
             self.canvasPlot1.show()
         except:
             self.canvasPlot1 = PlotCanvas(self, width=5, height=4)
-        self.canvasPlot1.move(middlePos+50, 10)
-        self.canvasPlot1.resize((self.width()/2)-50, self.height()-25)
+        self.canvasPlot1.setGeometry(middlePos+5, 0, self.width()/2-5, self.height()-50)
+        #self.canvasPlot1.resize((, self.height()-25)
         self.canvasPlot1.show()
 
         try:
@@ -110,14 +118,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         middleWidthPos = (self.width())/2
         middleHeightPos = (self.height())/2
 
-        self.openGLWidget.setGeometry(self.openGLWidget.pos().x(), self.openGLWidget.pos().y(), middleWidthPos - 50, middleHeightPos - 25)
+        self.openGLWidget.setGeometry(0, 0, middleWidthPos - 5, middleHeightPos - 5)
 
         #create matplotlib window right top corner
         try:
             self.canvasPlot1.show()
         except:
             self.canvasPlot1 = PlotCanvas(self, width=5, height=4)
-        self.canvasPlot1.setGeometry(middleWidthPos+25, 15, (self.width()/2-25), (self.height()/2)-15)
+        self.canvasPlot1.setGeometry(middleWidthPos + 5, 0, (self.width()/2 - 5), (self.height()/2)-5)
         self.canvasPlot1.show()
 
         #create matplotlib window left bottom corner
@@ -125,7 +133,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.canvasPlot2.show()
         except:
             self.canvasPlot2 = PlotCanvas(self, width=5, height=4)
-        self.canvasPlot2.setGeometry(25, middleHeightPos + 15, (self.width()/2-25), (self.height()/2)-30)
+        self.canvasPlot2.setGeometry(0, middleHeightPos + 5, (self.width()/2-5), (self.height()/2)-50)
         self.canvasPlot2.show()
 
         #create matplotlib window left bottom corner
@@ -133,7 +141,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.canvasPlot3.show()
         except:
             self.canvasPlot3 = PlotCanvas(self, width=5, height=4)
-        self.canvasPlot3.setGeometry(middleWidthPos + 25, middleHeightPos + 15, (self.width()/2-25), (self.height()/2)-30)
+        self.canvasPlot3.setGeometry(middleWidthPos + 5, middleHeightPos + 5, (self.width()/2-5), (self.height()/2)-50)
         self.canvasPlot3.show()
 
     def addButtons(self):
