@@ -24,7 +24,7 @@ class DrawData():
         return base_data, data, vectors_list
 
     def draw_cube(self, vec, color=[1,0,1], a=[1,1,0], b= [-1,-1,0]):
-        glBegin(GL_QUADS)
+        #glBegin(GL_QUADS)
         #TOP FACE
         glColor3f(color[0], color[1],color[2])
         glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
@@ -61,7 +61,7 @@ class DrawData():
         glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4], vec[5])
         glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
-        glEnd()
+        #glEnd()
 
     def draw_vector(self, vec, color=[0, 0, 0], a=[1,1,0], b= [-1,-1,0]):
         # [1,1,0] x, y ,z - red
@@ -76,6 +76,7 @@ class DrawData():
         glPointSize(5)
         glBegin(GL_POINTS)
         glVertex3f(vec[3]+color[0], vec[4]+color[1], vec[5]+color[2])
+
         glEnd()
 
     def draw_cordinate_system(self, size=5):
@@ -93,10 +94,24 @@ class DrawData():
         self.position = [0, -1, -10]
 
     def first_draw(self):
-        filename = "/home/lemurpwned/repos/early-spins/data/firstData/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000800.omf"
+        filename = "../data/firstData/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000800.omf"
         bd, d , vec = self.extract_data(filename)
         print(len(vec))
         self.vec = vec
+
+        self.theTorus = glGenLists (1);
+        glNewList(self.theTorus, GL_COMPILE);
+        self.cubestr();
+        glEndList();
+
+        glShadeModel(GL_FLAT);
+        glClearColor(0.0, 0.0, 0.0, 0.0);
+
+    def cubestr(self):
+        glBegin(GL_QUADS)
+        for vector in self.vec:
+            self.draw_cube(vector)
+        glEnd()
 
     def paintGL(self):
         '''testing purposes'''
@@ -112,9 +127,9 @@ class DrawData():
             gluPerspective(90, 651/551, 0.1, 50.0)
             self.first_draw()
             self.initialRun = False
-
-        for vector in self.vec:
-            self.draw_cube(vector)
+        glColor3f (1.0, 1.0, 1.0);
+        glCallList(self.theTorus);
+        glFlush();
 
         glTranslate(self.position[0], self.position[1], self.position[2])
         glRotatef(self.rotation[0], 0, 1, 0)  # weird
