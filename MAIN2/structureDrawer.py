@@ -99,15 +99,15 @@ class DrawData():
         print(len(vec))
         self.vec = vec
 
-        self.theTorus = glGenLists (1);
-        glNewList(self.theTorus, GL_COMPILE);
-        self.cubestr();
+        self.spin_struc = glGenLists (1);
+        glNewList(self.spin_struc, GL_COMPILE);
+        self.spins();
         glEndList();
 
         glShadeModel(GL_FLAT);
         glClearColor(0.0, 0.0, 0.0, 0.0);
 
-    def cubestr(self):
+    def spins(self):
         glBegin(GL_QUADS)
         for vector in self.vec:
             self.draw_cube(vector)
@@ -128,7 +128,7 @@ class DrawData():
             self.first_draw()
             self.initialRun = False
         glColor3f (1.0, 1.0, 1.0);
-        glCallList(self.theTorus);
+        glCallList(self.spin_struc);
         glFlush();
 
         glTranslate(self.position[0], self.position[1], self.position[2])
