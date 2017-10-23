@@ -2,6 +2,7 @@ from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
 import numpy as np
+from input_parser import *
 
 from PyQt5.QtWidgets import QWidget, QLabel
 
@@ -10,47 +11,52 @@ class DrawData():
         self.rotation = [0,0,0]
         self.position = [0,-1,-10]
         self.initialRun = True
+        self.spacer = 0.2
+
+    def extract_data(self, filename):
+        base_data, _ = extract_base_data(filename)
+        data = fortran_list(filename)
+        xc = int(base_data['xnodes'])
+        yc = int(base_data['ynodes'])
+        zc = int(base_data['znodes'])
+        data = normalize_fortran_list(data, xc, yc, zc)
+        vectors_list = construct_layer_outline(base_data)
+        return base_data, data, vectors_list
 
     def draw_cube(self, vec, color=[1,0,1], a=[1,1,0], b= [-1,-1,0]):
         glBegin(GL_QUADS)
         #TOP FACE
-        #glColor3f(color[0], color[1],color[2])
-        glColor3f(np.dot(a, color), np.dot(b, color), 0)
+        glColor3f(color[0], color[1],color[2])
         glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
         glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
         #BOTTOM FACE
-        glColor3f(np.dot(a, color), np.dot(b, color), 0)
-        #glColor3f(color[0], color[1],color[2])
+        glColor3f(color[0], color[1],color[2])
         glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
         glVertex3f(vec[3], vec[4], vec[5])
         glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
         glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
         #FRONT FACE
-        glColor3f(np.dot(a, color), np.dot(b, color), 0)
-        #glColor3f(color[0], color[1],color[2])
+        glColor3f(color[0], color[1],color[2])
         glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
         glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
         #BACK FACE
-        glColor3f(np.dot(a, color), np.dot(b, color), 0)
-        #glColor3f(color[0], color[1],color[2])
+        glColor3f(color[0], color[1],color[2])
         glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4], vec[5])
         glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
         #RIGHT FACE
-        glColor3f(np.dot(a, color), np.dot(b, color), 0)
-        #glColor3f(color[0], color[1],color[2])
+        glColor3f(color[0], color[1],color[2])
         glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
         glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
         glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
         glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
         #LEFT FACE
-        glColor3f(np.dot(a, color), np.dot(b, color), 0)
-        #glColor3f(color[0], color[1],color[2])
+        glColor3f(color[0], color[1],color[2])
         glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
         glVertex3f(vec[3], vec[4], vec[5])
@@ -86,6 +92,12 @@ class DrawData():
     def initialSettings(self):
         self.position = [0, -1, -10]
 
+    def first_draw(self):
+        filename = "/home/lemurpwned/repos/early-spins/data/firstData/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000800.omf"
+        bd, d , vec = self.extract_data(filename)
+        print(len(vec))
+        self.vec = vec
+
     def paintGL(self):
         '''testing purposes'''
         glClear(GL_COLOR_BUFFER_BIT)
@@ -93,11 +105,16 @@ class DrawData():
         self.draw_cordinate_system(5)
         #self.draw_cube()
         self.draw_vector([5,5,5,10,10,10])
+
+        #'self.draw_cube([1,1,1, 1,1,1], color=[1, 0, 1])
         if self.initialRun:
             self.initialSettings()
             gluPerspective(90, 651/551, 0.1, 50.0)
+            self.first_draw()
             self.initialRun = False
 
+        for vector in self.vec:
+            self.draw_cube(vector)
 
         glTranslate(self.position[0], self.position[1], self.position[2])
         glRotatef(self.rotation[0], 0, 1, 0)  # weird
