@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QOpenGLWidget, QSlider,
 
 import OpenGL.GL as gl
 import OpenGL.GLU as glu
+from input_parser import *
 
 class Window(QWidget):
 
@@ -117,7 +118,7 @@ class GLWidget(QOpenGLWidget):
         #self.gl = self.context().versionFunctions()
         #self.gl.initializeOpenGLFunctions()
         self.setClearColor(self.trolltechPurple.darker())
-        self.object = self.makeObject()
+        self.object = self.first_draw()
         gl.glShadeModel(gl.GL_FLAT)
         gl.glEnable(gl.GL_DEPTH_TEST)
         gl.glEnable(gl.GL_CULL_FACE)
@@ -165,7 +166,6 @@ class GLWidget(QOpenGLWidget):
     def makeObject(self):
         genList = gl.glGenLists(1)
         gl.glNewList(genList, gl.GL_COMPILE)
-        vectors = [[0,0,0], [1, 0, 0], [1, 1, 0], [1, 1, 1]]
         #gl.glColor4f(1.0, 1.0, 0.0, 1.0)
         #for x,y,z in zip(range(1), range(1), range(1)):
         gl.glColor3f(0.0,1.0,0.0)
@@ -178,36 +178,74 @@ class GLWidget(QOpenGLWidget):
 
         return genList
 
-    def draw_cube(self):
-        gl.glVertex3f( 1.0, 1.0,-1.0)
-        gl.glVertex3f(-1.0, 1.0,-1.0)
-        gl.glVertex3f(-1.0, 1.0, 1.0)
-        gl.glVertex3f( 1.0, 1.0, 1.0)
+    def extract_data(self, filename):
+        base_data, _ = extract_base_data(filename)
+        data = fortran_list(filename)
+        xc = int(base_data['xnodes'])
+        yc = int(base_data['ynodes'])
+        zc = int(base_data['znodes'])
+        data = normalize_fortran_list(data, xc, yc, zc)
+        vectors_list = construct_layer_outline(base_data)
+        return base_data, data, vectors_list
+    
+    def first_draw(self):
+        filename = "../data/firstData/voltage-spin-diode-Oxs_TimeDriver-Magnetization-00-0000800.omf"
+        bd, d , vec = self.extract_data(filename)
+        print(len(vec))
+        self.vec = vec
 
-        gl.glVertex3f( 1.0,-1.0, 1.0)
-        gl.glVertex3f(-1.0,-1.0, 1.0)
-        gl.glVertex3f(-1.0,-1.0,-1.0)
-        gl.glVertex3f( 1.0,-1.0,-1.0)
+        self.spin_struc = gl.glGenLists (1);
+        gl.glNewList(self.spin_struc, gl.GL_COMPILE);
+        self.spins();
+        gl.glEndList();
 
-        gl.glVertex3f( 1.0, 1.0, 1.0)
-        gl.glVertex3f(-1.0, 1.0, 1.0)
-        gl.glVertex3f(-1.0,-1.0, 1.0)
-        gl.glVertex3f( 1.0,-1.0, 1.0)
+        gl.glShadeModel(gl.GL_FLAT);
+        gl.glClearColor(0.0, 0.0, 0.0, 0.0);
 
-        gl.glVertex3f( 1.0,-1.0,-1.0)
-        gl.glVertex3f(-1.0,-1.0,-1.0)
-        gl.glVertex3f(-1.0, 1.0,-1.0)
-        gl.glVertex3f( 1.0, 1.0,-1.0)
+        return self.spin_struc
 
-        gl.glVertex3f(-1.0, 1.0, 1.0)
-        gl.glVertex3f(-1.0, 1.0,-1.0)
-        gl.glVertex3f(-1.0,-1.0,-1.0)
-        gl.glVertex3f(-1.0,-1.0, 1.0)
+    def spins(self):
+        gl.glBegin(gl.GL_QUADS)
+        for vector in self.vec:
+            self.draw_cube(vector)
+        gl.glEnd()
 
-        gl.glVertex3f( 1.0, 1.0,-1.0)
-        gl.glVertex3f( 1.0, 1.0, 1.0)
-        gl.glVertex3f( 1.0,-1.0, 1.0)
-        gl.glVertex3f( 1.0,-1.0,-1.0)
+    def draw_cube(self, vec, color=[1,0,1], a=[1,1,0], b= [-1,-1,0]):
+        gl.glColor3f(color[0], color[1],color[2])
+        gl.glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
+        gl.glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
+        gl.glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
+        gl.glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
+        #BOTTOM FACE
+        gl.glColor3f(color[0], color[1],color[2])
+        gl.glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
+        gl.glVertex3f(vec[3], vec[4], vec[5])
+        gl.glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
+        gl.glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
+        #FRONT FACE
+        gl.glColor3f(color[0], color[1],color[2])
+        gl.glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
+        gl.glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
+        gl.glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
+        gl.glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
+        #BACK FACE
+        gl.glColor3f(color[0], color[1],color[2])
+        gl.glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
+        gl.glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
+        gl.glVertex3f(vec[3], vec[4], vec[5])
+        gl.glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
+        #RIGHT FACE
+        gl.glColor3f(color[0], color[1],color[2])
+        gl.glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
+        gl.glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
+        gl.glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
+        gl.glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
+        #LEFT FACE
+        gl.glColor3f(color[0], color[1],color[2])
+        gl.glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
+        gl.glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
+        gl.glVertex3f(vec[3], vec[4], vec[5])
+        gl.glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
 
 
     def normalizeAngle(self, angle):

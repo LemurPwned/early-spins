@@ -4,10 +4,17 @@ from OpenGL.GLU import *
 import numpy as np
 from input_parser import *
 
-from PyQt5.QtWidgets import QWidget, QLabel
+from PyQt5.QtCore import QTimer, QPoint, pyqtSignal, Qt
 
-class DrawData():
-    def __init__(self):
+from PyQt5.QtWidgets import QWidget, QLabel
+from PyQt5.QtWidgets import (QApplication, QHBoxLayout, QOpenGLWidget, QSlider,
+                             QWidget)
+class DrawData(QOpenGLWidget):
+    def __init__(self, parent=None):
+        super(DrawData, self).__init__(parent)
+
+        self.lastPos = QPoint()
+        print(self.lastPos.x(), self.lastPos.y())
         self.rotation = [0,0,0]
         self.position = [0,-1,-10]
         self.initialRun = True
@@ -113,6 +120,17 @@ class DrawData():
             self.draw_cube(vector)
         glEnd()
 
+    def mousePressEvent(self, event):
+        self.lastPos = event.pos()
+        print(event.pos())
+
+    def mouseMoveEvent(self, event):
+        dx = event.x() - self.lastPos.x()
+        dy = event.y() - self.lastPos.y()
+        print(dx, dy)
+
+        self.lastPos = event.pos()
+
     def paintGL(self):
         '''testing purposes'''
         glClear(GL_COLOR_BUFFER_BIT)
@@ -127,9 +145,9 @@ class DrawData():
             gluPerspective(90, 651/551, 0.1, 50.0)
             self.first_draw()
             self.initialRun = False
-        glColor3f (1.0, 1.0, 1.0);
-        glCallList(self.spin_struc);
-        glFlush();
+        glColor3f (1.0, 1.0, 1.0)
+        glCallList(self.spin_struc)
+        glFlush()
 
         glTranslate(self.position[0], self.position[1], self.position[2])
         glRotatef(self.rotation[0], 0, 1, 0)  # weird

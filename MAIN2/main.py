@@ -2,7 +2,8 @@ import sys
 
 from PyQt5.QtCore import QTimer, QPoint
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
-
+from PyQt5.QtWidgets import (QHBoxLayout, QOpenGLWidget, QSlider,
+                             QWidget)
 from MainWindowTemplate import Ui_MainWindow
 
 #from mainWindow import GLWidget, Helper
@@ -10,9 +11,11 @@ from structureDrawer import DrawData
 from plotCanvas import PlotCanvas
 from animationSettings import AnimationSettings
 
-class MainWindow(QMainWindow, Ui_MainWindow):
+class MainWindow(QMainWindow, Ui_MainWindow, QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.setMouseTracking(True)
+        self.glWidget = DrawData()
         self.setupUi(self)
         self.setWindowTitle("ESE - Early Spins Enviroment")
         self.setGeometry(10,10,1280, 768)
