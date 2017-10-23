@@ -11,6 +11,52 @@ class DrawData():
         self.position = [0,-1,-10]
         self.initialRun = True
 
+    def draw_cube(self, vec, color=[1,0,1], a=[1,1,0], b= [-1,-1,0]):
+        glBegin(GL_QUADS)
+        #TOP FACE
+        #glColor3f(color[0], color[1],color[2])
+        glColor3f(np.dot(a, color), np.dot(b, color), 0)
+        glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
+        glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
+        #BOTTOM FACE
+        glColor3f(np.dot(a, color), np.dot(b, color), 0)
+        #glColor3f(color[0], color[1],color[2])
+        glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
+        glVertex3f(vec[3], vec[4], vec[5])
+        glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
+        glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
+        #FRONT FACE
+        glColor3f(np.dot(a, color), np.dot(b, color), 0)
+        #glColor3f(color[0], color[1],color[2])
+        glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
+        glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
+        #BACK FACE
+        glColor3f(np.dot(a, color), np.dot(b, color), 0)
+        #glColor3f(color[0], color[1],color[2])
+        glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4], vec[5])
+        glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
+        #RIGHT FACE
+        glColor3f(np.dot(a, color), np.dot(b, color), 0)
+        #glColor3f(color[0], color[1],color[2])
+        glVertex3f(vec[3]+self.spacer, vec[4], vec[5]+self.spacer)
+        glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5]+self.spacer)
+        glVertex3f(vec[3]+self.spacer, vec[4]+self.spacer, vec[5])
+        glVertex3f(vec[3]+self.spacer, vec[4], vec[5])
+        #LEFT FACE
+        glColor3f(np.dot(a, color), np.dot(b, color), 0)
+        #glColor3f(color[0], color[1],color[2])
+        glVertex3f(vec[3], vec[4]+self.spacer, vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4], vec[5]+self.spacer)
+        glVertex3f(vec[3], vec[4], vec[5])
+        glVertex3f(vec[3], vec[4]+self.spacer, vec[5])
+        glEnd()
+
     def draw_vector(self, vec, color=[0, 0, 0], a=[1,1,0], b= [-1,-1,0]):
         # [1,1,0] x, y ,z - red
         # [-1,-1,0] x, y, z - blue
@@ -43,8 +89,10 @@ class DrawData():
     def paintGL(self):
         '''testing purposes'''
         glClear(GL_COLOR_BUFFER_BIT)
-        print(glGetString(GL_VERSION))
+        #print(glGetString(GL_VERSION))
         self.draw_cordinate_system(5)
+        #self.draw_cube()
+        self.draw_vector([5,5,5,10,10,10])
         if self.initialRun:
             self.initialSettings()
             gluPerspective(90, 651/551, 0.1, 50.0)
